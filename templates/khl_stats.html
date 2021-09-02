@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KHL Stats</title>
+</head>
+<body>
+<table border="1", cellpadding="5">
+    <tr>
+        {% for name in stats.0 %}
+        <th>{{ name }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in stats|slice:"1:" %}
+        <tr>
+        {% for stat in row %}
+            <td align="right">{{ stat }}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
