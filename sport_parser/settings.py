@@ -127,3 +127,23 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SEASONS = {
+    '21': 1097,
+    '20': 1045,
+    '19': 851,
+    '18': 671,
+    '17': 468,
+    '16': 405,
+    '15': 309
+}
+
+SEASONS_FIRST_MATCH = {
+    '21': 877160,
+    '20': 872319,
+    '19': 81788,
+    '18': 69800,
+    '17': 55144,
+    '16': 49521,
+    '15': 45900
+}

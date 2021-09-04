@@ -1,6 +1,18 @@
 from django.db import models
 
 
+class KHLMatch(models.Model):
+    """ """
+    match_id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    match_date = models.DateTimeField()
+    season = models.IntegerField()
+    arena = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    viewers = models.IntegerField()
+
+
 class KHLProtocol(models.Model):
     """Таблица с протоколами матчей КХЛ
     created - Дата создания записи
@@ -23,8 +35,8 @@ class KHLProtocol(models.Model):
     """
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    team_id = models.CharField(max_length=100, null=True)
-    match_id = models.IntegerField(null=True)
+    team_id = models.IntegerField()
+    match_id = models.ForeignKey(KHLMatch, on_delete=models.CASCADE)
     g = models.IntegerField(null=True)
     sh = models.IntegerField(null=True)
     sog = models.IntegerField(null=True)
@@ -39,3 +51,15 @@ class KHLProtocol(models.Model):
     nshv = models.TimeField(max_length=100, null=True, blank=True)
     pd = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True)
 
+
+class KHLTeams(models.Model):
+    """ """
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=100)
+    img = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    arena = models.CharField(max_length=100)
+    division = models.CharField(max_length=100)
+    conference = models.CharField(max_length=100)
+    season = models.IntegerField()

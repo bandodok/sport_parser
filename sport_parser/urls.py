@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from sport_parser.views import index
 
 urlpatterns = [
+    path('', index),
     path('admin/', admin.site.urls),
     path('khl/', include('sport_parser.khl.urls'))
 ]
