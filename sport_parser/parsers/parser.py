@@ -4,7 +4,10 @@ from django.conf import settings
 from django.db import transaction
 import pandas as pd
 from bs4 import BeautifulSoup
-from sport_parser.database_services.database import add_khl_protocol_to_database, add_teams_to_database, add_matches_to_database
+from sport_parser.database_services.database import add_khl_protocol_to_database, add_teams_to_database, \
+    add_matches_to_database
+from sport_parser.khl.models import KHLMatch
+from django.db.models import Max
 
 
 def get_score_table():
@@ -172,6 +175,14 @@ def parse_season(first_match_id) -> None:
             add_khl_protocol_to_database(protocol)
         count = 0
         first_match_id += 1
+
+
+def update_protocols() -> None:
+    """Добавляет недостающие протоколы последнего сезона в базу данных"""
+    last_match_id = KHLMatch.objects.aggregate(Max('match_id'))['match_id__max']
+    if not last_match_id:
+        last_match_id = 55143
+    parse_season(last_match_id + 1)
 
 
 def parse_teams():
