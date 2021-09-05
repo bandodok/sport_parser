@@ -1,7 +1,7 @@
-from sport_parser.parsers.parser import get_score_table, parse_season, parse_teams
+from sport_parser.parsers.parser import get_score_table, parse_season, parse_teams, update_protocols, last_updated
 from sport_parser.database_services.database import get_team_stats_view
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 
 def index(request):
@@ -23,4 +23,10 @@ def update_teams(request):
 def stats(request, season):
     update_date = last_updated()
     stats = get_team_stats_view(season)
-    return render(request, 'khl_stats.html', context={'stats': stats})
+    return render(request, 'khl_stats.html', context={'stats': stats, 'update': update_date})
+
+
+def update_protocol(request):
+    update_protocols()
+    return redirect('/khl/stats/21')
+

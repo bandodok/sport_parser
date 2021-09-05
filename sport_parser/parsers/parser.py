@@ -8,6 +8,7 @@ from sport_parser.database_services.database import add_khl_protocol_to_database
     add_matches_to_database
 from sport_parser.khl.models import KHLMatch
 from django.db.models import Max
+from datetime import datetime
 
 
 def get_score_table():
@@ -181,7 +182,11 @@ def update_protocols() -> None:
     """Добавляет недостающие протоколы последнего сезона в базу данных"""
     last_match_id = KHLMatch.objects.aggregate(Max('match_id'))['match_id__max']
     if not last_match_id:
-        last_match_id = 55143
+        parse_season(55144)
+        return
+    last = KHLMatch.objects.get(match_id=last_match_id)
+    last.updated = datetime.now()
+    last.save()
     parse_season(last_match_id + 1)
 
 
