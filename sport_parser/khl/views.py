@@ -23,7 +23,7 @@ def update_teams(request):
 def stats(request, season):
     update_date = last_updated()
     stats = get_team_stats_view(season)
-    return render(request, 'khl_stats.html', context={'stats': stats, 'update': update_date})
+    return render(request, 'khl_stats.html', context={'stats': stats, 'update': update_date, 'season': season})
 
 
 def update_protocol(request):
