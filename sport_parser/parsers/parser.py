@@ -185,6 +185,12 @@ def update_protocols() -> None:
     parse_season(last_match_id + 1)
 
 
+def last_updated():
+    """Возвращает дату последнего обновления БД"""
+    last_update = KHLMatch.objects.aggregate(Max('updated'))['updated__max']
+    return last_update
+
+
 def parse_teams():
     teams = []
     for season in settings.SEASONS.values():
