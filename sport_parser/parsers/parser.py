@@ -1,6 +1,7 @@
 import requests
 import functools
 from django.conf import settings
+from django.db import transaction
 import pandas as pd
 from bs4 import BeautifulSoup
 from sport_parser.database_services.database import add_khl_protocol_to_database, add_teams_to_database, add_matches_to_database
@@ -166,8 +167,9 @@ def parse_season(first_match_id) -> None:
                 break
             continue
         match_info = get_khl_match_info(first_match_id)
-        add_matches_to_database(match_info)
-        add_khl_protocol_to_database(protocol)
+        with transaction.atomic():
+            add_matches_to_database(match_info)
+            add_khl_protocol_to_database(protocol)
         count = 0
         first_match_id += 1
 
