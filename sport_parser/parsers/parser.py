@@ -85,8 +85,8 @@ def get_khl_protocol(match_id):
     """Возвращает протокол по id матча в виде двух списков - для домашней и для гостевой команды"""
     url = f"https://text.khl.ru/text/{match_id}.html"
     soup = _get_request_content(url)
-    team_stats = soup.find_all('div', class_="table-responsive")
-    if not team_stats:
+    match_status = soup.find('dd', class_="b-period_score")
+    if not match_status or match_status.text != 'матч завершен':
         return f'match not found {match_id}'
 
     # Общего количества бросков нет в протоколе, берется отдельно из текстовой трансляции
@@ -118,6 +118,7 @@ def get_khl_protocol(match_id):
         sh_home = int(p1_home) + int(p2_home) + int(p3_home) + int(p4_home)
         sh_guest = int(p1_guest) + int(p2_guest) + int(p3_guest) + int(p4_guest)
 
+    team_stats = soup.find_all('div', class_="table-responsive")
     head = [x.find_all('th') for x in team_stats][0]
     body = [x.find_all('td') for x in team_stats][0]
     columns = [i.text.strip() for i in head]
