@@ -129,8 +129,7 @@ def get_team_stats_view(season):
 
 def get_team_list(season):
     """Возвращает список id команд, отсортированный по названию команд"""
-    team_ids = KHLProtocol.objects.values('team_id').order_by('team_id').distinct()
-    teams = KHLTeams.objects.filter(season=season).filter(id__in=team_ids).order_by('name').values('id')
+    teams = KHLTeams.objects.filter(season=season).order_by('name').values('id')
     return [team['id'] for team in teams]
 
 
