@@ -71,15 +71,17 @@ def get_team_stats_view(season):
         'G',
         'G(A)',
         'FaceOff%',
-        'Blocks',
-        'Blocks(A)',
-        'Blocks%',
-        'DEV%',
         'TimeA',
         'TimeA(A)',
         'TimeA%',
-        'Penalty',
+        'DEV%',
+        'PDO%',
         'Hits',
+        'Blocks',
+        'Blocks(A)',
+        'Blocks%',
+        'Penalty',
+
     ]]
     teams = get_team_list(season)
     for team in teams:
@@ -104,20 +106,23 @@ def get_team_stats_view(season):
         faceoffa = get_opponent_stat(team, 'faceoff', match_list, mode='sum')
 
         shp = f'{format(sh / (sh + sha) * 100, ".2f")}%'
-        sogp = f'{format(sog * 100 / sh, ".2f")}%'
+        sogp = f'{format(sog / sh * 100, ".2f")}%'
         faceoffp = f'{format(faceoff / (faceoff + faceoffa) * 100, ".2f")}%'
         blocksp = f'{format(blocks / (blocks + blocksa) * 100, ".2f")}%'
         devp = f'{format((1 - (soga / sha)) * 100, ".2f")}%'
         time_ap = f'{format(time_a / (time_a + time_aa) * 100, ".2f")}%'
+
+        pdo = f'{format(((sh / (sh + sha)) + (sog / sh)) * 100, ".2f")}%'
 
         time_a = sec_to_time(time_a)
         time_aa = sec_to_time(time_aa)
 
         formated_stats = output_format([
             sh, sha, shp, sog, soga,
-            sogp, g, ga, faceoffp, blocks,
-            blocksa, blocksp, devp, time_a,
-            time_aa, time_ap, penalty, hits
+            sogp, g, ga, faceoffp,
+            time_a, time_aa, time_ap,
+            devp, pdo, hits, blocks,
+            blocksa, blocksp, penalty
         ])
 
         team_stats.extend(formated_stats)
