@@ -1,6 +1,6 @@
 from sport_parser.parsers.parser import get_score_table, parse_season, parse_teams, update_protocols, last_updated
 from sport_parser.database_services.database import get_team_stats_view
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
 
@@ -23,6 +23,8 @@ def update_teams(request):
 def stats(request, season):
     update_date = last_updated()
     stats = get_team_stats_view(season)
+    if len(stats) == 1:
+        raise Http404("Season does not exist")
     return render(request, 'khl_stats.html', context={'stats': stats, 'update': update_date, 'season': season})
 
 
