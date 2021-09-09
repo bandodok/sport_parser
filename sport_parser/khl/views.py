@@ -1,5 +1,8 @@
-from sport_parser.parsers.parser import get_score_table, parse_season, parse_teams, update_protocols, last_updated
-from sport_parser.database_services.database import get_team_stats_view
+from sport_parser.khl.database_services.db_add import last_updated
+from sport_parser.khl.parsers.match_protocol import parse_season, update_protocols
+from sport_parser.khl.parsers.team_info import parse_teams
+from sport_parser.khl.parsers.score_table import get_score_table
+from sport_parser.khl.view_data.season_stats import get_team_stats_view
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
@@ -31,4 +34,3 @@ def stats(request, season):
 def update_protocol(request):
     update_protocols()
     return redirect('/khl/stats/21')
-
