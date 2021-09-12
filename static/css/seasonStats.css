@@ -1,0 +1,134 @@
+* {
+    color: #847c7c;
+}
+
+@keyframes onLoadAppear {
+  0% {
+    transform: translateY(3%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 100%;
+  }
+}
+
+header {
+    margin-top: 30px;
+    margin-left: 10%;
+    margin-bottom: 30px;
+}
+
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: #162447;
+
+}
+
+.background_image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 11%;
+
+    mix-blend-mode: normal;
+
+    mask-image: linear-gradient(to bottom, transparent 10%, black);
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    opacity: 100%;
+}
+
+a {
+    text-decoration: none
+}
+
+li {
+    list-style-type: none;
+    border: solid 1px #FFFFFF33;
+
+    color: #d9d2d2;
+    font-family: Montserrat, sans-serif;
+    text-align: center;
+    font-size: 16px;
+    margin: 3px;
+    padding: 3px;
+    width: 50px;
+}
+
+li:hover {
+    background-color: #47639f;
+}
+
+.sidebar {
+    position: absolute;
+    top: 21%;
+    left: 8.5%;
+    width: 6%;
+}
+
+.sidebar p {
+    font-family: Montserrat, sans-serif;
+    margin-left: 30px;
+}
+
+h3 {
+    animation: 1s ease-out 0s 1 onLoadAppear;
+
+    font-family: Montserrat, sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 29px;
+    margin-bottom: 10px;
+
+    color: #FFFFFF;
+}
+
+.update {
+    font-family: Montserrat, sans-serif;
+    margin: 5px;
+}
+
+.container {
+    position: absolute;
+    top: 13%;
+    left: 12%;
+    right: 10%;
+
+    margin-left: 50px;
+}
+
+table {
+    animation: 0.5s ease-out 0s 1 onLoadAppear;
+    backdrop-filter: blur(5px);
+
+    table-layout: auto;
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #d9d2d2;
+    font-family: Montserrat, sans-serif;
+}
+
+th {
+  text-align: center;
+  background-color: #47639f;
+}
+
+tr:hover {
+  background-color: rgba(218, 5, 5, 0.3);
+}

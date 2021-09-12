@@ -1,18 +1,34 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>KHL Stats</title>
+    <link rel="stylesheet" href="{% static 'css/seasonStats.css'%}" type="text/css">
 </head>
-<body>
-<p>Cезоны:</p>
-<a href="/khl/stats/17">17</a>,
-<a href="/khl/stats/18">18</a>,
-<a href="/khl/stats/19">19</a>,
-<a href="/khl/stats/20">20</a>,
-<a href="/khl/stats/21">21</a>
-<p>Последнее обновление: {{ update }}</p>
-<p>СЕЗОН {{ season }}</p>
+<main class="background">
+    <div>
+        <img src="/static/img/tribuna.jpg" class="background_image">
+    </div>
+
+<header>
+    <img src="/static/img/KHL.png" alt="KHL" class="logo">
+</header>
+
+<div class="sidebar">
+    <p>Cезоны:</p>
+    <ul style="width: 50px">
+        <a href="/khl/stats/17"><li>17</li></a>
+        <a href="/khl/stats/18"><li>18</li></a>
+        <a href="/khl/stats/19"><li>19</li></a>
+        <a href="/khl/stats/20"><li>20</li></a>
+        <a href="/khl/stats/21"><li>21</li></a>
+    </ul>
+</div>
+
+<div class="container">
+<h3>СЕЗОН {{ season }}</h3>
+<p class="update">Последнее обновление: {{ update }}</p>
 <table border="1" cellpadding="5">
     <tr>
         {% for name in stats.0 %}
@@ -27,5 +43,6 @@
         </tr>
     {% endfor %}
 </table>
-</body>
+</div>
+</main>
 </html>
