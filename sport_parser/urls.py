@@ -16,9 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from sport_parser.views import index
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
 
 urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
     path('khl/', include('sport_parser.khl.urls'))
 ]
+
+urlpatterns += staticfiles_urlpatterns()
