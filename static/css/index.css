@@ -12,6 +12,13 @@
     font-style: normal;
 }
 
+@font-face{
+    font-family: 'Avalors';
+    src: url('../fonts/Avalors.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 @keyframes onLoadAppear {
   0% {
     transform: translateY(5%);
@@ -41,13 +48,54 @@
     width: 2250px;
     height: 980px;
     left: 0;
-    top: 65px;
+    top: 165px;
     opacity: 11%;
 
     mix-blend-mode: normal;
     transform: matrix(-1, 0, 0, 1, 0, 0);
 
     mask-image: linear-gradient(to bottom, transparent 10%, black);
+}
+
+header {
+
+    display: flex;
+    flex-direction: row;
+    margin: auto;
+    align-items: flex-start;
+    height: 350px;
+}
+
+.name {
+    position: relative;               /* 2 */
+    top: 50%;                         /* 3 */
+    transform: translate(0, -50%);   /* 4 */
+
+    margin-right: auto;
+    flex-shrink: 0;
+    line-height: 0.9;
+    width: 80%;
+    max-width: 1200px;
+}
+
+h4 {
+    position: relative;
+    width: 100%;
+    padding-left: 50px;
+    margin-top: 70px;
+    font-family: Montserrat, sans-serif;
+    color: white;
+    font-variant: small-caps;
+    font-size: 105px;
+}
+
+.logo {
+    flex-shrink: 0;
+    margin-left: auto;
+    margin-top: 50px;
+    padding-left: 50px;
+    width: 250px;
+    height: 210px;
 }
 
 .text1 {
@@ -82,11 +130,13 @@ h3 {
 }
 
 .league {
-    position: absolute;
+    position: relative;
     width: 80%;
     height: 228px;
     left: 15%;
-    top: 48%;
+    top: 100px;
+
+
 }
 
 .league_button {
