@@ -34,9 +34,21 @@ h4 {
 }
 
 nav {
-    margin-left: 50px;
+    z-index: 1;
+    margin-left: 20px;
     margin-top: 10px;
     margin-bottom: 0;
+    font-family: Montserrat, sans-serif;
+}
+
+nav a {
+    padding: 5px;
+    color: #d9d2d2;
+}
+
+nav a:hover {
+    padding: 4px;
+    border: solid 1px #FFFFFF33;
 }
 
 .background {
@@ -59,7 +71,7 @@ nav {
 }
 
 .logo {
-    width: 100px;
+    width: 120px;
     height: 100px;
     opacity: 100%;
     margin-left: auto;
