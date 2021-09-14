@@ -14,9 +14,29 @@
 }
 
 header {
+    width: 1475px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     margin-top: 30px;
-    margin-left: 10%;
-    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0;
+}
+
+h4 {
+    padding: 50px 30px 0 30px;
+    margin: 30px 80px 0 0;
+    font-family: Montserrat, sans-serif;
+    color: white;
+    font-variant: small-caps;
+    font-size: 45px;
+}
+
+nav {
+    margin-left: 50px;
+    margin-top: 10px;
+    margin-bottom: 0;
 }
 
 .background {
@@ -34,13 +54,21 @@ header {
     width: 100%;
     height: 100%;
     opacity: 11%;
-    min-width: 1080px;
+    min-width: 1475px;
 }
 
 .logo {
     width: 100px;
     height: 100px;
     opacity: 100%;
+    margin-left: auto;
+}
+
+.leagueLogo {
+    width: 150px;
+    height: 150px;
+    opacity: 100%;
+    margin-right: auto;
 }
 
 a {
@@ -64,18 +92,6 @@ li:hover {
     background-color: #47639f;
 }
 
-.sidebar {
-    position: absolute;
-    top: 21%;
-    left: 8.5%;
-    width: 6%;
-}
-
-.sidebar p {
-    font-family: Montserrat, sans-serif;
-    margin-left: 30px;
-}
-
 h3 {
     animation: 1s ease-out 0s 1 onLoadAppear;
 
@@ -94,13 +110,40 @@ h3 {
     margin: 5px;
 }
 
-.container {
-    position: absolute;
-    top: 13%;
-    left: 12%;
-    right: 10%;
+.wrapper {
 
-    margin-left: 50px;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.container {
+    flex-shrink: 1;
+    margin-right: auto;
+    margin-left: 10px;
+}
+
+.sidebarLeft {
+    flex-shrink: 1;
+    width: 100px;
+    z-index: 1;
+    margin-top: 80px;
+    margin-right: 10px;
+    margin-left: auto;
+}
+
+.sidebarRight {
+    flex-shrink: 1;
+    width: 100px;
+    z-index: 1;
+    margin-top: 80px;
+    margin-left: 10px;
+}
+
+.sidebarLeft p {
+    font-family: Montserrat, sans-serif;
+    padding-left: 30px;
+
 }
 
 table {
@@ -108,10 +151,10 @@ table {
     backdrop-filter: blur(5px);
 
     table-layout: auto;
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 th,
@@ -119,13 +162,42 @@ td {
   background-color: rgba(255, 255, 255, 0.2);
   color: #d9d2d2;
     font-family: Montserrat, sans-serif;
+    font-size: 16px;
+    border: solid 1px #FFFFFF33;
+    padding: 3px;
 }
 
 th {
   text-align: center;
   background-color: #47639f;
+    cursor: pointer;
 }
 
 tr:hover {
   background-color: rgba(218, 5, 5, 0.3);
+}
+
+th.sorted[data-order="1"],
+th.sorted[data-order="-1"] {
+    background-color: #2651a2;
+}
+
+footer {
+    display: flex;
+    width: 1475px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    border-color: #FFFFFF33;
+    border-top-style: solid;
+    border-width: 1px;
+}
+
+footer div {
+    margin: auto;
+    padding: 10px
+}
+
+footer div a {
+    padding: 10px 30px;
 }

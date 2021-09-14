@@ -2,7 +2,7 @@ from sport_parser.khl.database_services.db_get import get_team_list, get_team_na
     get_opponent_stat, sec_to_time, output_format
 
 
-def get_team_stats_view(season):
+def get_season_stats_view(season):
     """Возвращает список с рассчитанной статистикой команд в виде списков"""
     stats = [[
         'Team',

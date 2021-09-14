@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>KHL Stats</title>
+    <script type="text/javascript" src="{% static 'js/seasonStats.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/seasonStats.css'%}" type="text/css">
 </head>
 <main class="background">
@@ -13,11 +14,19 @@
 
 <header>
     <img src="/static/img/KHL.png" alt="KHL" class="logo">
+     <nav>
+         <a href="#">Главная</a>
+     </nav>
+    <div class="header">
+        <h4>Континентальная Хоккейная Лига</h4>
+    </div>
+    <img src="/static/img/KHL.png" alt="KHL" class="leagueLogo">
 </header>
 
-<div class="sidebar">
+<div class="wrapper">
+<div class="sidebarLeft">
     <p>Cезоны:</p>
-    <ul style="width: 50px">
+    <ul>
         <a href="/khl/stats/17"><li>17</li></a>
         <a href="/khl/stats/18"><li>18</li></a>
         <a href="/khl/stats/19"><li>19</li></a>
@@ -29,12 +38,15 @@
 <div class="container">
 <h3>СЕЗОН {{ season }}</h3>
 <p class="update">Последнее обновление: {{ update }}</p>
-<table border="1" cellpadding="5">
-    <tr>
-        {% for name in stats.0 %}
-        <th>{{ name }}</th>
-        {% endfor %}
-    </tr>
+<table class="table_sort">
+    <thead>
+        <tr>
+            {% for name in stats.0 %}
+            <th>{{ name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
     {% for row in stats|slice:"1:" %}
         <tr>
         {% for stat in row %}
@@ -42,7 +54,23 @@
         {% endfor %}
         </tr>
     {% endfor %}
+    </tbody>
 </table>
 </div>
+    <div class="sidebarRight">
+    </div>
+</div>
+<footer>
+    <div class="wrapper">
+        <div>
+        <a href="#">About</a>
+        <a href="#">Feedback</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+        <a href="#">Cookies</a>
+        </div>
+    </div>
+</footer>
 </main>
 </html>
