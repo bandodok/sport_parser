@@ -17,12 +17,16 @@ def get_match_list(team):
     return [match[0] for match in match_list]
 
 
-def get_team_stat(team, stat, match_list, *, mode='median'):
+def get_team_stat(team, stat, match_list, *, mode='list'):
     """В зависимости от mode возвращает медиану или сумму параметра stat команды team в матчах match_list
     mode:
         median - рассчитать медиану
         sum - рассчитать сумму
+        list - список
     """
+    if mode == 'list':
+        queryset = KHLProtocol.objects.filter(match_id__in=match_list).filter(team_id=team).values_list(stat, flat=True)
+        return [v for v in queryset]
     stat_list = KHLProtocol.objects.filter(match_id__in=match_list).filter(team_id=team).order_by(stat)
     return _calculate_stat(stat, stat_list, mode=mode)
 
@@ -32,12 +36,16 @@ def get_opponent_stat(team, stat, match_list, *, mode='median'):
     mode:
         median - рассчитать медиану
         sum - рассчитать сумму
+        list - список
     """
+    if mode == 'list':
+        queryset = KHLProtocol.objects.filter(match_id__in=match_list).exclude(team_id=team).values_list(stat, flat=True)
+        return [v for v in queryset]
     stat_list = KHLProtocol.objects.filter(match_id__in=match_list).exclude(team_id=team).order_by(stat)
     return _calculate_stat(stat, stat_list, mode=mode)
 
 
-def _calculate_stat(stat, stat_list, mode='median'):
+def _calculate_stat(stat, stat_list, mode='list'):
     if mode == 'median':
         return get_median(stat_list.values_list(stat))
     if mode == 'sum':

@@ -1,0 +1,27 @@
+{% load static %}
+<html>
+  <head>
+      <link rel="stylesheet" href="{% static 'css/teamStats.css'%}" type="text/css">
+    <script>
+    var stats = {{ stats|safe }};
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
+  </head>
+  <body onload=hideChart()>
+  <ul class="chartList">
+      <li><a onclick=filterChart('chartSh') id="BchartSh">Sh</a></li>
+      <li><a onclick=filterChart('chartSog') id="BchartSog">Sog</a></li>
+      <li><a onclick=filterChart('chartG') id="BchartG">G</a></li>
+      <li><a onclick=filterChart('chartBlocks') id="BchartBlocks">Blocks</a></li>
+      <li><a onclick=filterChart('chartHits') id="BchartHits">Hits</a></li>
+      <li><a onclick=filterChart('chartPenalty') id="BchartPenalty">Penalty</a></li>
+  </ul>
+    <div id="chartSh" class="charts"></div>
+    <div id="chartSog" class="charts"></div>
+    <div id="chartG" class="charts"></div>
+    <div id="chartBlocks" class="charts"></div>
+    <div id="chartHits" class="charts"></div>
+    <div id="chartPenalty" class="charts"></div>
+  </body>
+</html>
