@@ -55,6 +55,7 @@ nav {
     height: 100%;
     opacity: 11%;
     min-width: 1475px;
+    max-height: 900px;
 }
 
 .logo {
