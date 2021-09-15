@@ -15,13 +15,11 @@
 
 header {
     width: 1475px;
+    height: 130px;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin-top: 30px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 0;
+    margin: 30px auto 0;
 }
 
 h4 {
@@ -52,6 +50,7 @@ nav a:hover {
 }
 
 .background {
+    z-index: -2;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -62,6 +61,7 @@ nav a:hover {
 }
 
 .background_image {
+    z-index: -1;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -73,14 +73,16 @@ nav a:hover {
 .logo {
     width: 120px;
     height: 100px;
-    opacity: 100%;
+    margin-left: auto;
+}
+
+header a {
     margin-left: auto;
 }
 
 .leagueLogo {
-    width: 150px;
-    height: 150px;
-    opacity: 100%;
+    height: 180px;
+    filter: saturate(80%);
     margin-right: auto;
 }
 
