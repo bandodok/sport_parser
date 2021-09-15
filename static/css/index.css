@@ -40,13 +40,13 @@
     max-width: 100%;
     max-height: 100%;
     overflow-x: hidden;
-    overflow-y: hidden;
+
 }
 
 .background_image {
     position: absolute;
     width: 2250px;
-    height: 980px;
+
     left: 0;
     top: 165px;
     opacity: 11%;
@@ -161,4 +161,8 @@ h3 {
 #NHL {
     margin-right: 50px;
     margin-bottom: 20px;
+}
+
+.container {
+    height: 100px;
 }
