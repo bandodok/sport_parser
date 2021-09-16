@@ -68,12 +68,14 @@ nav a:hover {
     opacity: 11%;
     min-width: 1475px;
     max-height: 900px;
+    user-select: none;
 }
 
 .logo {
     width: 120px;
     height: 100px;
     margin-left: auto;
+    user-select: none;
 }
 
 header a {
@@ -84,6 +86,7 @@ header a {
     height: 180px;
     filter: saturate(80%);
     margin-right: auto;
+    user-select: none;
 }
 
 a {

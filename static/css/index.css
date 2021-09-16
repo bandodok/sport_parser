@@ -96,6 +96,7 @@ h4 {
     padding-left: 50px;
     width: 250px;
     height: 210px;
+    user-select: none;
 }
 
 .text1 {
@@ -135,7 +136,7 @@ h3 {
     height: 228px;
     left: 15%;
     top: 100px;
-
+    user-select: none;
 
 }
 
