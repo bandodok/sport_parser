@@ -65,13 +65,6 @@ def _team_name_update(team):
     return new_team
 
 
-def update_last_updated(**kwargs) -> None:
-    """Обновляет дату последнего обновления"""
-    last = KHLMatch.objects.get(kwargs)
-    last.updated = datetime.now()
-    last.save()
-
-
 def last_updated(*, update=False):
     """Возвращает дату последнего обновления таблицы матчей
     При update=True обновляет эту дату на текущую"""
