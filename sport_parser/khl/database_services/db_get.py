@@ -47,16 +47,16 @@ def get_opponent_stat(team, stat, match_list, *, mode='median'):
 
 def _calculate_stat(stat, stat_list, mode='list'):
     if mode == 'median':
-        return get_median(stat_list.values_list(stat))
+        stats = stat_list.values_list(stat, flat=True)
+        return get_median([x for x in stats])
     if mode == 'sum':
         calc_stat = stat_list.aggregate(Sum(stat))
         return calc_stat[f'{stat}__sum']
     raise ValueError('Invalid mode')
 
 
-def get_median(item_list):
+def get_median(items):
     """Возвращает медиану списка"""
-    items = [x[0] for x in item_list]
     if len(items) % 2 != 0:
         median = int(len(items) // 2)
         if type(items[median]) == datetime.time:
