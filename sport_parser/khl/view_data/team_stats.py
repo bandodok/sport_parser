@@ -26,23 +26,23 @@ def get_team_stats_view(team_id):
     # СДЕЛАТЬ ДЛЯ КАЖДОГО МАТЧА ОТДЕЛЬНО
     shp = []
     for shi, shai in zip(sh, sha):
-        shp.append(f'{format(shi / (shi + shai) * 100, ".2f")}%')
+        shp.append(round(shi / (shi + shai) * 100, 2))
 
     sogp = []
     for sogi, shi in zip(sog, sh):
-        sogp.append(f'{format(sogi / shi * 100, ".2f")}%')
+        sogp.append(round(sogi / shi * 100, 2))
 
     faceoffp = []
     for faceoffi, faceoffai in zip(faceoff, faceoffa):
-        faceoffp.append(f'{format(faceoffi / (faceoffi + faceoffai) * 100, ".2f")}%')
+        faceoffp.append(round(faceoffi / (faceoffi + faceoffai) * 100, 2))
 
     blocksp = []
     for blocksi, blocksai in zip(blocks, blocksa):
-        blocksp.append(f'{format(blocksi / (blocksi + blocksai) * 100, ".2f")}%')
+        blocksp.append(round(blocksi / (blocksi + blocksai) * 100, 2))
 
     devp = []
     for sogai, shai, in zip(soga, sha):
-        devp.append(f'{format((1 - (sogai / shai)) * 100, ".2f")}%')
+        devp.append(round((1 - (sogai / shai)) * 100, 2))
 
     time_ap = []
 #    for time_ai, time_aai in zip(time_a, time_aa):
@@ -50,7 +50,7 @@ def get_team_stats_view(team_id):
 
     pdo = []
     for shi, shai, sogi in zip(sh, sha, sog):
-        pdo.append(f'{format(((shi / (shi + shai)) + (sogi / shi)) * 100, ".2f")}%')
+        pdo.append(round(((shi / (shi + shai)) + (sogi / shi)) * 100, 2))
 
     output_stats = [[
 #       'Team',
@@ -77,10 +77,16 @@ def get_team_stats_view(team_id):
 
     for i in range(len(sh)):
         output_stats.append([
-        sh[i], sha[i], sog[i], soga[i],
-        g[i], ga[i],
-        hits[i], blocks[i],
-        blocksa[i], penalty[i]
+        sh[i],
+        sha[i],
+        sog[i],
+        soga[i],
+        g[i],
+        ga[i],
+        hits[i],
+        blocks[i],
+        blocksa[i],
+        penalty[i]
         ])
 
     for i, row in enumerate(output_stats):
