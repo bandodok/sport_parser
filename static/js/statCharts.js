@@ -30,12 +30,12 @@ function drawChart() {
 
 
     stats.forEach(function (item, i) {
-        statsSh.push([i.toString(), item[1], item[2]])
-        statsSog.push([i.toString(), item[3], item[4]])
-        statsG.push([i.toString(), item[5], item[6]])
-        statsBlocks.push([i.toString(), item[8], item[9]])
-        statsHits.push([i.toString(), item[7]])
-        statsPenalty.push([i.toString(), item[10]])
+        statsSh.push([i.toString(), item[0], item[6]])
+        statsSog.push([i.toString(), item[1], item[7]])
+        statsG.push([i.toString(), item[2], item[8]])
+        statsBlocks.push([i.toString(), item[3], item[9]])
+        statsHits.push([i.toString(), item[5]])
+        statsPenalty.push([i.toString(), item[4]])
     });
 
 
