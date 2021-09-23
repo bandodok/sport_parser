@@ -46,10 +46,10 @@ def update_db():
 @pytest.mark.django_db(transaction=True)
 def test_get_team_stats_view(update_db):
     stats = [
-        ['Sh', 'SoG', 'G', 'Blocks', 'Penalty', 'Hits',
-         'Sh(A)', 'SoG(A)', 'G(A)', 'Blocks(A)', 'Penalty(A)', 'Hits(A)'],
-        [44, 22, 4, 22, 4, 16, 66, 30, 0, 14, 12, 14],
-        [44, 22, 8, 22, 4, 16, 52, 30, 1, 6, 12, 14]
+        ['Sh', 'SoG', 'G', 'Blocks', 'Penalty', 'Hits', 'TimeA',
+         'Sh(A)', 'SoG(A)', 'G(A)', 'Blocks(A)', 'Penalty(A)', 'Hits(A)', 'TimeA(A)'],
+        [44, 22, 4, 22, 4, 16, 521, 66, 30, 0, 14, 12, 14, 637],
+        [44, 22, 8, 22, 4, 16, 521, 52, 30, 1, 6, 12, 14, 587]
     ]
     team1_id = KHLTeams.objects.get(name='test1').id
     out = get_team_stats_view(team1_id)
