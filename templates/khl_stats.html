@@ -1,49 +1,16 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en" class="background">
-<head>
-    <meta charset="UTF-8">
-    <title>KHL Stats</title>
-    <script type="text/javascript" src="{% static 'js/seasonStats.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'css/seasonStats.css'%}" type="text/css">
-    <link rel="icon" href="{% static '/img/favicons/favicon.svg' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static '/img/favicons/favicon_32_rounded.png'%}">
+{% extends "base.html" %}
 
-<!-- Yandex.Metrika counter -->
-<script type="text/javascript" >
-   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-   m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+{% block title %}KHL Stats{% endblock %}
 
-   ym(8935165, "init", {
-        clickmap:true,
-        trackLinks:true,
-        accurateTrackBounce:true,
-        webvisor:true
-   });
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/8935165" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-<!-- /Yandex.Metrika counter -->
+{% block header_title %}
+    <h4>Континентальная Хоккейная Лига</h4>
+{% endblock %}
 
-</head>
-<main class="background">
-    <div>
-        <img src="/static/img/tribuna.png" class="background_image">
-    </div>
-
-<header>
-    <a href="/"><img src="/static/img/FA_small_white.png" alt="logo" class="logo"></a>
-     <nav>
-         <a href="/">Главная</a>
-     </nav>
-    <div class="header">
-        <h4>Континентальная Хоккейная Лига</h4>
-    </div>
+{% block right_logo %}
     <img src="/static/img/KHL.png" alt="KHL" class="leagueLogo">
-</header>
+{% endblock %}
 
-<div class="wrapper">
-<div class="sidebarLeft">
+{% block left_sidebar %}
     <p>Cезоны:</p>
     <ul>
         <a href="/khl/stats/17"><li>17</li></a>
@@ -52,9 +19,9 @@
         <a href="/khl/stats/20"><li>20</li></a>
         <a href="/khl/stats/21"><li>21</li></a>
     </ul>
-</div>
+{% endblock %}
 
-<div class="container">
+{% block main_content %}
 <h3>СЕЗОН {{ season }}</h3>
 <p class="update">Последнее обновление: {{ update }}</p>
 <table class="table_sort">
@@ -75,21 +42,4 @@
     {% endfor %}
     </tbody>
 </table>
-</div>
-    <div class="sidebarRight">
-    </div>
-</div>
-<footer>
-    <div class="wrapper">
-        <div>
-        <a href="#">About</a>
-        <a href="#">Feedback</a>
-        <a href="#">Contact Us</a>
-        <a href="#">Terms</a>
-        <a href="#">Privacy</a>
-        <a href="#">Cookies</a>
-        </div>
-    </div>
-</footer>
-</main>
-</html>
+{% endblock %}
