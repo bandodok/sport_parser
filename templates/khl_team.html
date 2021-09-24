@@ -1,23 +1,46 @@
+{% extends "base.html" %}
 {% load static %}
-<html>
-  <head>
-      <link rel="stylesheet" href="{% static 'css/teamStats.css'%}" type="text/css">
+
+{% block title %}KHL Stats{% endblock %}
+
+{% block static %}
+{{ block.super }}
     <script>
     var stats = {{ stats|safe }};
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
-  </head>
-  <body onload=hideChart()>
-  <ul class="chartList">
-      <li><a onclick=filterChart('chartSh') id="BchartSh">Sh</a></li>
-      <li><a onclick=filterChart('chartSog') id="BchartSog">Sog</a></li>
-      <li><a onclick=filterChart('chartG') id="BchartG">G</a></li>
-      <li><a onclick=filterChart('chartBlocks') id="BchartBlocks">Blocks</a></li>
-      <li><a onclick=filterChart('chartHits') id="BchartHits">Hits</a></li>
-      <li><a onclick=filterChart('chartPenalty') id="BchartPenalty">Penalty</a></li>
-      <li><a onclick=filterChart('chartTime_a') id="BchartTime_a">TimeA</a></li>
-  </ul>
+    <link rel="stylesheet" href="{% static 'css/teamStats.css'%}" type="text/css">
+{% endblock %}
+
+
+{% block header_title %}
+    <h4>Континентальная Хоккейная Лига</h4>
+{% endblock %}
+
+{% block main_tag %}
+<main class="background" onload=hideChart()>
+{% endblock %}
+
+{% block right_logo %}
+    <img src="/static/img/KHL.png" alt="KHL" class="leagueLogo">
+{% endblock %}
+
+{% block left_sidebar %}
+    <p>Параметры:</p>
+<ul class="chartList">
+    <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
+    <a onclick=filterChart('chartSog') id="BchartSog"><li>Sog</li></a>
+    <a onclick=filterChart('chartG') id="BchartG"><li>G</li></a>
+    <a onclick=filterChart('chartBlocks') id="BchartBlocks"><li>Blocks</li></a>
+    <a onclick=filterChart('chartHits') id="BchartHits"><li>Hits</li></a>
+    <a onclick=filterChart('chartPenalty') id="BchartPenalty"><li>Penalty</li></a>
+    <a onclick=filterChart('chartTime_a') id="BchartTime_a"><li>TimeA</li></a>
+</ul>
+{% endblock %}
+
+{% block main_content %}
+<h3>{{ team }}</h3>
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
     <div id="chartG" class="charts"></div>
@@ -25,5 +48,4 @@
     <div id="chartHits" class="charts"></div>
     <div id="chartPenalty" class="charts"></div>
     <div id="chartTime_a" class="charts"></div>
-  </body>
-</html>
+{% endblock %}

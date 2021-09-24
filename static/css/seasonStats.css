@@ -101,13 +101,16 @@ li {
     font-family: Montserrat, sans-serif;
     text-align: center;
     font-size: 16px;
-    margin: 3px;
+
     padding: 3px;
     width: 50px;
+    margin-left: auto;
+    margin-top: 2px;
 }
 
 li:hover {
     background-color: #47639f;
+    cursor: pointer;
 }
 
 h3 {
@@ -143,16 +146,17 @@ h3 {
 
 .sidebarLeft {
     flex-shrink: 1;
-    width: 100px;
+    width: 130px;
     z-index: 1;
     margin-top: 80px;
     margin-right: 10px;
     margin-left: auto;
+    text-align: right;
 }
 
 .sidebarRight {
     flex-shrink: 1;
-    width: 100px;
+    width: 130px;
     z-index: 1;
     margin-top: 80px;
     margin-left: 10px;
