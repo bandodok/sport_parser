@@ -133,14 +133,13 @@ h3 {
 
 .wrapper {
 
-    margin: auto;
     display: flex;
     flex-direction: row;
 }
 
 .container {
     flex-shrink: 1;
-    margin-right: auto;
+    margin-right: 10px;
     margin-left: 10px;
 }
 
@@ -159,7 +158,8 @@ h3 {
     width: 130px;
     z-index: 1;
     margin-top: 80px;
-    margin-left: 10px;
+    margin-right: auto;
+    text-align: right;
 }
 
 .sidebarLeft p {
@@ -209,7 +209,7 @@ footer {
     width: 1475px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 50px;
+    margin-top: 30px;
     border-color: #FFFFFF33;
     border-top-style: solid;
     border-width: 1px;

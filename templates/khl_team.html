@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}KHL Stats{% endblock %}
+{% block title %}{{ team }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
@@ -15,7 +15,11 @@
 
 
 {% block header_title %}
-    <h4>Континентальная Хоккейная Лига</h4>
+    <h4 class="header_title">{{ team }}</h4>
+    <p class="header_city">{{ city }}</p>
+    <p class="header_city">{{ arena }}</p>
+    <p class="header_city">Конференция «{{ conference }}»</p>
+    <p class="header_city">Дивизион {{ division }}</p>
 {% endblock %}
 
 {% block main_tag %}
@@ -23,7 +27,7 @@
 {% endblock %}
 
 {% block right_logo %}
-    <img src="/static/img/KHL.png" alt="KHL" class="leagueLogo">
+    <img src="{{ logo }}" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}
@@ -40,7 +44,9 @@
 {% endblock %}
 
 {% block main_content %}
-<h3>{{ team }}</h3>
+<h3>СЕЗОН {{ season }}</h3>
+<p class="update">Континентальная хоккейная лига</p>
+
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
     <div id="chartG" class="charts"></div>
