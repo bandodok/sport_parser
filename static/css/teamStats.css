@@ -1,17 +1,35 @@
-.chartList {
-    width: 70px;
-}
-
 .charts {
-    width: 1900px;
-    height: 500px;
-    display: none;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-li {
-    cursor: pointer
+.sidebarRight li {
+    width: 80px;
+    user-select: none;
 }
 
-li:hover {
-    color: brown;
+
+.header_title {
+    text-align: right;
+    margin-top: -30px;
+    margin-right: 0;
+}
+
+.header_city {
+    text-align: right;
+    font-family: Montserrat, sans-serif;
+    font-size: 18px;
+    margin-right: 30px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.leagueLogo {
+    margin-top: -60px;
+    height: 300px;
+    margin-right: -20px;
+}
+
+h3 a {
+    color: #FFFFFF;
 }

@@ -19,3 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.table_sort thead').forEach(tableTH => tableTH.addEventListener('click', () => getSort(event)));
 
 });
+
+function gotoTeam(team_id) {
+    const path = "/khl/team/";
+    if (window.event.ctrlKey) {
+        open(path + team_id).focus();
+    }
+    else {
+        document.location.href = path + team_id;
+    }
+}
+
+function middleGotoTeam(team_id) {
+    const path = "/khl/team/";
+    e = window.event
+    if ((e.button === 4) || (e.button === 1)) {
+        open(path + team_id).focus();
+    }
+}

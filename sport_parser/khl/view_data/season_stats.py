@@ -29,7 +29,7 @@ def get_season_stats_view(season):
     ]]
     teams = get_team_list(season)
     for team in teams:
-        team_stats = [get_team_name(team), ]
+        team_stats = [team, get_team_name(team), ]
         match_list = get_match_list(team)
 
         sh = get_team_stat(team, 'sh', match_list, mode='median')

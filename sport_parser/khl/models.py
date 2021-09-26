@@ -1,6 +1,14 @@
 from django.db import models
 
 
+class KHLProtocolManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def get_team_match_list(self, team):
+        return self.get_queryset().filter(team_id=team).values_list('match_id', flat=True)
+
+
 class KHLMatch(models.Model):
     """ """
     match_id = models.IntegerField(primary_key=True)
@@ -50,6 +58,8 @@ class KHLProtocol(models.Model):
     vvsh = models.TimeField(max_length=100, null=True, blank=True)
     nshv = models.TimeField(max_length=100, null=True, blank=True)
     pd = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True)
+
+    objects = KHLProtocolManager()
 
 
 class KHLTeams(models.Model):
