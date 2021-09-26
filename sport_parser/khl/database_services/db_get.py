@@ -45,6 +45,20 @@ def get_opponent_stat(team, stat, match_list, *, mode='median'):
     return _calculate_stat(stat, stat_list, mode=mode)
 
 
+def get_team_stats_per_day(team, *args):
+    match_list = get_match_list(team)
+    query = KHLProtocol.objects.filter(match_id__in=match_list)
+    out = query.filter(team_id=team).values_list(*args)
+    return [[stat for stat in day] for day in out]
+
+
+def get_opp_stats_per_day(team, *args):
+    match_list = get_match_list(team)
+    query = KHLProtocol.objects.filter(match_id__in=match_list)
+    out = query.exclude(team_id=team).values_list(*args)
+    return [[stat for stat in day] for day in out]
+
+
 def _calculate_stat(stat, stat_list, mode='list'):
     if mode == 'median':
         stats = stat_list.values_list(stat, flat=True)
@@ -98,6 +112,18 @@ def output_format(items):
 def get_team_name(team_id):
     """Возвращает название команды по id"""
     return KHLTeams.objects.get(id=team_id).name
+
+
+def get_team_attr(team_id, attr):
+    """Возвращает атрибут команды по id"""
+    return KHLTeams.objects.filter(id=team_id).values_list(attr, flat=True)[0]
+
+
+def get_team_id_by_season(team_id):
+    """Возвращает список id команды для разных сезонов"""
+    name = KHLTeams.objects.get(id=team_id).name
+    season_list = KHLTeams.objects.filter(name=name).order_by('season').values('id', 'season')
+    return [x for x in season_list]
 
 
 def get_last_match_id():

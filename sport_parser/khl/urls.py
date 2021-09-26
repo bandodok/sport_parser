@@ -7,9 +7,9 @@ urlpatterns = [
     path('', index),
     path('update/<int:match_id>/', update),
     path('update/teams/', update_teams),
-    path('stats/<int:season>', stats),
+    path('stats/<int:season>', stats, name='stats'),
     path('update/protocol/', update_protocol),
-    path('team/<int:team_id>', team)
+    path('team/<int:team_id>', team, name='team')
 ]
 
 urlpatterns += staticfiles_urlpatterns()
