@@ -53,7 +53,6 @@ stats.forEach(function (item, i) {
                 color: '#d9d2d2'
         }},
         hAxis: {
-            title: 'Матчи',
             gridlines: {
                 color: '#8f8c8c',
                 opacity: 0.1
@@ -79,7 +78,7 @@ stats.forEach(function (item, i) {
         },
         chartArea: {
             width: '90%',
-            height: '80%',
+            height: '90%',
         },
         backgroundColor: {
                 fill: '#ffffff',
