@@ -220,6 +220,13 @@ td {
     font-size: 16px;
     border: solid 1px #FFFFFF33;
     padding: 3px;
+    text-align: right;
+}
+
+.urlToTeam:hover {
+    cursor: pointer;
+    color: #ffffff;
+    background-color: rgba(213, 37, 37, 0.3);
 }
 
 th {
