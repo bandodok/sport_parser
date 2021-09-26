@@ -36,18 +36,22 @@
 </div>
 
 <header>
+<div id="leftHeaderBlock">
     <a href="/"><img src="/static/img/FA_small_white.png" alt="logo" class="logo"></a>
      <nav>
          {% block nav %}
          <a href="/">Главная</a>
          {% endblock %}
      </nav>
+</div>
+<div id="rightHeaderBlock">
     <div class="header">
         {% block header_title %}
         {% endblock %}
     </div>
     {% block right_logo %}
     {% endblock %}
+</div>
 </header>
 
 <div class="wrapper">

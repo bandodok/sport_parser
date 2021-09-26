@@ -18,25 +18,42 @@ header {
     height: 130px;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     margin: 30px auto 0;
+}
+
+#leftHeaderBlock {
+    margin-left: 60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+#rightHeaderBlock {
+    margin-right: 60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
 }
 
 h4 {
     padding: 50px 30px 0 30px;
-    margin: 30px 80px 0 0;
+    margin: 30px 10px 0 0;
     font-family: Montserrat, sans-serif;
     color: white;
     font-variant: small-caps;
     font-size: 45px;
+    white-space: nowrap;
 }
 
 nav {
     z-index: 1;
+    width: 100px;
     margin-left: 20px;
     margin-top: 10px;
     margin-bottom: 0;
     font-family: Montserrat, sans-serif;
+    white-space: nowrap;
 }
 
 nav a {
