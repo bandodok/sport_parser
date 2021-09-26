@@ -132,9 +132,11 @@ h3 {
 }
 
 .wrapper {
-
+    width: 100%;
+    min-width: 1430px;
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 .container {
@@ -149,23 +151,37 @@ h3 {
     z-index: 1;
     margin-top: 80px;
     margin-right: 10px;
-    margin-left: auto;
-    text-align: right;
-}
 
-.sidebarRight {
-    flex-shrink: 1;
-    width: 130px;
-    z-index: 1;
-    margin-top: 80px;
-    margin-right: auto;
     text-align: right;
 }
 
 .sidebarLeft p {
     font-family: Montserrat, sans-serif;
     padding-left: 30px;
+}
 
+
+.sidebarRight {
+    flex-shrink: 1;
+    width: 130px;
+    z-index: 1;
+    margin-top: 80px;
+    margin-left: 10px;
+
+    text-align: left;
+}
+
+.sidebarRight p {
+    font-family: Montserrat, sans-serif;
+}
+
+.sidebarRight ul {
+    text-align: left;
+    padding: 0;
+}
+
+.sidebarRight li {
+    margin-left: 0;
 }
 
 table {

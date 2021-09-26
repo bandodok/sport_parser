@@ -15,15 +15,11 @@
 
 
 {% block header_title %}
+    <p class="header_city">Конференция «{{ conference }}»</p>
+    <p class="header_city">Дивизион {{ division }}</p>
     <h4 class="header_title">{{ team }}</h4>
     <p class="header_city">{{ city }}</p>
     <p class="header_city">{{ arena }}</p>
-    <p class="header_city">Конференция «{{ conference }}»</p>
-    <p class="header_city">Дивизион {{ division }}</p>
-{% endblock %}
-
-{% block main_tag %}
-<main class="background" onload=hideChart()>
 {% endblock %}
 
 {% block right_logo %}
@@ -31,6 +27,15 @@
 {% endblock %}
 
 {% block left_sidebar %}
+    <p>Сезоны:</p>
+<ul class="chartList">
+    {% for season in seasons %}
+        <a href="{% url 'team' season.id %}"><li>{{ season.season }}</li></a>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block right_sidebar %}
     <p>Параметры:</p>
 <ul class="chartList">
     <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
@@ -44,9 +49,8 @@
 {% endblock %}
 
 {% block main_content %}
-<h3>СЕЗОН {{ season }}</h3>
+<h3><a href="{% url 'stats' season %}">СЕЗОН {{ season }}</a></h3>
 <p class="update">Континентальная хоккейная лига</p>
-
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
     <div id="chartG" class="charts"></div>

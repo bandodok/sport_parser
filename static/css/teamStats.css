@@ -3,14 +3,14 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-li {
+.sidebarRight li {
     width: 80px;
     user-select: none;
 }
 
 
 .header_title {
-    width: 789px;
+    width: 864px;
     text-align: right;
     margin-top: -30px;
     margin-right: 0;
@@ -28,4 +28,9 @@ li {
 .leagueLogo {
     margin-top: -60px;
     height: 300px;
+    margin-right: -20px;
+}
+
+h3 a {
+    color: #FFFFFF;
 }
