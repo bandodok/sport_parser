@@ -2,6 +2,7 @@ import pytest
 
 from sport_parser.khl.database_services.db_add import add_khl_protocol_to_database, add_teams_to_database, \
     add_matches_to_database
+from sport_parser.khl.models import KHLTeams
 from sport_parser.khl.view_data.season_stats import get_season_stats_view
 
 
@@ -44,15 +45,18 @@ def update_db():
 
 @pytest.mark.django_db(transaction=True)
 def test_get_season_stats_view(update_db):
+    team1_id = KHLTeams.objects.get(name='test1').id
+    team2_id = KHLTeams.objects.get(name='test2').id
+    team6_id = KHLTeams.objects.get(name='test6').id
     stats = [
         ['Team', 'Sh', 'Sh(A)', 'Sh%', 'SoG', 'SoG(A)', 'AQ', 'G', 'G(A)', 'FaceOff%', 'TimeA', 'TimeA(A)', 'TimeA%',
          'DEV%', 'PDO%', 'Hits', 'Blocks', 'Blocks(A)', 'Blocks%', 'Penalty'],
-        ['test1', '44.0', '59.0', '42.72%', '22.0', '30.0', '50.00%', '6.0', '0.5', '60.38%', '8:41', '10:12', '45.98%',
-         '49.15%', '92.72%', '16.0', '22.0', '10.0', '68.75%', '4.0'],
-        ['test2', '66.0', '44.0', '60.00%', '30.0', '22.0', '45.45%', '0.0', '4.0', '44.83%', '10:37', '8:41', '55.01%',
-         '50.00%', '105.45%', '14.0', '14.0', '22.0', '38.89%', '12.0'],
-        ['test6', '52.0', '44.0', '54.17%', '30.0', '22.0', '57.69%', '1.0', '8.0', '33.33%', '9:47', '8:41', '52.98%',
-         '50.00%', '111.86%', '14.0', '6.0', '22.0', '21.43%', '12.0']
+        [team1_id, 'test1', '44.0', '59.0', '42.72%', '22.0', '30.0', '50.00%', '6.0', '0.5', '60.38%', '8:41', '10:12',
+         '45.98%', '49.15%', '92.72%', '16.0', '22.0', '10.0', '68.75%', '4.0'],
+        [team2_id, 'test2', '66.0', '44.0', '60.00%', '30.0', '22.0', '45.45%', '0.0', '4.0', '44.83%', '10:37', '8:41',
+         '55.01%', '50.00%', '105.45%', '14.0', '14.0', '22.0', '38.89%', '12.0'],
+        [team6_id, 'test6', '52.0', '44.0', '54.17%', '30.0', '22.0', '57.69%', '1.0', '8.0', '33.33%', '9:47', '8:41',
+         '52.98%', '50.00%', '111.86%', '14.0', '6.0', '22.0', '21.43%', '12.0']
     ]
     out = get_season_stats_view(21)
     assert out == stats
