@@ -119,6 +119,13 @@ def get_team_attr(team_id, attr):
     return KHLTeams.objects.filter(id=team_id).values_list(attr, flat=True)[0]
 
 
+def get_team_id_by_season(team_id):
+    """Возвращает список id команды для разных сезонов"""
+    name = KHLTeams.objects.get(id=team_id).name
+    season_list = KHLTeams.objects.filter(name=name).order_by('season').values('id', 'season')
+    return [x for x in season_list]
+
+
 def get_last_match_id():
     """Возвращает id последнего матча в базе данных"""
     return KHLMatch.objects.aggregate(Max('match_id'))['match_id__max']
