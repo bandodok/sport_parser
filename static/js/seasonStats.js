@@ -19,3 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.table_sort thead').forEach(tableTH => tableTH.addEventListener('click', () => getSort(event)));
 
 });
+
+function gotoTeam(team_id) {
+    const path = "/khl/team/";
+    document.location.href = path + team_id;
+}

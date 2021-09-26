@@ -35,7 +35,8 @@
     <tbody>
     {% for row in stats|slice:"1:" %}
         <tr>
-        {% for stat in row %}
+        <td onclick="gotoTeam({{ row.0 }})" class="urlToTeam">{{ row.1 }}</td>
+        {% for stat in row|slice:"2:" %}
             <td align="right">{{ stat }}</td>
         {% endfor %}
         </tr>
