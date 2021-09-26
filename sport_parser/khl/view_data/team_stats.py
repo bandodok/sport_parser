@@ -32,5 +32,3 @@ def get_team_stats_view(team_id):
         output_stats.append(value)
 
     return output_stats
-
-
