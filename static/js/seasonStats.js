@@ -22,5 +22,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function gotoTeam(team_id) {
     const path = "/khl/team/";
-    document.location.href = path + team_id;
+    if (window.event.ctrlKey) {
+        open(path + team_id).focus();
+    }
+    else {
+        document.location.href = path + team_id;
+    }
+}
+
+function middleGotoTeam(team_id) {
+    const path = "/khl/team/";
+    e = window.event
+    if ((e.button === 4) || (e.button === 1)) {
+        open(path + team_id).focus();
+    }
 }
