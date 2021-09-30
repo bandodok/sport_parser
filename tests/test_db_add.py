@@ -12,7 +12,7 @@ ROW1 = ['test1', 12, '4', '22', '4', '32', '55.17', '22', '16', '5', '00:08:41',
 ROW2 = ['test2', 12, 0, '30', '12', '26', '44.83', '14', '14', '1', '00:10:37', '00:19:11', '00:06:40', '68.97',
         '66']
 PROTOCOL = [ROW1, ROW2]
-MATCH = [12, '2017-08-21 19:30:00', 21, 'arena', 'city', 1]
+MATCH = {'match_id': 12, 'date': '2017-08-21 19:30:00', 'season': 21, 'arena': 'arena', 'city': 'city', 'finished': False}
 TEAM1 = ['test1', 'img', 'city', 'arena', 'division', 'conference', 21]
 TEAM2 = ['test2', 'img', 'city', 'arena', 'division', 'conference', 21]
 
@@ -24,7 +24,6 @@ def test_add_matches_to_database():
     assert match.season == 21
     assert match.arena == 'arena'
     assert match.city == 'city'
-    assert match.viewers == 1
 
 
 @pytest.mark.django_db(transaction=True)
