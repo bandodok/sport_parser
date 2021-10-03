@@ -9,16 +9,38 @@ class KHLProtocolManager(models.Manager):
         return self.get_queryset().filter(team_id=team).values_list('match_id', flat=True)
 
 
+class KHLTeams(models.Model):
+    """ """
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=100)
+    img = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    arena = models.CharField(max_length=100)
+    division = models.CharField(max_length=100)
+    conference = models.CharField(max_length=100)
+    season = models.IntegerField()
+
+    def __str__(self):
+        return str(self.name)
+
+
 class KHLMatch(models.Model):
     """ """
     match_id = models.IntegerField(primary_key=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    match_date = models.DateTimeField()
-    season = models.IntegerField()
-    arena = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    viewers = models.IntegerField()
+    date = models.DateTimeField(null=True)
+    time = models.TimeField(null=True)
+    season = models.IntegerField(null=True)
+    arena = models.CharField(max_length=100, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    viewers = models.IntegerField(default=0)
+    finished = models.BooleanField(default=False)
+    teams = models.ManyToManyField(KHLTeams)
+
+    def __str__(self):
+        return str(self.match_id)
 
 
 class KHLProtocol(models.Model):
@@ -60,16 +82,3 @@ class KHLProtocol(models.Model):
     pd = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True)
 
     objects = KHLProtocolManager()
-
-
-class KHLTeams(models.Model):
-    """ """
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=100)
-    img = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    arena = models.CharField(max_length=100)
-    division = models.CharField(max_length=100)
-    conference = models.CharField(max_length=100)
-    season = models.IntegerField()
