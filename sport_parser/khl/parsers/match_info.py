@@ -3,7 +3,7 @@ from django.conf import settings
 from sport_parser.khl.parsers.request import get_selenium_content, get_request_content
 
 
-def get_khl_season_match_info(season, webdriver=get_selenium_content):
+def get_khl_season_match_info(season, webdriver=get_selenium_content, check_finished=True):
     s = settings.SEASONS.get(str(season), 0)
     if s == 0:
         return f'season {s} not found'
@@ -30,6 +30,8 @@ def get_khl_season_match_info(season, webdriver=get_selenium_content):
             score = match.find('dl', class_='b-score')
             if '—' in score.dt.h3.text:
                 finished = True
+                if not check_finished:
+                    continue
                 match_info = get_finished_match_info(match_id)
             else:
                 finished = False

@@ -88,6 +88,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 200,
+        }
     }
 }
 
@@ -145,8 +148,6 @@ SEASONS = {
     '19': 851,
     '18': 671,
     '17': 468,
-    '16': 405,
-    '15': 309
 }
 
 SEASONS_FIRST_MATCH = {
@@ -155,6 +156,4 @@ SEASONS_FIRST_MATCH = {
     '19': 81788,
     '18': 69800,
     '17': 55144,
-    '16': 49521,
-    '15': 45900
 }
