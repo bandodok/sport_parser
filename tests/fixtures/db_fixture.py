@@ -15,12 +15,12 @@ def update_db():
         ['test6', 'img', 'city', 'arena', 'division', 'conference', 21]
     ]
     matches = [
-        {'match_id': 15, 'date': '2017-08-21 19:30:00', 'season': 21, 'arena': 'arena', 'city': 'city',
-         'finished': False},
-        {'match_id': 16, 'date': '2017-08-21 19:30:00', 'season': 19, 'arena': 'arena', 'city': 'city',
-         'finished': False},
-        {'match_id': 17, 'date': '2017-08-21 19:30:00', 'season': 21, 'arena': 'arena', 'city': 'city',
-         'finished': False}
+        {'match_id': 15, 'date': '2017-08-21', 'time': '15:00', 'season': 21, 'arena': 'arena', 'city': 'city',
+         'finished': False, 'viewers': 228, 'home_team': 'test1', 'guest_team': 'test2'},
+        {'match_id': 16, 'date': '2017-08-22', 'time': '15:00', 'season': 19, 'arena': 'arena', 'city': 'city',
+         'finished': False, 'viewers': 228, 'home_team': 'test3', 'guest_team': 'test4'},
+        {'match_id': 17, 'date': '2017-08-23', 'time': '15:00', 'season': 21, 'arena': 'arena', 'city': 'city',
+         'finished': False, 'viewers': 228, 'home_team': 'test1', 'guest_team': 'test6'}
     ]
     protocols = [
         [['test1', 15, '4', '22', '4', '32', '55.17', '22', '16', '5', '00:08:41', '00:16:38', '00:06:40',
@@ -38,7 +38,6 @@ def update_db():
     ]
     for team in teams:
         add_teams_to_database(team)
-    for match in matches:
-        add_matches_to_database(match)
+    add_matches_to_database(matches)
     for protocol in protocols:
         add_khl_protocol_to_database(protocol)
