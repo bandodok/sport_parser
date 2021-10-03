@@ -128,4 +128,9 @@ def get_team_id_by_season(team_id):
 
 def get_last_match_id():
     """Возвращает id последнего матча в базе данных"""
-    return KHLMatch.objects.aggregate(Max('match_id'))['match_id__max']
+    return KHLMatch.objects.filter(finished=True).aggregate(Max('match_id'))['match_id__max']
+
+
+def get_match_by_id(match_id):
+    """ """
+    return KHLMatch.objects.get(match_id=match_id)
