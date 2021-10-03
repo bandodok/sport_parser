@@ -80,7 +80,8 @@ def last_updated(*, update=False):
     При update=True обновляет эту дату на текущую"""
     last_update = KHLMatch.objects.aggregate(Max('updated'))['updated__max']
     if update:
-        last = KHLMatch.objects.get(updated=last_update)
+        last_matches = KHLMatch.objects.filter(updated=last_update)
+        last = last_matches[len(last_matches) - 1]
         last.updated = datetime.now()
         last.save()
     return last_update
