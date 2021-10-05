@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import pytest
 
 from sport_parser.khl.database_services.db_add import add_khl_protocol_to_database, add_teams_to_database, \
@@ -15,12 +17,15 @@ def update_db():
         ['test6', 'img', 'city', 'arena', 'division', 'conference', 21]
     ]
     matches = [
-        {'match_id': 15, 'date': '2017-08-21', 'time': '15:00', 'season': 21, 'arena': 'arena', 'city': 'city',
-         'finished': False, 'viewers': 228, 'home_team': 'test1', 'guest_team': 'test2'},
-        {'match_id': 16, 'date': '2017-08-22', 'time': '15:00', 'season': 19, 'arena': 'arena', 'city': 'city',
-         'finished': False, 'viewers': 228, 'home_team': 'test3', 'guest_team': 'test4'},
-        {'match_id': 17, 'date': '2017-08-23', 'time': '15:00', 'season': 21, 'arena': 'arena', 'city': 'city',
-         'finished': False, 'viewers': 228, 'home_team': 'test1', 'guest_team': 'test6'}
+        {'match_id': 15, 'date': datetime(2017, 8, 20, 21, 0, tzinfo=timezone.utc), 'time': '15:00', 'season': 21,
+         'arena': 'arena', 'city': 'city', 'finished': False, 'viewers': 228,
+         'home_team': 'test1', 'guest_team': 'test2'},
+        {'match_id': 16, 'date': datetime(2017, 8, 22, 21, 0, tzinfo=timezone.utc), 'time': '15:00', 'season': 19,
+         'arena': 'arena', 'city': 'city', 'finished': False, 'viewers': 228,
+         'home_team': 'test3', 'guest_team': 'test4'},
+        {'match_id': 17, 'date': datetime(2017, 8, 23, 21, 0, tzinfo=timezone.utc), 'time': '15:00', 'season': 21,
+         'arena': 'arena', 'city': 'city', 'finished': False, 'viewers': 228,
+         'home_team': 'test1', 'guest_team': 'test6'}
     ]
     protocols = [
         [['test1', 15, '4', '22', '4', '32', '55.17', '22', '16', '5', '00:08:41', '00:16:38', '00:06:40',
