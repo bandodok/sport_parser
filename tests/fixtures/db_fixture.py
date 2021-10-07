@@ -28,21 +28,58 @@ def update_db():
          'home_team': 'test1', 'guest_team': 'test6'}
     ]
     protocols = [
-        [['test1', 15, '4', '22', '4', '32', '55.17', '22', '16', '5', '00:08:41', '00:16:38', '00:06:40',
-          '66.31', '44'],
-         ['test2', 15, 0, '30', '12', '26', '44.83', '14', '14', '1', '00:10:37', '00:19:11', '00:06:40', '68.97',
-          '66']],
-        [['test3', 16, '4', '22', '4', '32', '55.17', '22', '16', '5', '00:08:41', '00:16:38', '00:06:40',
-          '66.31', '44'],
-         ['test4', 16, 0, '30', '12', '26', '44.83', '14', '14', '1', '00:10:37', '00:19:11', '00:06:40', '68.97',
-          '66']],
-        [['test1', 17, '8', '22', '4', '32', '55.17', '22', '16', '5', '00:08:41', '00:16:38', '00:06:40',
-          '66.31', '44'],
-         ['test6', 17, '5', '30', '12', '26', '44.83', '14', '14', '1', '00:10:37', '00:19:11', '00:06:40', '68.97',
-          '66']],
+        [{'team': 'test1', 'match_id': 15, 'g': '4', 'sog': '22', 'penalty': '4', 'faceoff': '32', 'faceoff_p': '55.17',
+          'blocks': '22', 'hits': '16', 'fop': '5', 'time_a': '00:08:41', 'vvsh': '00:16:38', 'nshv': '00:06:40',
+          'pd': '66.31', 'sh': '44'},
+         {'team': 'test2', 'match_id': 15, 'g': 0, 'sog': '30', 'penalty': '12', 'faceoff': '26', 'faceoff_p': '44.83',
+          'blocks': '14', 'hits': '14', 'fop': '1', 'time_a': '00:10:37', 'vvsh': '00:19:11', 'nshv': '00:06:40',
+          'pd': '68.97', 'sh': '66'}],
+        [{'team': 'test3', 'match_id': 16, 'g': '4', 'sog': '22', 'penalty': '4', 'faceoff': '32', 'faceoff_p': '55.17',
+          'blocks': '22', 'hits': '16', 'fop': '5', 'time_a': '00:08:41', 'vvsh': '00:16:38', 'nshv': '00:06:40',
+          'pd': '66.31', 'sh': '44'},
+         {'team': 'test4', 'match_id': 16, 'g': 0, 'sog': '30', 'penalty': '12', 'faceoff': '26', 'faceoff_p': '44.83',
+          'blocks': '14', 'hits': '14', 'fop': '1', 'time_a': '00:10:37', 'vvsh': '00:19:11', 'nshv': '00:06:40',
+          'pd': '68.97', 'sh': '66'}],
+        [{'team': 'test1', 'match_id': 17, 'g': '8', 'sog': '22', 'penalty': '4', 'faceoff': '32', 'faceoff_p': '55.17',
+          'blocks': '22', 'hits': '16', 'fop': '5', 'time_a': '00:08:41', 'vvsh': '00:16:38', 'nshv': '00:06:40',
+          'pd': '66.31', 'sh': '44'},
+         {'team': 'test6', 'match_id': 17, 'g': '5', 'sog': '30', 'penalty': '12', 'faceoff': '26',
+          'faceoff_p': '44.83', 'blocks': '14', 'hits': '14', 'fop': '1', 'time_a': '00:10:37', 'vvsh': '00:19:11',
+          'nshv': '00:06:40', 'pd': '68.97', 'sh': '66'}],
     ]
     for team in teams:
         add_teams_to_database(team)
     add_matches_to_database(matches)
     for protocol in protocols:
         add_khl_protocol_to_database(protocol)
+
+
+@pytest.fixture()
+def get_protocol():
+    row1 = {'team': 'test1', 'match_id': 12, 'g': '4', 'sog': '22', 'penalty': '4', 'faceoff': '32',
+            'faceoff_p': '55.17',
+            'blocks': '22', 'hits': '16', 'fop': '5', 'time_a': '00:08:41', 'vvsh': '00:16:38', 'nshv': '00:06:40',
+            'pd': '66.31', 'sh': '44'}
+    row2 = {'team': 'test2', 'match_id': 12, 'g': 0, 'sog': '30', 'penalty': '12', 'faceoff': '26',
+            'faceoff_p': '44.83',
+            'blocks': '14', 'hits': '14', 'fop': '1', 'time_a': '00:10:37', 'vvsh': '00:19:11', 'nshv': '00:06:40',
+            'pd': '68.97', 'sh': '66'}
+    return [row1, row2]
+
+
+@pytest.fixture()
+def get_matches():
+    match1 = {'match_id': 12, 'date': '2017-08-21', 'time': '15:00', 'season': 21, 'arena': 'arena', 'city': 'city',
+              'finished': True, 'viewers': 228, 'home_team': 'test1', 'guest_team': 'test2'}
+    match2 = {'match_id': 13, 'date': '2017-08-22', 'time': '15:01', 'season': 21, 'arena': 'arena', 'city': 'city',
+              'finished': True, 'viewers': 228, 'home_team': 'test1', 'guest_team': 'test2'}
+    match3 = {'match_id': 14, 'date': '2017-08-23', 'time': '15:02', 'season': 21, 'arena': 'arena', 'city': 'city',
+              'finished': False, 'viewers': 228, 'home_team': 'test1', 'guest_team': 'test2'}
+    return [match1, match2, match3]
+
+
+@pytest.fixture()
+def get_teams():
+    team1 = ['test1', 'img', 'city', 'arena', 'division', 'conference', 21]
+    team2 = ['test2', 'img', 'city', 'arena', 'division', 'conference', 21]
+    return team1, team2
