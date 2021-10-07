@@ -7,24 +7,24 @@ from datetime import datetime
 def add_khl_protocol_to_database(protocol) -> None:
     """Добавляет данные из протокола в базу данных"""
     for row in protocol:
-        team = _team_name_update(row[0])
-        season = KHLMatch.objects.get(match_id=row[1]).season
+        team = _team_name_update(row['team'])
+        season = KHLMatch.objects.get(match_id=row['match_id']).season
         KHLProtocol.objects.create(
             team_id=KHLTeams.objects.filter(season=season).get(name=team).id,
-            match_id=KHLMatch.objects.get(match_id=row[1]),
-            g=row[2],
-            sog=row[3],
-            penalty=row[4],
-            faceoff=row[5],
-            faceoff_p=row[6],
-            blocks=row[7],
-            hits=row[8],
-            fop=row[9],
-            time_a=row[10],
-            vvsh=row[11],
-            nshv=row[12],
-            pd=row[13],
-            sh=row[14]
+            match_id=KHLMatch.objects.get(match_id=row['match_id']),
+            g=row['g'],
+            sog=row['sog'],
+            penalty=row['penalty'],
+            faceoff=row['faceoff'],
+            faceoff_p=row['faceoff_p'],
+            blocks=row['blocks'],
+            hits=row['hits'],
+            fop=row['fop'],
+            time_a=row['time_a'],
+            vvsh=row['vvsh'],
+            nshv=row['nshv'],
+            pd=row['pd'],
+            sh=row['sh']
         )
 
 
