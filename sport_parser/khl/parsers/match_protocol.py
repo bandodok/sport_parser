@@ -56,30 +56,42 @@ def get_khl_protocol(match_id):
         len_ = int((len(rows) + 1) / 2)
         rows.insert((k + len_), v)
 
-    row_len = int(len(rows) / 2)
-    row_home = rows[:row_len]
-    row_home.insert(1, match_id)
-    row_home = row_update_type(row_home)
-    row_home.append(str(sh_home))
-    row_guest = rows[row_len:]
-    row_guest.insert(1, match_id)
-    row_guest = row_update_type(row_guest)
-    row_guest.append(str(sh_guest))
-    return row_home, row_guest
+    stat_dict = {
+        'Команда': 'Team',
+        'Ш': 'g',
+        'БВ': 'sog',
+        'Штр': 'penalty',
+        'ВВбр': 'faceoff',
+        '%ВВбр': 'faceoff_p',
+        'БлБ': 'blocks',
+        'СПр': 'hits',
+        'ФоП': 'fop',
+        'ВВА': 'time_a',
+        'ВВШ': 'vvsh',
+        'НВШ': 'nshv',
+        'ПД': 'pd'
+    }
+
+    row_home = {stat_dict[stat]: value for stat, value in zip(columns, rows)}
+    row_guest = {stat_dict[stat]: value for stat, value in zip(columns, rows[len(columns):])}
+
+    row_home.update({'match_id': match_id, 'sh': sh_home})
+    row_guest.update({'match_id': match_id, 'sh': sh_guest})
+
+    return row_update_type(row_home), row_update_type(row_guest)
 
 
 def row_update_type(row):
     """Приводит некорректные типы данных в протоколах к корректному
     для восприятия базой данных"""
-    for stat in row[2:]:
-        if not stat:
-            row[row.index(stat)] = 0
-            continue
-        if ':' in stat:
-            row[row.index(stat)] = f'00:{stat}'
-    if 14 - len(row) != 0:
-        for _ in range(14 - len(row)):
-            row.append(0)
+    for stat, value in row.items():
+        if stat in ('time_a', 'vvsh', 'nshv'):
+            if value == "":
+                row[stat] = '00:00:00'
+            else:
+                row[stat] = f'00:{value}'
+        elif not value:
+            row[stat] = 0
     return row
 
 
