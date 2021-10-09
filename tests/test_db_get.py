@@ -21,7 +21,7 @@ def test_get_team_list(update_db):
 def test_get_match_list(update_db):
     id1 = KHLTeams.objects.get(name='test1').id
     match_list = get_match_list(id1)
-    assert match_list == [15, 17]
+    assert match_list == [15, 17, 19, 22]
 
 
 @pytest.mark.django_db(transaction=True)
@@ -31,9 +31,9 @@ def test_get_team_stat(update_db):
     out1 = get_team_stat(id1, 'g', match_list, mode='list')
     out2 = get_team_stat(id1, 'g', match_list, mode='median')
     out3 = get_team_stat(id1, 'g', match_list, mode='sum')
-    assert out1 == [4, 8]
+    assert out1 == [4, 8, 10, 1]
     assert out2 == 6
-    assert out3 == 12
+    assert out3 == 23
 
 
 @pytest.mark.django_db(transaction=True)
@@ -43,9 +43,9 @@ def test_get_opponent_stat(update_db):
     out1 = get_opponent_stat(id1, 'g', match_list, mode='list')
     out2 = get_opponent_stat(id1, 'g', match_list, mode='median')
     out3 = get_opponent_stat(id1, 'g', match_list, mode='sum')
-    assert out1 == [0, 5]
-    assert out2 == 2.5
-    assert out3 == 5
+    assert out1 == [0, 5, 8, 3]
+    assert out2 == 4.0
+    assert out3 == 16
 
 
 def test_get_median():

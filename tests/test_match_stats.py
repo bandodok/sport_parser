@@ -7,7 +7,7 @@ from sport_parser.khl.view_data.match_stats import get_match_stats_view
 
 @pytest.mark.django_db(transaction=True)
 def test_get_match_stats_view(update_db):
-    data = get_match_stats_view(15)
+    data = get_match_stats_view(22)
     output = {
         'match_info': {
             'arena': 'arena',
