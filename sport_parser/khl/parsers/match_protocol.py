@@ -51,7 +51,7 @@ def get_khl_protocol(match_id):
         rows.insert((k + len_), v)
 
     stat_dict = {
-        'Команда': 'Team',
+        'Команда': 'team',
         'Ш': 'g',
         'БВ': 'sog',
         'Штр': 'penalty',
