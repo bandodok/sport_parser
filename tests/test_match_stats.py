@@ -3,12 +3,15 @@ import datetime
 
 import pytest
 from fixtures.db_fixture import update_db
+from sport_parser.khl.models import KHLTeams
 from sport_parser.khl.view_data.match_stats import get_match_stats_view
 
 
 @pytest.mark.django_db(transaction=True)
 def test_get_match_stats_view(update_db):
     data = get_match_stats_view(22)
+    team1_id = KHLTeams.objects.get(name='test1').id
+    team6_id = KHLTeams.objects.get(name='test6').id
 
     output = {
         'match_info': {
@@ -20,9 +23,9 @@ def test_get_match_stats_view(update_db):
             'season_stats': [
                 ['Team', 'Sh', 'Sh(A)', 'Sh%', 'SoG', 'SoG(A)', 'AQ', 'G', 'G(A)', 'FaceOff%', 'TimeA',
                  'TimeA(A)', 'TimeA%', 'DEV%', 'PDO%', 'Hits', 'Blocks', 'Blocks(A)', 'Blocks%', 'Penalty'],
-                ['test1', 1, '55.0', '55.0', '50.00%', '26.0', '26.0', '47.27%', '6.0', '4.0', '50.00%',
+                ['test1', team1_id, '55.0', '55.0', '50.00%', '26.0', '26.0', '47.27%', '6.0', '4.0', '50.00%',
                  '9:39', '9:39', '50.00%', '52.73%', '97.27%', '15.0', '18.0', '18.0', '50.00%', '8.0'],
-                ['test6', 6, '55.0', '55.0', '50.00%', '26.0', '26.0', '47.27%', '5.0', '5.5', '50.00%',
+                ['test6', team6_id, '55.0', '55.0', '50.00%', '26.0', '26.0', '47.27%', '5.0', '5.5', '50.00%',
                  '9:39', '9:39', '50.00%', '52.73%', '97.27%', '15.0', '18.0', '18.0', '50.00%', '8.0']
             ],
         },
