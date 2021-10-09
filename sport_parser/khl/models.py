@@ -24,6 +24,9 @@ class KHLTeams(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def last_matches(self, num, *, exclude=0):
+        return self.khlmatch_set.filter(finished=True).exclude(match_id=exclude).order_by('-date')[:num]
+
 
 class KHLMatch(models.Model):
     """ """
