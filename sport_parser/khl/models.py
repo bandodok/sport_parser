@@ -68,7 +68,7 @@ class KHLProtocol(models.Model):
     """
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    team_id = models.IntegerField()
+    team_id = models.ForeignKey(KHLTeams, on_delete=models.CASCADE)
     match_id = models.ForeignKey(KHLMatch, on_delete=models.CASCADE)
     g = models.IntegerField(null=True)
     sh = models.IntegerField(null=True)

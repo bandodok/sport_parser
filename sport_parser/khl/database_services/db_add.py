@@ -11,7 +11,7 @@ def add_khl_protocol_to_database(protocol) -> None:
         team = _team_name_update(row['team'])
         season = KHLMatch.objects.get(match_id=row['match_id']).season
         KHLProtocol.objects.create(
-            team_id=KHLTeams.objects.filter(season=season).get(name=team).id,
+            team_id=KHLTeams.objects.filter(season=season).get(name=team),
             match_id=KHLMatch.objects.get(match_id=row['match_id']),
             g=row['g'],
             sog=row['sog'],
