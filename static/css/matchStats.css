@@ -1,0 +1,68 @@
+h3 {
+    text-align: center;
+}
+
+.teams {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.leagueLogo {
+    margin-right: 0;
+}
+
+.score {
+    font-family: Montserrat, sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.score p {
+    color: white;
+}
+
+.score_time {
+    font-family: Montserrat, sans-serif;
+    font-size: 80px;
+    font-weight: normal;
+}
+
+.arena {
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+#arena {
+    color: #847c7c;
+}
+
+#viewers {
+    color: #847c7c;
+
+}
+
+.teams p {
+    font-family: Montserrat, sans-serif;
+    margin: 5px 0;
+}
+
+.teams h4 {
+    font-family: Montserrat, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.team1_info {
+    width: 300px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.team2_info {
+    width: 300px;
+    text-align: left;
+    white-space: nowrap;
+}

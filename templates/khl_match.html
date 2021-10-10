@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %} - flawlessanalytics{% endblock %}
+
+{% block static %}
+{{ block.super }}
+    <script>
+    var team1_stats = {{ team1_info.stats|safe }};
+    var team2_stats = {{ team2_info.stats|safe }};
+    var team1_name = "{{ team1_info.name|safe }}";
+    var team2_name = "{{ team2_info.name|safe }}";
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="{% static 'js/matchStats.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/matchStats.css'%}" type="text/css">
+{% endblock %}
+
+{% block nav %}
+    {{ block.super }}
+
+{% endblock %}
+
+{% block header_title %}
+    <h4>Континентальная Хоккейная Лига</h4>
+{% endblock %}
+
+{% block right_logo %}
+    <img src="/static/img/KHL.webp" alt="KHL" class="leagueLogo">
+{% endblock %}
+
+{% block left_sidebar %}
+{% endblock %}
+
+{% block right_sidebar %}
+    <p>Параметры:</p>
+<ul class="chartList">
+    <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
+    <a onclick=filterChart('chartSog') id="BchartSog"><li>Sog</li></a>
+    <a onclick=filterChart('chartG') id="BchartG"><li>G</li></a>
+    <a onclick=filterChart('chartBlocks') id="BchartBlocks"><li>Blocks</li></a>
+    <a onclick=filterChart('chartHits') id="BchartHits"><li>Hits</li></a>
+    <a onclick=filterChart('chartPenalty') id="BchartPenalty"><li>Penalty</li></a>
+    <a onclick=filterChart('chartTime_a') id="BchartTime_a"><li>TimeA</li></a>
+</ul>
+{% endblock %}
+
+{% block main_content %}
+    <div class="teams">
+        <div class="team1_info">
+            <p class="header_city">Конференция «{{ team1_info.conference }}»</p>
+            <p class="header_city">Дивизион {{ team1_info.division }}</p>
+            <h4 class="header_title">{{ team1_info.name }}</h4>
+            <p class="header_city">{{ team1_info.city }}</p>
+            <p class="header_city">{{ team1_info.arena }}</p>
+        </div>
+
+        <img src="{{ team1_info.image }}" alt="KHL" class="leagueLogo" id="team_logo">
+
+            <div class="score">
+                {% language 'ru' %}
+                <p class="header_city">{{ match_info.date|date:'j E Y' }}</p>
+                    {% if match_info.finished == True %}
+                        <p class="score_time">{{ team1_info.score }} - {{ team2_info.score }}</p>
+                        {%  else %}
+                        <p class="score_time">{{ match_info.time }}</p>
+                    {% endif %}
+                <p class="arena" id="arena">{{ match_info.arena }}</p>
+                <p class="arena" id="viewers">Зрителей: {{ match_info.viewers }}</p>
+                {% endlanguage %}
+            </div>
+
+        <img src="{{ team2_info.image }}" alt="KHL" class="leagueLogo" id="team_logo">
+
+        <div class="team2_info">
+            <p class="header_city">Конференция «{{ team2_info.conference }}»</p>
+            <p class="header_city">Дивизион {{ team2_info.division }}</p>
+            <h4 class="header_title">{{ team2_info.name }}</h4>
+            <p class="header_city">{{ team2_info.city }}</p>
+            <p class="header_city">{{ team2_info.arena }}</p>
+        </div>
+    </div>
+    <h3>СЕЗОН</h3>
+    <table class="table_sort">
+    <thead>
+        <tr>
+            {% for name in match_info.season_stats.0 %}
+            <th>{{ name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for row in match_info.season_stats|slice:"1:" %}
+        <tr>
+        <td onmousedown="middleGotoTeam({{ row.0 }})" onmouseup="gotoTeam({{ row.0 }})" class="urlToTeam">{{ row.1 }}</td>
+        {% for stat in row|slice:"2:" %}
+            <td align="right">{{ stat }}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<p class="update">Континентальная хоккейная лига</p>
+    <div id="chartSh" class="charts"></div>
+    <div id="chartSog" class="charts"></div>
+    <div id="chartG" class="charts"></div>
+    <div id="chartBlocks" class="charts"></div>
+    <div id="chartHits" class="charts"></div>
+    <div id="chartPenalty" class="charts"></div>
+    <div id="chartTime_a" class="charts"></div>
+{% endblock %}
