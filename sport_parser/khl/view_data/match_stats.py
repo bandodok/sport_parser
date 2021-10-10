@@ -6,8 +6,8 @@ def get_match_stats_view(match_id):
     match = get_match_by_id(match_id)
     team1, team2 = match.teams.all()
 
-    team1_season_stats = [team1.name, team1.id]
-    team2_season_stats = [team2.name, team2.id]
+    team1_season_stats = [team1.id, team1.name]
+    team2_season_stats = [team2.id, team2.name]
 
     team1_season_stats.extend(get_team_season_stats(team1.id))
     team2_season_stats.extend(get_team_season_stats(team2.id))
@@ -48,8 +48,12 @@ def get_match_stats_view(match_id):
     }
 
     exclude = 0
+    team1_score = '-'
+    team2_score = '-'
     if match_info['finished']:
         exclude = match.match_id
+        team1_score = match.khlprotocol_set.all().get(team_id=team1.id).g
+        team2_score = match.khlprotocol_set.all().get(team_id=team2.id).g
 
     team1_last_matches_query = team1.last_matches(5, exclude=exclude)
     team2_last_matches_query = team2.last_matches(5, exclude=exclude)
@@ -60,14 +64,24 @@ def get_match_stats_view(match_id):
     team1_info = {
         'name': team1.name,
         'city': team1.city,
+        'division': team1.division,
+        'conference': team1.conference,
+        'arena': team1.arena,
         'stats': get_team_stats_view(team1.id),
-        'last_matches': team1_last_matches
+        'last_matches': team1_last_matches,
+        'image': team1.img,
+        'score': team1_score
     }
     team2_info = {
         'name': team2.name,
         'city': team2.city,
+        'division': team1.division,
+        'conference': team1.conference,
+        'arena': team1.arena,
         'stats': get_team_stats_view(team2.id),
-        'last_matches': team2_last_matches
+        'last_matches': team2_last_matches,
+        'image': team2.img,
+        'score': team2_score
     }
 
     return {
