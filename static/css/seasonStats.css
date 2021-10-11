@@ -123,11 +123,13 @@ li {
     width: 50px;
     margin-left: auto;
     margin-top: 2px;
+    transition: background-color 0.2s;
 }
 
 li:hover {
     background-color: #47639f;
     cursor: pointer;
+    transition: none;
 }
 
 h3 {
@@ -235,8 +237,13 @@ th {
     cursor: pointer;
 }
 
+tr {
+    transition: background-color 0.2s;
+}
+
 tr:hover {
-  background-color: rgba(218, 5, 5, 0.3);
+    background-color: rgba(218, 5, 5, 0.3);
+    transition: none;
 }
 
 th.sorted[data-order="1"],
