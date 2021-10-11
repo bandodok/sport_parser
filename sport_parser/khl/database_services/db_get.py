@@ -177,3 +177,46 @@ def get_team_season_stats(team):
     ])
 
     return formated_stats
+
+
+def get_match_stats(match_id):
+    match = get_match_by_id(match_id)
+    team1, team2 = match.teams.all()
+    p1 = match.khlprotocol_set.all().get(team_id=team1.id)
+    p2 = match.khlprotocol_set.all().get(team_id=team2.id)
+
+    match_stats = [
+        [
+            'Team_id',
+            'Team',
+            'Sh',
+            'SoG',
+            'G',
+            'FaceOff',
+            'FaceOff%',
+            'Hits',
+            'Blocks',
+            'Penalty',
+            'TimeA',
+        ],
+    ]
+
+    team1_stats = [
+        p1.team_id.id,
+        p1.team_id.name,
+    ]
+
+    team2_stats = [
+        p2.team_id.id,
+        p2.team_id.name,
+    ]
+
+    team1_stats.extend(output_format(
+        [p1.sh, p1.sog, p1.g, p1.faceoff, p1.faceoff_p, p1.hits, p1.blocks, p1.penalty, sec_to_time(time_to_sec(p1.time_a))]))
+
+    team2_stats.extend(output_format(
+        [p2.sh, p2.sog, p2.g, p2.faceoff, p2.faceoff_p, p2.hits, p2.blocks, p2.penalty, sec_to_time(time_to_sec(p2.time_a))]))
+
+    match_stats.extend([team1_stats, team2_stats])
+
+    return match_stats
