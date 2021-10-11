@@ -25,7 +25,7 @@ def test_get_khl_protocol(get_protocol, get_protocol1):
                      response_body=get_protocol
                      )
     out_home = {
-        'Team': 'Йокерит',
+        'team': 'Йокерит',
         'blocks': '7',
         'faceoff': '31',
         'faceoff_p': '65.96',
@@ -42,7 +42,7 @@ def test_get_khl_protocol(get_protocol, get_protocol1):
         'vvsh': '00:19:42'
     }
     out_guest = {
-        'Team': 'Динамо М',
+        'team': 'Динамо М',
         'blocks': '6',
         'faceoff': '16',
         'faceoff_p': '34.04',
@@ -64,7 +64,7 @@ def test_get_khl_protocol(get_protocol, get_protocol1):
     assert mock1.calls == 1
 
     out_home = {
-        'Team': 'Авангард',
+        'team': 'Авангард',
         'blocks': '22',
         'faceoff': '32',
         'faceoff_p': '55.17',
@@ -81,7 +81,7 @@ def test_get_khl_protocol(get_protocol, get_protocol1):
         'vvsh': '00:16:38'
     }
     out_guest = {
-        'Team': 'ЦСКА',
+        'team': 'ЦСКА',
         'blocks': '14',
         'faceoff': '26',
         'faceoff_p': '44.83',

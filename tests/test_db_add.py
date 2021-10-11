@@ -3,33 +3,15 @@ from freezegun import freeze_time
 
 import pytest
 
+from fixtures.db_fixture import get_protocol, get_teams, get_matches
 from sport_parser.khl.database_services.db_add import add_khl_protocol_to_database, add_teams_to_database, \
     add_matches_to_database, last_updated
 from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch
 
-ROW1 = {'team': 'test1', 'match_id': 12, 'g': '4', 'sog': '22', 'penalty': '4', 'faceoff': '32', 'faceoff_p': '55.17', 'blocks': '22', 'hits': '16', 'fop': '5', 'time_a': '00:08:41', 'vvsh': '00:16:38', 'nshv': '00:06:40',
-        'pd': '66.31', 'sh': '44'}
-ROW2 = {'team': 'test2', 'match_id': 12, 'g': 0, 'sog': '30', 'penalty': '12', 'faceoff': '26', 'faceoff_p': '44.83', 'blocks': '14', 'hits': '14', 'fop': '1', 'time_a': '00:10:37', 'vvsh': '00:19:11', 'nshv': '00:06:40', 'pd': '68.97',
-        'sh': '66'}
-PROTOCOL = [ROW1, ROW2]
-MATCH = [12, '2017-08-21 19:30:00', 21, 'arena', 'city', 1]
-TEAM1 = ['test1', 'img', 'city', 'arena', 'division', 'conference', 21]
-TEAM2 = ['test2', 'img', 'city', 'arena', 'division', 'conference', 21]
-
 
 @pytest.mark.django_db(transaction=True)
-def test_add_matches_to_database():
-    add_matches_to_database(MATCH)
-    match = KHLMatch.objects.get(match_id=12)
-    assert match.season == 21
-    assert match.arena == 'arena'
-    assert match.city == 'city'
-    assert match.viewers == 1
-
-
-@pytest.mark.django_db(transaction=True)
-def test_add_teams_to_database():
-    add_teams_to_database(TEAM1)
+def test_add_teams_to_database(get_teams):
+    add_teams_to_database(get_teams[0])
     team = KHLTeams.objects.get(name='test1')
     assert team.id == 1
     assert team.img == 'img'
@@ -41,13 +23,24 @@ def test_add_teams_to_database():
 
 
 @pytest.mark.django_db(transaction=True)
-def test_add_khl_protocol_to_database():
-    add_matches_to_database(MATCH)
-    add_teams_to_database(TEAM1)
-    add_teams_to_database(TEAM2)
+def test_add_matches_to_database(get_teams, get_matches):
+    add_teams_to_database(get_teams[0])
+    add_teams_to_database(get_teams[1])
+    add_matches_to_database(get_matches)
+    match = KHLMatch.objects.get(match_id=12)
+    assert match.season == 21
+    assert match.arena == 'arena'
+    assert match.city == 'city'
+
+
+@pytest.mark.django_db(transaction=True)
+def test_add_khl_protocol_to_database(get_teams, get_matches, get_protocol):
+    add_teams_to_database(get_teams[0])
+    add_teams_to_database(get_teams[1])
+    add_matches_to_database(get_matches)
     team1_id = KHLTeams.objects.get(name='test1').id
     team2_id = KHLTeams.objects.get(name='test2').id
-    add_khl_protocol_to_database(PROTOCOL)
+    add_khl_protocol_to_database(get_protocol)
     team1 = KHLProtocol.objects.get(team_id=team1_id)
     team2 = KHLProtocol.objects.get(team_id=team2_id)
     assert team1.g == 4
@@ -59,9 +52,11 @@ def test_add_khl_protocol_to_database():
 
 
 @pytest.mark.django_db(transaction=True)
-def test_last_updated():
+def test_last_updated(get_teams, get_matches):
     with freeze_time(datetime(2012, 1, 14, tzinfo=timezone.utc)):
-        add_matches_to_database(MATCH)
+        add_teams_to_database(get_teams[0])
+        add_teams_to_database(get_teams[1])
+        add_matches_to_database(get_matches)
     with freeze_time(datetime(2018, 4, 24, tzinfo=timezone.utc)):
         update = last_updated()
         assert update == datetime(2012, 1, 14, tzinfo=timezone.utc)

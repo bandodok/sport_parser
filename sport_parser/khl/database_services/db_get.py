@@ -128,4 +128,95 @@ def get_team_id_by_season(team_id):
 
 def get_last_match_id():
     """Возвращает id последнего матча в базе данных"""
-    return KHLMatch.objects.aggregate(Max('match_id'))['match_id__max']
+    return KHLMatch.objects.filter(finished=True).aggregate(Max('match_id'))['match_id__max']
+
+
+def get_match_by_id(match_id):
+    """ """
+    return KHLMatch.objects.get(match_id=match_id)
+
+
+def get_team_season_stats(team):
+    match_list = get_match_list(team)
+
+    sh = get_team_stat(team, 'sh', match_list, mode='median')
+    sog = get_team_stat(team, 'sog', match_list, mode='median')
+    g = get_team_stat(team, 'g', match_list, mode='median')
+    blocks = get_team_stat(team, 'blocks', match_list, mode='median')
+    time_a = get_team_stat(team, 'time_a', match_list, mode='median')
+    penalty = get_team_stat(team, 'penalty', match_list, mode='median')
+    hits = get_team_stat(team, 'hits', match_list, mode='median')
+
+    sha = get_opponent_stat(team, 'sh', match_list, mode='median')
+    soga = get_opponent_stat(team, 'sog', match_list, mode='median')
+    ga = get_opponent_stat(team, 'g', match_list, mode='median')
+    blocksa = get_opponent_stat(team, 'blocks', match_list, mode='median')
+    time_aa = get_opponent_stat(team, 'time_a', match_list, mode='median')
+
+    faceoff = get_team_stat(team, 'faceoff', match_list, mode='sum')
+    faceoffa = get_opponent_stat(team, 'faceoff', match_list, mode='sum')
+
+    shp = f'{format(sh / (sh + sha) * 100, ".2f")}%'
+    sogp = f'{format(sog / sh * 100, ".2f")}%'
+    faceoffp = f'{format(faceoff / (faceoff + faceoffa) * 100, ".2f")}%'
+    blocksp = f'{format(blocks / (blocks + blocksa) * 100, ".2f")}%'
+    devp = f'{format((1 - (soga / sha)) * 100, ".2f")}%'
+    time_ap = f'{format(time_a / (time_a + time_aa) * 100, ".2f")}%'
+
+    pdo = f'{format(((sh / (sh + sha)) + (sog / sh)) * 100, ".2f")}%'
+
+    time_a = sec_to_time(time_a)
+    time_aa = sec_to_time(time_aa)
+
+    formated_stats = output_format([
+        sh, sha, shp, sog, soga,
+        sogp, g, ga, faceoffp,
+        time_a, time_aa, time_ap,
+        devp, pdo, hits, blocks,
+        blocksa, blocksp, penalty
+    ])
+
+    return formated_stats
+
+
+def get_match_stats(match_id):
+    match = get_match_by_id(match_id)
+    team1, team2 = match.teams.all()
+    p1 = match.khlprotocol_set.all().get(team_id=team1.id)
+    p2 = match.khlprotocol_set.all().get(team_id=team2.id)
+
+    match_stats = [
+        [
+            'Team_id',
+            'Team',
+            'Sh',
+            'SoG',
+            'G',
+            'FaceOff',
+            'FaceOff%',
+            'Hits',
+            'Blocks',
+            'Penalty',
+            'TimeA',
+        ],
+    ]
+
+    team1_stats = [
+        p1.team_id.id,
+        p1.team_id.name,
+    ]
+
+    team2_stats = [
+        p2.team_id.id,
+        p2.team_id.name,
+    ]
+
+    team1_stats.extend(output_format(
+        [p1.sh, p1.sog, p1.g, p1.faceoff, p1.faceoff_p, p1.hits, p1.blocks, p1.penalty, sec_to_time(time_to_sec(p1.time_a))]))
+
+    team2_stats.extend(output_format(
+        [p2.sh, p2.sog, p2.g, p2.faceoff, p2.faceoff_p, p2.hits, p2.blocks, p2.penalty, sec_to_time(time_to_sec(p2.time_a))]))
+
+    match_stats.extend([team1_stats, team2_stats])
+
+    return match_stats

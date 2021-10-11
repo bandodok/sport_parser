@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Max
 
 from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch
@@ -10,7 +11,7 @@ def add_khl_protocol_to_database(protocol) -> None:
         team = _team_name_update(row['team'])
         season = KHLMatch.objects.get(match_id=row['match_id']).season
         KHLProtocol.objects.create(
-            team_id=KHLTeams.objects.filter(season=season).get(name=team).id,
+            team_id=KHLTeams.objects.filter(season=season).get(name=team),
             match_id=KHLMatch.objects.get(match_id=row['match_id']),
             g=row['g'],
             sog=row['sog'],
@@ -41,16 +42,25 @@ def add_teams_to_database(team) -> None:
         )
 
 
-def add_matches_to_database(match):
+def add_matches_to_database(matches):
     """Добавляет информацию о матчах в базу данных"""
-    KHLMatch.objects.create(
-        match_id=match[0],
-        match_date=match[1],
-        season=match[2],
-        arena=match[3],
-        city=match[4],
-        viewers=match[5]
-    )
+    for match in matches:
+        with transaction.atomic():
+            a, _ = KHLMatch.objects.get_or_create(
+                match_id=match['match_id'],
+            )
+            a.date = match['date']
+            a.time = match['time']
+            a.season = match['season']
+            a.city = match['city']
+            a.arena = match['arena']
+            a.finished = match['finished']
+            a.viewers = match['viewers']
+            a.save()
+            home_team = KHLTeams.objects.filter(season=match['season']).get(name=match['home_team'])
+            guest_team = KHLTeams.objects.filter(season=match['season']).get(name=match['guest_team'])
+            a.teams.add(home_team, guest_team)
+            a.save()
 
 
 def _team_name_update(team):
@@ -70,7 +80,8 @@ def last_updated(*, update=False):
     При update=True обновляет эту дату на текущую"""
     last_update = KHLMatch.objects.aggregate(Max('updated'))['updated__max']
     if update:
-        last = KHLMatch.objects.get(updated=last_update)
+        last_matches = KHLMatch.objects.filter(updated=last_update)
+        last = last_matches[len(last_matches) - 1]
         last.updated = datetime.now()
         last.save()
     return last_update

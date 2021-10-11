@@ -1,9 +1,3 @@
-from django.db import transaction
-
-from sport_parser.khl.database_services.db_add import add_matches_to_database, add_khl_protocol_to_database, \
-    last_updated
-from sport_parser.khl.database_services.db_get import get_last_match_id
-from sport_parser.khl.parsers.match_info import get_khl_match_info
 from sport_parser.khl.parsers.request import get_request_content
 
 
@@ -57,7 +51,7 @@ def get_khl_protocol(match_id):
         rows.insert((k + len_), v)
 
     stat_dict = {
-        'Команда': 'Team',
+        'Команда': 'team',
         'Ш': 'g',
         'БВ': 'sog',
         'Штр': 'penalty',
@@ -93,35 +87,3 @@ def row_update_type(row):
         elif not value:
             row[stat] = 0
     return row
-
-
-def parse_season(first_match_id) -> None:
-    """Выгружает информацию по всему сезону и добавляет в базу данных"""
-    count = 0
-    for i in range(99999):
-        if first_match_id == 872325:
-            first_match_id += 1
-            continue
-        protocol = get_khl_protocol(first_match_id)
-        if 'match not found' in protocol:
-            count += 1
-            first_match_id += 1
-            if count > 15:
-                break
-            continue
-        match_info = get_khl_match_info(first_match_id)
-        with transaction.atomic():
-            add_matches_to_database(match_info)
-            add_khl_protocol_to_database(protocol)
-        count = 0
-        first_match_id += 1
-
-
-def update_protocols() -> None:
-    """Добавляет недостающие протоколы последнего сезона в базу данных"""
-    last_match_id = get_last_match_id()
-    if not last_match_id:
-        parse_season(55144)
-        return
-    last_updated(update=True)
-    parse_season(last_match_id + 1)

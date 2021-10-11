@@ -1,8 +1,9 @@
 from sport_parser.khl.database_services.db_add import last_updated
 from sport_parser.khl.database_services.db_get import get_team_attr, get_team_id_by_season
-from sport_parser.khl.parsers.match_protocol import parse_season, update_protocols
+from sport_parser.khl.parsers.season import parse_season, update_protocols, parse_season_matches
 from sport_parser.khl.parsers.team_info import parse_teams
 from sport_parser.khl.parsers.score_table import get_score_table
+from sport_parser.khl.view_data.match_stats import get_match_stats_view
 from sport_parser.khl.view_data.season_stats import get_season_stats_view
 from sport_parser.khl.view_data.team_stats import get_team_stats_view
 from django.http import HttpResponse, Http404
@@ -56,6 +57,16 @@ def team(request, team_id):
     })
 
 
+def match(request, match_id):
+    context = get_match_stats_view(match_id)
+    return render(request, 'khl_match.html', context=context)
+
+
 def update_protocol(request):
     update_protocols()
+    return redirect('/khl/stats/21')
+
+
+def update_season_matches(request, season):
+    parse_season_matches(season)
     return redirect('/khl/stats/21')
