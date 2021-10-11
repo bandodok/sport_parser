@@ -48,24 +48,30 @@ def test_get_match_stats_view(update_db):
                     'date': datetime.datetime(2017, 8, 20, 21, 0, tzinfo=timezone.utc),
                     'team1_name': 'test1',
                     'team1_score': 4,
+                    'team1_image': 'img',
                     'team2_name': 'test2',
                     'team2_score': 0,
+                    'team2_image': 'img',
                     'time': datetime.time(15, 0),
                 },
                 17: {
                     'date': datetime.datetime(2017, 8, 23, 21, 0, tzinfo=timezone.utc),
                     'team1_name': 'test1',
                     'team1_score': 8,
+                    'team1_image': 'img',
                     'team2_name': 'test6',
                     'team2_score': 5,
+                    'team2_image': 'img',
                     'time': datetime.time(15, 0)
                 },
                 19: {
                     'date': datetime.datetime(2017, 8, 25, 21, 0, tzinfo=timezone.utc),
                     'team1_name': 'test2',
                     'team1_score': 8,
+                    'team1_image': 'img',
                     'team2_name': 'test1',
                     'team2_score': 10,
+                    'team2_image': 'img',
                     'time': datetime.time(15, 0)
                 }
             }
@@ -89,24 +95,30 @@ def test_get_match_stats_view(update_db):
                     'date': datetime.datetime(2017, 8, 23, 21, 0, tzinfo=timezone.utc),
                     'team1_name': 'test1',
                     'team1_score': 8,
+                    'team1_image': 'img',
                     'team2_name': 'test6',
                     'team2_score': 5,
+                    'team2_image': 'img',
                     'time': datetime.time(15, 0)
                 },
                 18: {
                     'date': datetime.datetime(2017, 8, 24, 21, 0, tzinfo=timezone.utc),
                     'team1_name': 'test2',
                     'team1_score': 8,
+                    'team1_image': 'img',
                     'team2_name': 'test6',
                     'team2_score': 5,
+                    'team2_image': 'img',
                     'time': datetime.time(15, 0)
                 },
                 20: {
                     'date': datetime.datetime(2017, 8, 26, 21, 0, tzinfo=timezone.utc),
                     'team1_name': 'test6',
                     'team1_score': 8,
+                    'team1_image': 'img',
                     'team2_name': 'test2',
                     'team2_score': 3,
+                    'team2_image': 'img',
                     'time': datetime.time(15, 0)
                 }
             }

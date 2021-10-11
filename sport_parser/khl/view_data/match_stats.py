@@ -99,7 +99,9 @@ def _last_matches_info(matches):
             'time': match.time,
             'team1_name': match.khlprotocol_set.all()[0].team_id.name,
             'team1_score': match.khlprotocol_set.all()[0].g,
+            'team1_image': match.khlprotocol_set.all()[0].team_id.img,
             'team2_name': match.khlprotocol_set.all()[1].team_id.name,
             'team2_score': match.khlprotocol_set.all()[1].g,
+            'team2_image': match.khlprotocol_set.all()[1].team_id.img,
         }
     return last_matches
