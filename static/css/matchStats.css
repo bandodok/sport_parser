@@ -1,45 +1,17 @@
+.sidebarRight {
+    margin-top: 450px;
+}
+
+.sidebarRight li {
+    width: 80px;
+    user-select: none;
+}
+
 .teams {
     margin-top: 70px;
     display: flex;
     justify-content: center;
     text-align: center;
-}
-
-.leagueLogo {
-    margin-right: 0;
-}
-
-.score {
-    font-family: Montserrat, sans-serif;
-    font-size: 30px;
-    font-weight: bold;
-    padding: 0 40px;
-    white-space: nowrap;
-}
-
-.score p {
-    color: white;
-}
-
-.score_time {
-    font-family: Montserrat, sans-serif;
-    font-size: 80px;
-    font-weight: normal;
-}
-
-.arena {
-    font-family: Montserrat, sans-serif;
-    font-size: 15px;
-    font-weight: normal;
-}
-
-#arena {
-    color: #847c7c;
-}
-
-#viewers {
-    color: #847c7c;
-
 }
 
 .teams p {
@@ -63,4 +35,106 @@
     width: 100%;
     text-align: left;
     white-space: nowrap;
+}
+
+.leagueLogo {
+    margin-right: 0;
+}
+
+.score {
+    font-family: Montserrat, sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 0 40px;
+    white-space: nowrap;
+}
+
+.score p {
+    color: white;
+}
+
+#score_time {
+    font-family: Avalors, sans-serif;
+    font-size: 60px;
+    font-weight: normal;
+}
+
+.arena {
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+#arena {
+    color: #847c7c;
+}
+
+#viewers {
+    color: #847c7c;
+
+}
+
+.lastMatches {
+    display: flex;
+    justify-content: center;
+}
+
+.lastMatches .team1 {
+    text-align: right;
+}
+
+.lastMatches .team2 {
+    text-align: left;
+}
+
+.lastMatches .match {
+    font-size: 16px;
+    font-family: Montserrat, sans-serif;
+    border-color: #FFFFFF33;
+    border-style: solid;
+    border-width: 1px;
+    margin: 10px 15px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    width: 590px;
+}
+
+
+.match .team_left {
+    display: flex;
+    width: 100%;
+    margin-right: auto;
+    text-align: right;
+    align-self: center;
+    align-items: center;
+    justify-content: right;
+}
+.match .team_right {
+    display: flex;
+    width: 100%;
+    margin-left: auto;
+    text-align: left;
+    align-self: center;
+    align-items: center;
+    justify-content: left;
+}
+
+.match .match_info {
+    width: 210px;
+}
+
+.match .last_logo {
+    width: 100px;
+    height: 100px;
+    margin: 0 10px;
+}
+
+.match_info p {
+    margin-top: 10px;
+}
+
+.last_score {
+    font-size: 25px;
+    font-family: Avalors, sans-serif;
 }

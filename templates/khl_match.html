@@ -61,11 +61,11 @@
                 {% language 'ru' %}
                 <p class="header_city">{{ match_info.date|date:'j E Y' }}</p>
                     {% if match_info.finished == True %}
-                        <p class="score_time">{{ team1_info.score }} - {{ team2_info.score }}</p>
+                        <p id="score_time">{{ team1_info.score }} - {{ team2_info.score }}</p>
                         <p class="arena" id="arena">{{ match_info.arena }}</p>
                         <p class="arena" id="viewers">Зрителей: {{ match_info.viewers }}</p>
                         {%  else %}
-                        <p class="score_time">{{ match_info.time }}</p>
+                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px;">{{ match_info.time }}</p>
                     {% endif %}
                 {% endlanguage %}
             </div>
@@ -110,4 +110,63 @@
     <div id="chartHits" class="charts"></div>
     <div id="chartPenalty" class="charts"></div>
     <div id="chartTime_a" class="charts"></div>
+
+    <div class="lastMatches">
+        <div class="team1">
+        {% for key, value in team1_info.items %}
+            {% if key == 'last_matches' %}
+            {% for match_id, match_stats in value.items %}
+                <div class="match">
+                    <div class="team_left">
+                        {{ match_stats.team1_name }}
+                        <img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo">
+                    </div>
+                    <div class="match_info">
+                        {% language 'ru' %}
+                        <p>{{ match_stats.date|date:'j.m.Y' }}</p>
+                        <p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p>
+                        {% endlanguage %}
+                    </div>
+                    <div class="team_right">
+                        <div>
+                            <img src="{{ match_stats.team2_image }}" alt="{{ match_stats.team2_name }}" class="last_logo">
+                        </div>
+                        <div>
+                            {{ match_stats.team2_name }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% endif %}
+        {% endfor %}
+        </div>
+        <div class="team2">
+        {% for key, value in team2_info.items %}
+            {% if key == 'last_matches' %}
+            {% for match_id, match_stats in value.items %}
+                <div class="match">
+                    <div class="team_left">
+                        {{ match_stats.team1_name }}
+                        <img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo">
+                    </div>
+                    <div class="match_info">
+                        {% language 'ru' %}
+                        <p>{{ match_stats.date|date:'j.m.Y' }}</p>
+                        <p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p>
+                        {% endlanguage %}
+                    </div>
+                    <div class="team_right">
+                        <div>
+                            <img src="{{ match_stats.team2_image }}" alt="{{ match_stats.team2_name }}" class="last_logo">
+                        </div>
+                        <div>
+                            {{ match_stats.team2_name }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% endif %}
+        {% endfor %}
+        </div>
+    </div>
 {% endblock %}
