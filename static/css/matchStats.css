@@ -1,9 +1,5 @@
-h3 {
-    text-align: center;
-}
-
 .teams {
-    margin-top: 50px;
+    margin-top: 70px;
     display: flex;
     justify-content: center;
     text-align: center;
@@ -17,6 +13,8 @@ h3 {
     font-family: Montserrat, sans-serif;
     font-size: 30px;
     font-weight: bold;
+    padding: 0 40px;
+    white-space: nowrap;
 }
 
 .score p {
@@ -56,13 +54,13 @@ h3 {
 }
 
 .team1_info {
-    width: 300px;
+    width: 100%;
     text-align: right;
     white-space: nowrap;
 }
 
 .team2_info {
-    width: 300px;
+    width: 100%;
     text-align: left;
     white-space: nowrap;
 }

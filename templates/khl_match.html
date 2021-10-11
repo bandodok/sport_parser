@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
-{% block title %} - flawlessanalytics{% endblock %}
+{% block title %}{{ team1_info.name }} - {{ team2_info.name }} - КХЛ - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
@@ -62,11 +62,11 @@
                 <p class="header_city">{{ match_info.date|date:'j E Y' }}</p>
                     {% if match_info.finished == True %}
                         <p class="score_time">{{ team1_info.score }} - {{ team2_info.score }}</p>
+                        <p class="arena" id="arena">{{ match_info.arena }}</p>
+                        <p class="arena" id="viewers">Зрителей: {{ match_info.viewers }}</p>
                         {%  else %}
                         <p class="score_time">{{ match_info.time }}</p>
                     {% endif %}
-                <p class="arena" id="arena">{{ match_info.arena }}</p>
-                <p class="arena" id="viewers">Зрителей: {{ match_info.viewers }}</p>
                 {% endlanguage %}
             </div>
 
@@ -80,7 +80,7 @@
             <p class="header_city">{{ team2_info.arena }}</p>
         </div>
     </div>
-    <h3>СЕЗОН</h3>
+    <h3>Статистика команд в текущем сезоне</h3>
     <table class="table_sort">
     <thead>
         <tr>
@@ -102,7 +102,7 @@
 </table>
 
 
-<p class="update">Континентальная хоккейная лига</p>
+<h3 id="chartTitle">Континентальная хоккейная лига</h3>
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
     <div id="chartG" class="charts"></div>

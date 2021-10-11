@@ -13,6 +13,7 @@ function hideChart() {
         document.getElementById(item).style.display = 'none';
     });
     document.getElementById('chartSh').style.display = 'block';
+    document.getElementById('chartTitle').innerHTML = 'Все броски (Sh)';
     }
 
 
@@ -22,6 +23,29 @@ function filterChart(elementID) {
         document.getElementById(item).style.display = 'none';
     });
     document.getElementById(elementID).style.display = 'block';
+    switch (elementID) {
+        case 'chartSh':
+            document.getElementById('chartTitle').innerHTML = 'Все броски (Sh)';
+            break;
+        case 'chartSog':
+            document.getElementById('chartTitle').innerHTML = 'Броски в створ (Sog)';
+            break;
+        case 'chartG':
+            document.getElementById('chartTitle').innerHTML = 'Голы (G)';
+            break;
+        case 'chartBlocks':
+            document.getElementById('chartTitle').innerHTML = 'Блокированные броски (Blocks)';
+            break;
+        case 'chartHits':
+            document.getElementById('chartTitle').innerHTML = 'Силовые приемы (Hits)';
+            break;
+        case 'chartPenalty':
+            document.getElementById('chartTitle').innerHTML = 'Все броски (Sh)';
+            break;
+        case 'chartTime_a':
+            document.getElementById('chartTitle').innerHTML = 'Время в атаке (TimeA)';
+            break;
+    }
 }
 
 var statsSh = [];
