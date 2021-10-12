@@ -13,6 +13,8 @@ def get_khl_season_match_info(season, webdriver=get_selenium_content, check_fini
     url = f'https://www.khl.ru/calendar/{s}/00/'
     soup = webdriver(url)
     match_soup = soup.find('div', id='tab-calendar-all')
+    if not match_soup:
+        match_soup = soup.find('div', id='tab-calendar-last')
 
     dates = match_soup.find_all('div', class_='b-final_cup_date')
     dates = [date.b.text for date in dates]
@@ -33,6 +35,8 @@ def get_khl_season_match_info(season, webdriver=get_selenium_content, check_fini
                 if not check_finished:
                     continue
                 match_info = get_finished_match_info(match_id)
+                if match_info == 'match not updated':
+                    continue
             else:
                 finished = False
                 time = score.dt.h3.text.split(' ')[0]
@@ -67,6 +71,10 @@ def get_finished_match_info(match_id):
     url = f'https://www.khl.ru/game/{season}/{match_id}/preview/'
     soup = get_request_content(url)
     extra_info = soup.find_all('li', class_="b-match_add_info_item")
+
+    # если матч завершился, но страницу еще не обновили, прерываем обновление чтобы обновить позже
+    if not extra_info:
+        return 'match not updated'
 
     date_info = extra_info[0]
     arena_info = extra_info[1]
