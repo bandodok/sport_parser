@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}{{ team }} - flawlessanalytics{% endblock %}
 
@@ -63,4 +64,52 @@
     <div id="chartHits" class="charts"></div>
     <div id="chartPenalty" class="charts"></div>
     <div id="chartTime_a" class="charts"></div>
+
+    <div style="display: flex; justify-content: space-between">
+        <h3>Последние матчи</h3><h3>Ближайшие матчи</h3>
+    </div>
+
+    <div class="lastMatches">
+        <div class="team1">
+            {% for match_id, match_stats in last_matches.items %}
+                <a href="{% url 'match' match_id %}"><div class="match">
+                    <div class="team_left">
+                        <a href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
+                        <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
+                    </div>
+                    <div class="match_info">
+                        {% language 'ru' %}
+                        <p>{{ match_stats.date|date:'j.m.Y' }}</p>
+                        <a href="{% url 'match' match_id %}"><p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p></a>
+                        {% endlanguage %}
+                    </div>
+                    <div class="team_right">
+                        <a href="{% url 'team' match_stats.team2_id %}"><img src="{{ match_stats.team2_image }}" alt="{{ match_stats.team2_name }}" class="last_logo"></a>
+                        <a href="{% url 'team' match_stats.team2_id %}">{{ match_stats.team2_name }}</a>
+                    </div>
+                </div></a>
+            {% endfor %}
+        </div>
+        <div class="team2">
+            {% for match_id, match_stats in future_matches.items %}
+                <a href="{% url 'match' match_id %}"><div class="match">
+                    <div class="team_left">
+                        <a href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
+                        <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
+                    </div>
+                    <div class="match_info">
+                        {% language 'ru' %}
+                        <p>{{ match_stats.date|date:'j.m.Y' }}</p>
+                        <a href="{% url 'match' match_id %}"><p class="last_score">{{ match_stats.time }}</p></a>
+                        {% endlanguage %}
+                    </div>
+                    <div class="team_right">
+                        <a href="{% url 'team' match_stats.team2_id %}"><img src="{{ match_stats.team2_image }}" alt="{{ match_stats.team2_name }}" class="last_logo"></a>
+                        <a href="{% url 'team' match_stats.team2_id %}">{{ match_stats.team2_name }}</a>
+                    </div>
+                </div></a>
+            {% endfor %}
+        </div>
+    </div>
+
 {% endblock %}
