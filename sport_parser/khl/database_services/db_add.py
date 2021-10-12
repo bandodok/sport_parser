@@ -10,36 +10,36 @@ def add_khl_protocol_to_database(protocol) -> None:
     for row in protocol:
         team = _team_name_update(row['team'])
         season = KHLMatch.objects.get(match_id=row['match_id']).season
-        KHLProtocol.objects.create(
+        p, _ = KHLProtocol.objects.get_or_create(
             team_id=KHLTeams.objects.filter(season=season).get(name=team),
-            match_id=KHLMatch.objects.get(match_id=row['match_id']),
-            g=row['g'],
-            sog=row['sog'],
-            penalty=row['penalty'],
-            faceoff=row['faceoff'],
-            faceoff_p=row['faceoff_p'],
-            blocks=row['blocks'],
-            hits=row['hits'],
-            fop=row['fop'],
-            time_a=row['time_a'],
-            vvsh=row['vvsh'],
-            nshv=row['nshv'],
-            pd=row['pd'],
-            sh=row['sh']
+            match_id=KHLMatch.objects.get(match_id=row['match_id'])
         )
+        p.g = row['g']
+        p.sog = row['sog']
+        p.penalty = row['penalty']
+        p.faceoff = row['faceoff']
+        p.faceoff_p = row['faceoff_p']
+        p.blocks = row['blocks']
+        p.hits = row['hits']
+        p.fop = row['fop']
+        p.time_a = row['time_a']
+        p.vvsh = row['vvsh']
+        p.nshv = row['nshv']
+        p.pd = row['pd']
+        p.sh = row['sh']
+        p.save()
 
 
-def add_teams_to_database(team) -> None:
+def add_teams_to_database(team_info) -> None:
     """Добавляет данные команд в базу данных"""
-    KHLTeams.objects.create(
-        name=team[0],
-        img=team[1],
-        city=team[2],
-        arena=team[3],
-        division=team[4],
-        conference=team[5],
-        season=team[6]
-        )
+    team_name = _team_name_update(team_info[0])
+    team, _ = KHLTeams.objects.get_or_create(name=team_name, season=team_info[6])
+    team.img = team_info[1]
+    team.city = team_info[2]
+    team.arena = team_info[3]
+    team.division = team_info[4]
+    team.conference = team_info[5]
+    team.save()
 
 
 def add_matches_to_database(matches):
@@ -57,8 +57,10 @@ def add_matches_to_database(matches):
             a.finished = match['finished']
             a.viewers = match['viewers']
             a.save()
-            home_team = KHLTeams.objects.filter(season=match['season']).get(name=match['home_team'])
-            guest_team = KHLTeams.objects.filter(season=match['season']).get(name=match['guest_team'])
+            home_team = _team_name_update(match['home_team'])
+            guest_team = _team_name_update(match['guest_team'])
+            home_team = KHLTeams.objects.filter(season=match['season']).get(name=home_team)
+            guest_team = KHLTeams.objects.filter(season=match['season']).get(name=guest_team)
             a.teams.add(home_team, guest_team)
             a.save()
 
@@ -70,6 +72,8 @@ def _team_name_update(team):
         new_team = 'Динамо М'
     elif team == 'ХК Динамо М':
         new_team = 'Динамо М'
+    elif team == 'ХК Сочи':
+        new_team = 'Сочи'
     else:
         return team
     return new_team
