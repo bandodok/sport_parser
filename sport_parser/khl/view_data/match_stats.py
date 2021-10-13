@@ -64,6 +64,15 @@ def get_match_stats_view(match_id):
     team1_last_matches = last_matches_info(team1_last_matches_query)
     team2_last_matches = last_matches_info(team2_last_matches_query)
 
+    team1_chart_stats = get_team_chart_stats(team1.id)
+    team2_chart_stats = get_team_chart_stats(team2.id)
+
+    if team1_chart_stats != team2_chart_stats:
+        if len(team1_chart_stats) < len(team2_chart_stats):
+            team2_chart_stats.pop()
+        else:
+            team1_chart_stats.pop()
+
     team1_info = {
         'name': team1.name,
         'id': team1.id,
@@ -71,7 +80,7 @@ def get_match_stats_view(match_id):
         'division': team1.division,
         'conference': team1.conference,
         'arena': team1.arena,
-        'stats': get_team_chart_stats(team1.id),
+        'stats': team1_chart_stats,
         'last_matches': team1_last_matches,
         'image': team1.img,
         'score': team1_score
@@ -80,10 +89,10 @@ def get_match_stats_view(match_id):
         'name': team2.name,
         'id': team2.id,
         'city': team2.city,
-        'division': team1.division,
-        'conference': team1.conference,
-        'arena': team1.arena,
-        'stats': get_team_chart_stats(team2.id),
+        'division': team2.division,
+        'conference': team2.conference,
+        'arena': team2.arena,
+        'stats': team2_chart_stats,
         'last_matches': team2_last_matches,
         'image': team2.img,
         'score': team2_score
