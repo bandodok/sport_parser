@@ -35,6 +35,11 @@
 {% endblock %}
 
 {% block right_sidebar %}
+    {% if match_info.finished == True %}
+    <div style="margin-top: 550px">
+    {% else %}
+        <div style="margin-top: 380px">
+        {% endif %}
     <p>Параметры:</p>
 <ul class="chartList">
     <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
@@ -45,6 +50,7 @@
     <a onclick=filterChart('chartPenalty') id="BchartPenalty"><li>Penalty</li></a>
     <a onclick=filterChart('chartTime_a') id="BchartTime_a"><li>TimeA</li></a>
 </ul>
+    </div>
 {% endblock %}
 
 {% block main_content %}
@@ -130,7 +136,10 @@
 </table>
 
 
-<h3 id="chartTitle">Континентальная хоккейная лига</h3>
+    <div style="display: flex; justify-content: space-between">
+        <h3 id="chartTitle1">Все броски</h3><h3 id="chartTitle2">Sh</h3>
+    </div>
+
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
     <div id="chartG" class="charts"></div>
