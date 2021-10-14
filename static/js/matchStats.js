@@ -25,25 +25,32 @@ function filterChart(elementID) {
     document.getElementById(elementID).style.display = 'block';
     switch (elementID) {
         case 'chartSh':
-            document.getElementById('chartTitle').innerHTML = 'Все броски (Sh)';
+            document.getElementById('chartTitle1').innerHTML = 'Все броски';
+            document.getElementById('chartTitle2').innerHTML = 'Sh';
             break;
         case 'chartSog':
-            document.getElementById('chartTitle').innerHTML = 'Броски в створ (Sog)';
+            document.getElementById('chartTitle1').innerHTML = 'Броски в створ';
+            document.getElementById('chartTitle2').innerHTML = 'Sog';
             break;
         case 'chartG':
-            document.getElementById('chartTitle').innerHTML = 'Голы (G)';
+            document.getElementById('chartTitle1').innerHTML = 'Голы';
+            document.getElementById('chartTitle2').innerHTML = 'G';
             break;
         case 'chartBlocks':
-            document.getElementById('chartTitle').innerHTML = 'Блокированные броски (Blocks)';
+            document.getElementById('chartTitle1').innerHTML = 'Блокированные броски';
+            document.getElementById('chartTitle2').innerHTML = 'Blocks';
             break;
         case 'chartHits':
-            document.getElementById('chartTitle').innerHTML = 'Силовые приемы (Hits)';
+            document.getElementById('chartTitle1').innerHTML = 'Силовые приемы';
+            document.getElementById('chartTitle2').innerHTML = 'Hits';
             break;
         case 'chartPenalty':
-            document.getElementById('chartTitle').innerHTML = 'Все броски (Sh)';
+            document.getElementById('chartTitle1').innerHTML = 'Все броски';
+            document.getElementById('chartTitle2').innerHTML = 'Sh';
             break;
         case 'chartTime_a':
-            document.getElementById('chartTitle').innerHTML = 'Время в атаке (TimeA)';
+            document.getElementById('chartTitle1').innerHTML = 'Время в атаке';
+            document.getElementById('chartTitle2').innerHTML = 'TimeA';
             break;
     }
 }

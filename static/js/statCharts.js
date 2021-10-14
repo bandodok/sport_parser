@@ -44,7 +44,7 @@ stats.forEach(function (item, i) {
 
     var options = {
         curveType: 'function',
-        width: 1200,
+        'min-width': 1200,
         height: 400,
         legend: {
             position: 'bottom',

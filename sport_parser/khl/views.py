@@ -1,5 +1,4 @@
 from sport_parser.khl.database_services.db_add import last_updated
-from sport_parser.khl.database_services.db_get import get_team_attr, get_team_id_by_season
 from sport_parser.khl.parsers.season import parse_season, update_protocols, parse_season_matches
 from sport_parser.khl.parsers.team_info import parse_teams
 from sport_parser.khl.parsers.score_table import get_score_table
@@ -35,26 +34,7 @@ def stats(request, season):
 
 
 def team(request, team_id):
-    team_stats = get_team_stats_view(team_id)
-    team = get_team_attr(team_id, 'name')
-    arena = get_team_attr(team_id, 'arena')
-    city = get_team_attr(team_id, 'city')
-    division = get_team_attr(team_id, 'division')
-    conference = get_team_attr(team_id, 'conference')
-    logo = get_team_attr(team_id, 'img')
-    season = get_team_attr(team_id, 'season')
-    season_dict = get_team_id_by_season(team_id)
-    return render(request, 'khl_team.html', context={
-        'stats': team_stats,
-        'team': team,
-        'arena': arena,
-        'city': city,
-        'division': division,
-        'conference': conference,
-        'logo': logo,
-        'season': season,
-        'seasons': season_dict
-    })
+    return render(request, 'khl_team.html', context=get_team_stats_view(team_id))
 
 
 def match(request, match_id):

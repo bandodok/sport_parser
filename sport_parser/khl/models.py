@@ -27,6 +27,9 @@ class KHLTeams(models.Model):
     def last_matches(self, num, *, exclude=0):
         return self.khlmatch_set.filter(finished=True).exclude(match_id=exclude).order_by('-date')[:num]
 
+    def future_matches(self, num):
+        return self.khlmatch_set.filter(finished=False).order_by('date')[:num]
+
 
 class KHLMatch(models.Model):
     """ """
