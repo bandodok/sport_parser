@@ -11,6 +11,7 @@ from sport_parser.khl.view_data.match_stats import get_match_stats_view
 def test_get_match_stats_view(update_db):
     data = get_match_stats_view(22)
     team1_id = KHLTeams.objects.get(name='test1').id
+    team2_id = KHLTeams.objects.get(name='test2').id
     team6_id = KHLTeams.objects.get(name='test6').id
 
     output = {
@@ -20,6 +21,10 @@ def test_get_match_stats_view(update_db):
             'time': datetime.time(15, 0),
             'viewers': 228,
             'finished': True,
+            'match_stats': [['Team_id', 'Team', 'Sh', 'SoG', 'G', 'FaceOff', 'FaceOff%', 'Hits', 'Blocks', 'Penalty',
+                             'TimeA'],
+                            [team1_id, 'test1', '66.0', '30.0', '1.0', '26.0', '44.8', '14.0', '14.0', '12.0', '10:37'],
+                            [team6_id, 'test6', '44.0', '22.0', '3.0', '32.0', '55.2', '16.0', '22.0', '4.0', '8:41']],
             'season_stats': [
                 ['Team', 'Sh', 'Sh(A)', 'Sh%', 'SoG', 'SoG(A)', 'AQ', 'G', 'G(A)', 'FaceOff%', 'TimeA',
                  'TimeA(A)', 'TimeA%', 'DEV%', 'PDO%', 'Hits', 'Blocks', 'Blocks(A)', 'Blocks%', 'Penalty'],
@@ -33,6 +38,7 @@ def test_get_match_stats_view(update_db):
             'city': 'city',
             'name': 'test1',
             'image': 'img',
+            'id': team1_id,
             'conference': 'conference',
             'division': 'division',
             'arena': 'arena',
@@ -49,9 +55,11 @@ def test_get_match_stats_view(update_db):
                     'team1_name': 'test1',
                     'team1_score': 4,
                     'team1_image': 'img',
+                    'team1_id': team1_id,
                     'team2_name': 'test2',
                     'team2_score': 0,
                     'team2_image': 'img',
+                    'team2_id': team2_id,
                     'time': datetime.time(15, 0),
                 },
                 17: {
@@ -59,9 +67,11 @@ def test_get_match_stats_view(update_db):
                     'team1_name': 'test1',
                     'team1_score': 8,
                     'team1_image': 'img',
+                    'team1_id': team1_id,
                     'team2_name': 'test6',
                     'team2_score': 5,
                     'team2_image': 'img',
+                    'team2_id': team6_id,
                     'time': datetime.time(15, 0)
                 },
                 19: {
@@ -69,9 +79,11 @@ def test_get_match_stats_view(update_db):
                     'team1_name': 'test2',
                     'team1_score': 8,
                     'team1_image': 'img',
+                    'team1_id': team2_id,
                     'team2_name': 'test1',
                     'team2_score': 10,
                     'team2_image': 'img',
+                    'team2_id': team1_id,
                     'time': datetime.time(15, 0)
                 }
             }
@@ -84,6 +96,7 @@ def test_get_match_stats_view(update_db):
             'division': 'division',
             'arena': 'arena',
             'score': 3,
+            'id': team6_id,
             'stats': [['Sh', 'SoG', 'G', 'Blocks', 'Penalty', 'Hits', 'TimeA', 'Sh(A)', 'SoG(A)', 'G(A)', 'Blocks(A)',
                        'Penalty(A)', 'Hits(A)', 'TimeA(A)'],
                       [66, 30, 5, 14, 12, 14, 637, 44, 22, 8, 22, 4, 16, 521],
@@ -96,9 +109,11 @@ def test_get_match_stats_view(update_db):
                     'team1_name': 'test1',
                     'team1_score': 8,
                     'team1_image': 'img',
+                    'team1_id': team1_id,
                     'team2_name': 'test6',
                     'team2_score': 5,
                     'team2_image': 'img',
+                    'team2_id': team6_id,
                     'time': datetime.time(15, 0)
                 },
                 18: {
@@ -106,9 +121,11 @@ def test_get_match_stats_view(update_db):
                     'team1_name': 'test2',
                     'team1_score': 8,
                     'team1_image': 'img',
+                    'team1_id': team2_id,
                     'team2_name': 'test6',
                     'team2_score': 5,
                     'team2_image': 'img',
+                    'team2_id': team6_id,
                     'time': datetime.time(15, 0)
                 },
                 20: {
@@ -116,9 +133,11 @@ def test_get_match_stats_view(update_db):
                     'team1_name': 'test6',
                     'team1_score': 8,
                     'team1_image': 'img',
+                    'team1_id': team6_id,
                     'team2_name': 'test2',
                     'team2_score': 3,
                     'team2_image': 'img',
+                    'team2_id': team2_id,
                     'time': datetime.time(15, 0)
                 }
             }
