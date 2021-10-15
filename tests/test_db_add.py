@@ -13,7 +13,6 @@ from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch
 def test_add_teams_to_database(get_teams):
     add_teams_to_database(get_teams[0])
     team = KHLTeams.objects.get(name='test1')
-    assert team.id == 1
     assert team.img == 'img'
     assert team.city == 'city'
     assert team.arena == 'arena'
