@@ -18,8 +18,8 @@
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'stats' 21 %}">Сезоны</a>
-    <a href="#">Календарь</a>
+    <a href="{% url 'stats' match_info.season %}">Сезоны</a>
+    <a href="{% url 'calendar' match_info.season %}">Календарь</a>
 
 {% endblock %}
 
