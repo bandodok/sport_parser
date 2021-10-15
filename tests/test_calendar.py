@@ -16,6 +16,7 @@ def test_get_calendar_view(update_db):
     team6_id = KHLTeams.objects.get(name='test6').id
 
     calendar = {
+        'season': 21,
         'finished_matches': {
             15: {'date': datetime.datetime(2017, 8, 20, 21, 0, tzinfo=timezone.utc),
                  'team1_id': team1_id,

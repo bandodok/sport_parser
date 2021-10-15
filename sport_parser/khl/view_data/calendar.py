@@ -8,6 +8,7 @@ def get_calendar_view(season):
     finished_matches = last_matches_info(matches.filter(finished=True).order_by('date'))
     unfinished_matches = future_matches_info(matches.filter(finished=False).order_by('date'))
     return {
+        'season': season,
         'finished_matches': finished_matches,
         'unfinished_matches': unfinished_matches,
     }
