@@ -45,6 +45,7 @@ def get_match_stats_view(match_id):
         'arena': match.arena,
         'viewers': match.viewers,
         'season_stats': season_stats,
+        'season': match.season,
         'finished': match.finished,
     }
 
