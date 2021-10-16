@@ -2,6 +2,11 @@
 
 {% block title %}KHL Stats{% endblock %}
 
+{% block nav %}
+    {{ block.super }}
+    <a href="{% url 'calendar' season %}">Календарь</a>
+{% endblock %}
+
 {% block header_title %}
     <h4>Континентальная Хоккейная Лига</h4>
 {% endblock %}

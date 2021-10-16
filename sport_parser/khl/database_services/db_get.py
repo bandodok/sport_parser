@@ -141,6 +141,11 @@ def get_team_by_id(team_id):
     return KHLTeams.objects.get(id=team_id)
 
 
+def get_matches_by_season(season):
+    """ """
+    return KHLMatch.objects.filter(season=season)
+
+
 def get_unfinished_matches_id():
     """Возвращает список id незавершенных матчей"""
     return KHLMatch.objects.filter(finished=False).order_by('date').values_list('match_id', flat=True)

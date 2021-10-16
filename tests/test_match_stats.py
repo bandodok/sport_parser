@@ -20,6 +20,7 @@ def test_get_match_stats_view(update_db):
             'date': datetime.datetime(2017, 8, 28, 21, 0, tzinfo=timezone.utc),
             'time': datetime.time(15, 0),
             'viewers': 228,
+            'season': 21,
             'finished': True,
             'match_stats': [['Team_id', 'Team', 'Sh', 'SoG', 'G', 'FaceOff', 'FaceOff%', 'Hits', 'Blocks', 'Penalty',
                              'TimeA'],

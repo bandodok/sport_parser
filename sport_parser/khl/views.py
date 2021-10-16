@@ -2,6 +2,7 @@ from sport_parser.khl.database_services.db_add import last_updated
 from sport_parser.khl.parsers.season import parse_season, update_protocols, parse_season_matches
 from sport_parser.khl.parsers.team_info import parse_teams
 from sport_parser.khl.parsers.score_table import get_score_table
+from sport_parser.khl.view_data.calendar import get_calendar_view
 from sport_parser.khl.view_data.match_stats import get_match_stats_view
 from sport_parser.khl.view_data.season_stats import get_season_stats_view
 from sport_parser.khl.view_data.team_stats import get_team_stats_view
@@ -40,6 +41,10 @@ def team(request, team_id):
 def match(request, match_id):
     context = get_match_stats_view(match_id)
     return render(request, 'khl_match.html', context=context)
+
+
+def calendar(request, season):
+    return render(request, 'khl_calendar.html', context=get_calendar_view(season))
 
 
 def update_protocol(request):
