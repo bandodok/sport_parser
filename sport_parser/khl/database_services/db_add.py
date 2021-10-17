@@ -14,19 +14,19 @@ def add_khl_protocol_to_database(protocol) -> None:
             team_id=KHLTeams.objects.filter(season=season).get(name=team),
             match_id=KHLMatch.objects.get(match_id=row['match_id'])
         )
-        p.g = row['g']
-        p.sog = row['sog']
-        p.penalty = row['penalty']
-        p.faceoff = row['faceoff']
-        p.faceoff_p = row['faceoff_p']
-        p.blocks = row['blocks']
-        p.hits = row['hits']
-        p.fop = row['fop']
-        p.time_a = row['time_a']
-        p.vvsh = row['vvsh']
-        p.nshv = row['nshv']
-        p.pd = row['pd']
-        p.sh = row['sh']
+        p.g = row.get('g', '0')
+        p.sog = row.get('sog', '0')
+        p.penalty = row.get('penalty', '0')
+        p.faceoff = row.get('faceoff', '0')
+        p.faceoff_p = row.get('faceoff_p', '00:00')
+        p.blocks = row.get('blocks', '0')
+        p.hits = row.get('hits', '0')
+        p.fop = row.get('fop', '0')
+        p.time_a = row.get('time_a', '00:00:00')
+        p.vvsh = row.get('vvsh', '00:00:00')
+        p.nshv = row.get('nshv', '00:00:00')
+        p.pd = row.get('pd', '00.00')
+        p.sh = row.get('sh', 0)
         p.save()
 
 
