@@ -27,7 +27,11 @@ def get_khl_season_match_info(season, webdriver=get_selenium_content, check_fini
         for match in match_list:
             href = match.find('dl', class_='b-title-option').div.div.ul.li.a['href']
             match_id = href.split('/')[3]
-            home_team = match.find('dl', class_='b-details m-club').dd.h5.a.text
+            # у матчей дивизиона нет ссылок на страницу команды
+            home_team_a = match.find('dl', class_='b-details m-club').dd.h5.a
+            if not home_team_a:
+                continue
+            home_team = home_team_a.text
             guest_team = match.find('dl', class_='b-details m-club m-rightward').dd.h5.a.text
             score = match.find('dl', class_='b-score')
             if '—' in score.dt.h3.text:

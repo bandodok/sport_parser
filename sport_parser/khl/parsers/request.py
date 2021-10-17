@@ -1,4 +1,5 @@
 import functools
+import os
 
 import requests
 from bs4 import BeautifulSoup
@@ -13,12 +14,13 @@ def get_request_content(url):
 
 @functools.lru_cache(maxsize=5)
 def get_selenium_content(url):
+    loc = os.getenv('CHROMEDRIVER')
     op = webdriver.ChromeOptions()
     op.add_argument('headless')
     op.add_argument('ignore-certificate-errors')
     capabilities = webdriver.DesiredCapabilities().CHROME
     capabilities['acceptSslCerts'] = True
-    driver = webdriver.Chrome(options=op)
+    driver = webdriver.Chrome(loc, options=op)
     driver.get(url)
     r = driver.page_source
     driver.close()

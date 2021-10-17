@@ -16,11 +16,6 @@ def index(request):
    # return render(request, 'khl_index.html', context={'data': data.to_html()})
 
 
-def update(request, match_id):
-    parse_season(match_id)
-    return HttpResponse('Complete!')
-
-
 def update_teams(request):
     parse_teams()
     return HttpResponse('Complete!')
@@ -50,6 +45,11 @@ def calendar(request, season):
 def update_protocol(request):
     update_protocols()
     return redirect('/khl/stats/21')
+
+
+def update_finished(request, season):
+    update_protocols(season, finished=True)
+    return HttpResponse('Complete!')
 
 
 def update_season_matches(request, season):

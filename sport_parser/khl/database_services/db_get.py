@@ -146,6 +146,11 @@ def get_matches_by_season(season):
     return KHLMatch.objects.filter(season=season)
 
 
+def get_finished_matches_id(season):
+    """Возвращает список id завершенных матчей сезона"""
+    return KHLMatch.objects.filter(season=season).filter(finished=True).order_by('date').values_list('match_id', flat=True)
+
+
 def get_unfinished_matches_id():
     """Возвращает список id незавершенных матчей"""
     return KHLMatch.objects.filter(finished=False).order_by('date').values_list('match_id', flat=True)
