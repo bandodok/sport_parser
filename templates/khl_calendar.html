@@ -7,8 +7,7 @@
 {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/calendar.css'%}" type="text/css">
     <script>
-    var finished_matches = {{ finished_matches|safe }};
-    var unfinished_matches = {{ unfinished_matches|safe  }};
+    var season = {{ season|safe  }};
     </script>
     <script type="text/javascript" src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}
@@ -41,7 +40,6 @@
 {% block right_sidebar %}
     <p>Отображение:</p>
     <ul class="calendarFilter">
-        <a onclick=createMatch()><li>YJDSQ VFNX</li></a>
         <a onclick=filterCalendar('all')><li>Все</li></a>
         <a onclick=filterCalendar('past')><li>Прошедшие</li></a>
         <a onclick=filterCalendar('future')><li>Будущие</li></a>
