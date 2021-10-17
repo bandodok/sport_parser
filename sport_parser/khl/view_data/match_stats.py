@@ -68,7 +68,7 @@ def get_match_stats_view(match_id):
     team1_chart_stats = get_team_chart_stats(team1.id)
     team2_chart_stats = get_team_chart_stats(team2.id)
 
-    if len(team1_chart_stats) != len(team2_chart_stats):
+    while len(team1_chart_stats) != len(team2_chart_stats):
         if len(team1_chart_stats) < len(team2_chart_stats):
             team2_chart_stats.pop()
         else:
