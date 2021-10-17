@@ -7,8 +7,7 @@
 {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/calendar.css'%}" type="text/css">
     <script>
-    var finished_matches = {{ finished_matches|safe }};
-    var unfinished_matches = {{ unfinished_matches|safe  }};
+    var season = {{ season|safe  }};
     </script>
     <script type="text/javascript" src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}
