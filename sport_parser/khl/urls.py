@@ -1,5 +1,5 @@
 from django.urls import path
-from sport_parser.khl.views import index, update, stats, team, match, update_teams, update_protocol,\
+from sport_parser.khl.views import index, update_finished, stats, team, match, update_teams, update_protocol,\
     update_season_matches, calendar
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -13,9 +13,9 @@ urlpatterns = [
     path('calendar/<int:season>/', calendar, name='calendar'),
 
     path('update/teams/', update_teams),
-    path('update/protocol/', update_protocol),
-    path('update/<int:match_id>/', update),
     path('update/season_matches/<int:season>', update_season_matches),
+    path('update/finished_protocol/<int:season>/', update_finished),
+    path('update/protocol/', update_protocol),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

@@ -1,7 +1,8 @@
 from django.db import transaction
 
 from sport_parser.khl.database_services.db_add import add_matches_to_database, add_khl_protocol_to_database
-from sport_parser.khl.database_services.db_get import get_match_by_id, get_unfinished_matches_id
+from sport_parser.khl.database_services.db_get import get_match_by_id, get_unfinished_matches_id, \
+    get_finished_matches_id
 from sport_parser.khl.parsers.match_info import get_khl_season_match_info, get_finished_match_info
 from sport_parser.khl.parsers.match_protocol import get_khl_protocol
 
@@ -40,10 +41,13 @@ def update_match_status(match_id):
     match.save()
 
 
-def update_protocols() -> None:
+def update_protocols(season=0, *, finished=False) -> None:
     """Добавляет недостающие протоколы последнего сезона в базу данных"""
-    last_matches_id = get_unfinished_matches_id()
-    season = get_match_by_id(last_matches_id[0]).season
+    if finished:
+        last_matches_id = get_finished_matches_id(season)
+    else:
+        last_matches_id = get_unfinished_matches_id()
+        season = get_match_by_id(last_matches_id[0]).season
     matches_info = get_khl_season_match_info(season, check_finished=False)
     add_matches_to_database(matches_info)
     parse_season(last_matches_id)
