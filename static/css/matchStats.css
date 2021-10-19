@@ -134,6 +134,10 @@
     align-items: center;
     justify-content: right;
 }
+
+.match .team_left #teamLeft {
+    margin-left: auto;
+}
 .match .team_right {
     color: #FFFFFF;
     display: flex;
@@ -143,6 +147,9 @@
     align-self: center;
     align-items: center;
     justify-content: left;
+}
+.match .team_right #teamRight {
+    margin-right: auto;
 }
 
 .match .match_info {

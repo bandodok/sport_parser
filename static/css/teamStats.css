@@ -95,6 +95,9 @@ h3 a {
     align-items: center;
     justify-content: right;
 }
+.match .team_left #teamLeft {
+    margin-left: auto;
+}
 .match .team_right {
     color: #FFFFFF;
     display: flex;
@@ -104,6 +107,9 @@ h3 a {
     align-self: center;
     align-items: center;
     justify-content: left;
+}
+.match .team_right #teamRight {
+    margin-right: auto;
 }
 
 .match .match_info {

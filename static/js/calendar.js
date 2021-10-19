@@ -86,6 +86,8 @@ function createFinishedMatch(finished_matches) {
         team_left.className = "team_left";
 
         var team_left_name = document.createElement('a');
+	team_left_name.id = "teamLeft";
+	team_left_name.setAttribute("id", "teamLeft");
         team_left_name.href = "/khl/team/" +  match_data["team1_id"]; // 199
         team_left_name.innerHTML = match_data["team1_name"]; // "Авангард"
 
@@ -133,6 +135,7 @@ function createFinishedMatch(finished_matches) {
         team_right_img.className = "last_logo";
 
         var team_right_name = document.createElement('a');
+	team_right_name.id = "teamRight";
         team_right_name.href = "/khl/team/" + match_data["team2_id"]; // 189
         team_right_name.innerHTML = match_data["team2_name"]; // "ЦСКА"
 
@@ -176,6 +179,7 @@ function createUnfinishedMatch(unfinished_matches) {
         team_left.className = "team_left";
 
         var team_left_name = document.createElement('a');
+	team_left_name.id = "teamLeft";
         team_left_name.href = "/khl/team/" +  match_data["team1_id"]; // 199
         team_left_name.innerHTML = match_data["team1_name"]; // "Авангард"
 
@@ -223,6 +227,7 @@ function createUnfinishedMatch(unfinished_matches) {
         team_right_img.className = "last_logo";
 
         var team_right_name = document.createElement('a');
+	team_right_name.id = "teamRight";
         team_right_name.href = "/khl/team/" + match_data["team2_id"]; // 189
         team_right_name.innerHTML = match_data["team2_name"]; // "ЦСКА"
 

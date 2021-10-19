@@ -58,8 +58,11 @@ h3 {
     align-items: center;
 }
 
-.match .team_left a {
+.match .team_left #teamLeft {
     margin-left: auto;
+    text-align: right;
+    padding 0;
+    margin-right: 0;
 }
 
 .match .team_right {
@@ -72,8 +75,11 @@ h3 {
     align-items: center;
 }
 
-.match .team_right a {
+.match .team_right #teamRight {
     margin-right: auto;
+    text-align: left;
+    padding: 0;
+    margin-left: 0;
 }
 
 .match .match_info {

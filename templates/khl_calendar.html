@@ -54,7 +54,7 @@
             {% for match_id, match_stats in finished_matches.items %}
                 <a href="{% url 'match' match_id %}"><div class="match" id="past_match">
                     <div class="team_left">
-                        <a href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
+                        <a id="teamLeft" href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
                         <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
                     </div>
                     <div class="match_info">
@@ -65,7 +65,7 @@
                     </div>
                     <div class="team_right">
                         <a href="{% url 'team' match_stats.team2_id %}"><img src="{{ match_stats.team2_image }}" alt="{{ match_stats.team2_name }}" class="last_logo"></a>
-                        <a href="{% url 'team' match_stats.team2_id %}">{{ match_stats.team2_name }}</a>
+                        <a id="teamRight" href="{% url 'team' match_stats.team2_id %}">{{ match_stats.team2_name }}</a>
                     </div>
                 </div></a>
             {% endfor %}
