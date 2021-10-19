@@ -12,11 +12,13 @@
     font-style: normal;
 }
 
-@font-face{
-    font-family: 'Avalors';
-    src: url('../fonts/Avalors.ttf') format('truetype');
+@font-face {
+    font-family: 'avalorsregular';
+    src: url('../fonts/avalors-webfont.woff2') format('woff2'),
+         url('../fonts/avalors-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+
 }
 
 @keyframes onLoadAppear {
