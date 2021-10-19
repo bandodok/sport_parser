@@ -54,12 +54,8 @@
             {% for match_id, match_stats in finished_matches.items %}
                 <a href="{% url 'match' match_id %}"><div class="match" id="past_match">
                     <div class="team_left">
-                        <div class="teamNameWrapper">
                         <a href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
-                        </div>
-                        <div class="teamLogoWrapper">
                         <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
-                        </div>
                     </div>
                     <div class="match_info">
                         {% language 'ru' %}

@@ -56,8 +56,12 @@ h3 {
     text-align: right;
     align-self: center;
     align-items: center;
-    justify-content: right;
 }
+
+.match .team_left a {
+    margin-left: auto;
+}
+
 .match .team_right {
     color: #FFFFFF;
     display: flex;
@@ -66,7 +70,10 @@ h3 {
     text-align: left;
     align-self: center;
     align-items: center;
-    justify-content: left;
+}
+
+.match .team_right a {
+    margin-right: auto;
 }
 
 .match .match_info {
