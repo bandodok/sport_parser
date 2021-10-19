@@ -36,9 +36,10 @@ def last_matches_info(matches):
     last_matches = {}
     for match in matches:
         protocol1, protocol2 = match.khlprotocol_set.all()
-        last_matches[match.match_id] = {
+        last_matches[f'{match.match_id}/{match.date}'] = {
             'date': match.date,
             'time': match.time,
+            'id': match.match_id,
             'team1_name': protocol1.team_id.name,
             'team1_score': protocol1.g,
             'team1_image': protocol1.team_id.img,
@@ -55,9 +56,10 @@ def future_matches_info(matches):
     future_matches = {}
     for match in matches:
         team1, team2 = match.teams.all()
-        future_matches[match.match_id] = {
+        future_matches[f'{match.match_id}/{match.date}'] = {
             'date': match.date,
             'time': match.time,
+            'id': match.match_id,
             'team1_name': team1.name,
             'team1_image': team1.img,
             'team1_id': team1.id,

@@ -51,8 +51,8 @@
     <h3 id="calendarTitle">Все матчи</h3>
     <div class="lastMatches">
         <div class="team1" id="team1">
-            {% for match_id, match_stats in finished_matches.items %}
-                <a href="{% url 'match' match_id %}"><div class="match" id="past_match">
+            {% for _, match_stats in finished_matches.items %}
+                <a href="{% url 'match' match_stats.id %}"><div class="match" id="past_match">
                     <div class="team_left">
                         <a id="teamLeft" href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
                         <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
@@ -60,7 +60,7 @@
                     <div class="match_info">
                         {% language 'ru' %}
                         <p>{{ match_stats.date|date:'j.m.Y' }}</p>
-                        <a href="{% url 'match' match_id %}"><p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p></a>
+                        <a href="{% url 'match' match_stats.id %}"><p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p></a>
                         {% endlanguage %}
                     </div>
                     <div class="team_right">
@@ -69,8 +69,8 @@
                     </div>
                 </div></a>
             {% endfor %}
-            {% for match_id, match_stats in unfinished_matches.items %}
-                <a href="{% url 'match' match_id %}"><div class="match" id="future_match">
+            {% for _, match_stats in unfinished_matches.items %}
+                <a href="{% url 'match' match_stats.id %}"><div class="match" id="future_match">
                     <div class="team_left">
                         <a href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
                         <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
@@ -78,7 +78,7 @@
                     <div class="match_info">
                         {% language 'ru' %}
                         <p>{{ match_stats.date|date:'j.m.Y' }}</p>
-                        <a href="{% url 'match' match_id %}"><p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p></a>
+                        <a href="{% url 'match' match_stats.id %}"><p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p></a>
                         {% endlanguage %}
                     </div>
                     <div class="team_right">
