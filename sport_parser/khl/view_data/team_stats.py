@@ -35,17 +35,18 @@ def get_team_stats_view(team_id):
 def last_matches_info(matches):
     last_matches = {}
     for match in matches:
+        protocol1, protocol2 = match.khlprotocol_set.all()
         last_matches[match.match_id] = {
             'date': match.date,
             'time': match.time,
-            'team1_name': match.khlprotocol_set.all()[0].team_id.name,
-            'team1_score': match.khlprotocol_set.all()[0].g,
-            'team1_image': match.khlprotocol_set.all()[0].team_id.img,
-            'team1_id': match.khlprotocol_set.all()[0].team_id.id,
-            'team2_name': match.khlprotocol_set.all()[1].team_id.name,
-            'team2_score': match.khlprotocol_set.all()[1].g,
-            'team2_image': match.khlprotocol_set.all()[1].team_id.img,
-            'team2_id': match.khlprotocol_set.all()[1].team_id.id,
+            'team1_name': protocol1.team_id.name,
+            'team1_score': protocol1.g,
+            'team1_image': protocol1.team_id.img,
+            'team1_id': protocol1.team_id.id,
+            'team2_name': protocol2.team_id.name,
+            'team2_score': protocol2.g,
+            'team2_image': protocol2.team_id.img,
+            'team2_id': protocol2.team_id.id,
         }
     return last_matches
 
@@ -53,14 +54,15 @@ def last_matches_info(matches):
 def future_matches_info(matches):
     future_matches = {}
     for match in matches:
+        team1, team2 = match.teams.all()
         future_matches[match.match_id] = {
             'date': match.date,
             'time': match.time,
-            'team1_name': match.teams.all()[0].name,
-            'team1_image': match.teams.all()[0].img,
-            'team1_id': match.teams.all()[0].id,
-            'team2_name': match.teams.all()[1].name,
-            'team2_image': match.teams.all()[1].img,
-            'team2_id': match.teams.all()[1].id,
+            'team1_name': team1.name,
+            'team1_image': team1.img,
+            'team1_id': team1.id,
+            'team2_name': team2.name,
+            'team2_image': team2.img,
+            'team2_id': team2.id,
         }
     return future_matches
