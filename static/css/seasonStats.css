@@ -14,7 +14,7 @@
 }
 
 header {
-    width: 1475px;
+    width: 1550px;
     height: 130px;
     display: flex;
     flex-direction: row;
@@ -83,7 +83,7 @@ nav a:hover {
     width: 100%;
     height: 100%;
     opacity: 11%;
-    min-width: 1650px;
+    min-width: 1670px;
     max-height: 900px;
     user-select: none;
 }
@@ -152,9 +152,11 @@ h3 {
 
 .wrapper {
     width: 100%;
-    min-width: 1550px;
+    min-width: 1650px;
     display: flex;
     flex-direction: row;
+    margin-left: auto;
+    margin-right: auto;
     justify-content: center;
 }
 
@@ -166,7 +168,7 @@ h3 {
 
 .sidebarLeft {
     flex-shrink: 1;
-    width: 130px;
+
     z-index: 1;
     margin-top: 80px;
     margin-right: 10px;
@@ -253,7 +255,7 @@ th.sorted[data-order="-1"] {
 
 footer {
     display: flex;
-    width: 1475px;
+    width: 1650px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 30px;
