@@ -1,21 +1,21 @@
 @font-face{
-    font-family: 'Montserrat';
-    src: url('../fonts/Montserrat-Bold.ttf') format('truetype');
+    font-family: 'Montserrat', sans-serif;
+    src: url('/static/fonts/Montserrat-Bold.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face{
-    font-family: 'Montserrat';
-    src: url('../fonts/Montserrat-Regular.ttf') format('truetype');
+    font-family: 'Montserrat', sans-serif;
+    src: url('/static/fonts/Montserrat-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'avalorsregular';
-    src: url('../fonts/avalors-webfont.woff2') format('woff2'),
-         url('../fonts/avalors-webfont.woff') format('woff');
+    font-family: 'avalorsregular', sans-serif;
+    src: url('/static/fonts/avalors-webfont.woff2') format('woff2'),
+         url('/static/fonts/avalors-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
