@@ -10,9 +10,12 @@
     var team2_stats = {{ team2_info.stats|safe }};
     var team1_name = "{{ team1_info.name|safe }}";
     var team2_name = "{{ team2_info.name|safe }}";
+    var team1_matches = {{ team1_info.last_matches|safe }};
+    var team2_matches = {{ team2_info.last_matches|safe }};
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="{% static 'js/matchStats.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/matchStats.css'%}" type="text/css">
 {% endblock %}
 
@@ -150,53 +153,11 @@
 
     <h3>Последние матчи</h3>
     <div class="lastMatches">
-        <div class="team1">
-        {% for key, value in team1_info.items %}
-            {% if key == 'last_matches' %}
-            {% for _, match_stats in value.items %}
-                <a href="{% url 'match' match_stats.id %}"><div class="match">
-                    <div class="team_left">
-                        <a id="teamLeft" href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
-                        <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
-                    </div>
-                    <div class="match_info">
-                        {% language 'ru' %}
-                        <p>{{ match_stats.date|date:'j.m.Y' }}</p>
-                        <a href="{% url 'match' match_stats.id %}"><p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p></a>
-                        {% endlanguage %}
-                    </div>
-                    <div class="team_right">
-                        <a href="{% url 'team' match_stats.team2_id %}"><img src="{{ match_stats.team2_image }}" alt="{{ match_stats.team2_name }}" class="last_logo"></a>
-                        <a id="teamRight" href="{% url 'team' match_stats.team2_id %}">{{ match_stats.team2_name }}</a>
-                    </div>
-                </div></a>
-            {% endfor %}
-            {% endif %}
-        {% endfor %}
+        <div class="team1" id="team1">
+
         </div>
-        <div class="team2">
-        {% for key, value in team2_info.items %}
-            {% if key == 'last_matches' %}
-            {% for _, match_stats in value.items %}
-                <a href="{% url 'match' match_stats.id %}"><div class="match">
-                    <div class="team_left">
-                        <a id="teamLeft" href="{% url 'team' match_stats.team1_id %}">{{ match_stats.team1_name }}</a>
-                        <a href="{% url 'team' match_stats.team1_id %}"><img src="{{ match_stats.team1_image }}" alt="{{ match_stats.team1_name }}" class="last_logo"></a>
-                    </div>
-                    <div class="match_info">
-                        {% language 'ru' %}
-                        <p>{{ match_stats.date|date:'j.m.Y' }}</p>
-                        <a href="{% url 'match' match_stats.id %}"><p class="last_score">{{ match_stats.team1_score }} - {{ match_stats.team2_score }}</p></a>
-                        {% endlanguage %}
-                    </div>
-                    <div class="team_right">
-                        <a href="{% url 'team' match_stats.team2_id %}"><img src="{{ match_stats.team2_image }}" alt="{{ match_stats.team2_name }}" class="last_logo"></a>
-                        <a id="teamRight" href="{% url 'team' match_stats.team2_id %}">{{ match_stats.team2_name }}</a>
-                    </div>
-                </div></a>
-            {% endfor %}
-            {% endif %}
-        {% endfor %}
+        <div class="team2" id="team2">
+
         </div>
     </div>
 {% endblock %}
