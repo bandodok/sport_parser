@@ -191,7 +191,7 @@ h3 {
 
 .sidebarLeft {
     flex-shrink: 1;
-
+    width: 130px;
     z-index: 1;
     margin-top: 80px;
     margin-right: 10px;
