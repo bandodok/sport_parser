@@ -91,11 +91,17 @@ h4 {
     font-size: 105px;
 }
 
-.logo {
+.a_logo {
+    z-index: 2;
     flex-shrink: 0;
     margin-left: auto;
     margin-top: 50px;
     padding-left: 50px;
+}
+
+.logo {
+    z-index: 2;
+    flex-shrink: 0;
     width: 250px;
     height: 210px;
     user-select: none;
