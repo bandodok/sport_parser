@@ -1,3 +1,6 @@
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 from sport_parser.khl.database_services.db_get import get_team_by_id, get_team_id_by_season, get_team_chart_stats
 
 
@@ -49,7 +52,7 @@ def last_matches_info(matches):
             'team2_image': protocol2.team_id.img,
             'team2_id': protocol2.team_id.id,
         }
-    return last_matches
+    return json.dumps(last_matches, cls=DjangoJSONEncoder)
 
 
 def future_matches_info(matches):
@@ -67,4 +70,4 @@ def future_matches_info(matches):
             'team2_image': team2.img,
             'team2_id': team2.id,
         }
-    return future_matches
+    return json.dumps(future_matches, cls=DjangoJSONEncoder)
