@@ -55,9 +55,10 @@
 }
 
 #score_time {
-    font-family: Avalors, sans-serif;
+    font-family: avalorsregular, sans-serif;
     font-size: 60px;
     font-weight: normal;
+    padding-top: 30px;
 }
 
 .arena {
