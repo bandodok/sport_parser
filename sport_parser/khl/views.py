@@ -43,11 +43,11 @@ def calendar(request, season):
 
 
 def calendar_f(request, season):
-    return JsonResponse(get_calendar_finished(season))
+    return HttpResponse(get_calendar_finished(season), content_type='application/json')
 
 
 def calendar_u(request, season):
-    return JsonResponse(get_calendar_unfinished(season))
+    return HttpResponse(get_calendar_unfinished(season), content_type='application/json')
 
 
 def update_protocol(request):

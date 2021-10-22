@@ -3,6 +3,8 @@ google.charts.load('current', {'packages':['corechart']});
 
 window.onload = function() {
     hideChart()
+    createFinishedMatch('team1', team1_matches);
+    createFinishedMatch('team2', team2_matches);
 }
 
 
@@ -13,7 +15,6 @@ function hideChart() {
         document.getElementById(item).style.display = 'none';
     });
     document.getElementById('chartSh').style.display = 'block';
-    document.getElementById('chartTitle').innerHTML = 'Все броски (Sh)';
     }
 
 

@@ -47,7 +47,7 @@ def get_opponent_stat(team, stat, match_list, *, mode='median'):
 
 def get_team_stats_per_day(team, *args):
     match_list = get_match_list(team)
-    query = KHLProtocol.objects.filter(match_id__in=match_list)
+    query = KHLProtocol.objects.filter(match_id__in=match_list).order_by('match_id__date')
     out = query.filter(team_id=team).values_list(*args)
     return [[stat for stat in day] for day in out]
 

@@ -3,6 +3,8 @@ google.charts.load('current', {'packages':['corechart']});
 
 window.onload = function() {
     hideChart()
+    createFinishedMatch('team1', last_matches);
+    createUnfinishedMatch('team2', future_matches);
 }
 
 

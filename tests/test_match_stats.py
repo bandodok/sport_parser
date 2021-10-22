@@ -50,44 +50,27 @@ def test_get_match_stats_view(update_db):
                       [44, 22, 8, 22, 4, 16, 521, 66, 30, 5, 14, 12, 14, 637],
                       [66, 30, 10, 14, 12, 14, 637, 44, 22, 8, 22, 4, 16, 521],
                       [66, 30, 1, 14, 12, 14, 637, 44, 22, 3, 22, 4, 16, 521]],
-            'last_matches': {
-                15: {
-                    'date': datetime.datetime(2017, 8, 20, 21, 0, tzinfo=timezone.utc),
-                    'team1_name': 'test1',
-                    'team1_score': 4,
-                    'team1_image': 'img',
-                    'team1_id': team1_id,
-                    'team2_name': 'test2',
-                    'team2_score': 0,
-                    'team2_image': 'img',
-                    'team2_id': team2_id,
-                    'time': datetime.time(15, 0),
-                },
-                17: {
-                    'date': datetime.datetime(2017, 8, 23, 21, 0, tzinfo=timezone.utc),
-                    'team1_name': 'test1',
-                    'team1_score': 8,
-                    'team1_image': 'img',
-                    'team1_id': team1_id,
-                    'team2_name': 'test6',
-                    'team2_score': 5,
-                    'team2_image': 'img',
-                    'team2_id': team6_id,
-                    'time': datetime.time(15, 0)
-                },
-                19: {
-                    'date': datetime.datetime(2017, 8, 25, 21, 0, tzinfo=timezone.utc),
-                    'team1_name': 'test2',
-                    'team1_score': 8,
-                    'team1_image': 'img',
-                    'team1_id': team2_id,
-                    'team2_name': 'test1',
-                    'team2_score': 10,
-                    'team2_image': 'img',
-                    'team2_id': team1_id,
-                    'time': datetime.time(15, 0)
-                }
-            }
+            'last_matches': '{"19/2017-08-25 21:00:00+00:00": {"date": '
+                            '"2017-08-25T21:00:00Z", "time": "15:00:00", '
+                            '"id": 19, "team1_name": "test2", '
+                            '"team1_score": 8, "team1_image": "img", '
+                            '"team1_id": 45, "team2_name": "test1", '
+                            '"team2_score": 10, "team2_image": "img", '
+                            '"team2_id": 44}, "17/2017-08-23 '
+                            '21:00:00+00:00": {"date": '
+                            '"2017-08-23T21:00:00Z", "time": "15:00:00", '
+                            '"id": 17, "team1_name": "test1", '
+                            '"team1_score": 8, "team1_image": "img", '
+                            '"team1_id": 44, "team2_name": "test6", '
+                            '"team2_score": 5, "team2_image": "img", '
+                            '"team2_id": 49}, "15/2017-08-20 '
+                            '21:00:00+00:00": {"date": '
+                            '"2017-08-20T21:00:00Z", "time": "15:00:00", '
+                            '"id": 15, "team1_name": "test1", '
+                            '"team1_score": 4, "team1_image": "img", '
+                            '"team1_id": 44, "team2_name": "test2", '
+                            '"team2_score": 0, "team2_image": "img", '
+                            '"team2_id": 45}}',
         },
         'team2_info': {
             'city': 'city',
@@ -104,44 +87,27 @@ def test_get_match_stats_view(update_db):
                       [66, 30, 5, 14, 12, 14, 637, 44, 22, 8, 22, 4, 16, 521],
                       [44, 22, 8, 22, 4, 16, 521, 66, 30, 3, 14, 12, 14, 637],
                       [44, 22, 3, 22, 4, 16, 521, 66, 30, 1, 14, 12, 14, 637]],
-            'last_matches': {
-                17: {
-                    'date': datetime.datetime(2017, 8, 23, 21, 0, tzinfo=timezone.utc),
-                    'team1_name': 'test1',
-                    'team1_score': 8,
-                    'team1_image': 'img',
-                    'team1_id': team1_id,
-                    'team2_name': 'test6',
-                    'team2_score': 5,
-                    'team2_image': 'img',
-                    'team2_id': team6_id,
-                    'time': datetime.time(15, 0)
-                },
-                18: {
-                    'date': datetime.datetime(2017, 8, 24, 21, 0, tzinfo=timezone.utc),
-                    'team1_name': 'test2',
-                    'team1_score': 8,
-                    'team1_image': 'img',
-                    'team1_id': team2_id,
-                    'team2_name': 'test6',
-                    'team2_score': 5,
-                    'team2_image': 'img',
-                    'team2_id': team6_id,
-                    'time': datetime.time(15, 0)
-                },
-                20: {
-                    'date': datetime.datetime(2017, 8, 26, 21, 0, tzinfo=timezone.utc),
-                    'team1_name': 'test6',
-                    'team1_score': 8,
-                    'team1_image': 'img',
-                    'team1_id': team6_id,
-                    'team2_name': 'test2',
-                    'team2_score': 3,
-                    'team2_image': 'img',
-                    'team2_id': team2_id,
-                    'time': datetime.time(15, 0)
-                }
-            }
+            'last_matches': '{"20/2017-08-26 21:00:00+00:00": {"date": '
+                            '"2017-08-26T21:00:00Z", "time": "15:00:00", '
+                            f'"id": 20, "team1_name": "test6", '
+                            '"team1_score": 8, "team1_image": "img", '
+                            '"team1_id": 49, "team2_name": "test2", '
+                            '"team2_score": 3, "team2_image": "img", '
+                            '"team2_id": 45}, "18/2017-08-24 '
+                            '21:00:00+00:00": {"date": '
+                            '"2017-08-24T21:00:00Z", "time": "15:00:00", '
+                            '"id": 18, "team1_name": "test2", '
+                            '"team1_score": 8, "team1_image": "img", '
+                            '"team1_id": 45, "team2_name": "test6", '
+                            '"team2_score": 5, "team2_image": "img", '
+                            '"team2_id": 49}, "17/2017-08-23 '
+                            '21:00:00+00:00": {"date": '
+                            '"2017-08-23T21:00:00Z", "time": "15:00:00", '
+                            '"id": 17, "team1_name": "test1", '
+                            '"team1_score": 8, "team1_image": "img", '
+                            '"team1_id": 44, "team2_name": "test6", '
+                            '"team2_score": 5, "team2_image": "img", '
+                            '"team2_id": 49}}',
         }
     }
     assert data == output

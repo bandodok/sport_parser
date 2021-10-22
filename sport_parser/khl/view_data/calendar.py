@@ -5,7 +5,7 @@ from sport_parser.khl.view_data.team_stats import last_matches_info, future_matc
 def get_calendar_view(season):
     """"""
     matches = get_matches_by_season(season)
-    finished_matches = last_matches_info(matches.filter(finished=True).order_by('date')[:50])
+    finished_matches = last_matches_info(matches.filter(finished=True).order_by('date', 'time')[:50])
     return {
         'season': season,
         'finished_matches': finished_matches,
@@ -15,12 +15,12 @@ def get_calendar_view(season):
 def get_calendar_finished(season):
     """"""
     matches = get_matches_by_season(season)
-    finished_matches = last_matches_info(matches.filter(finished=True).order_by('date')[50:])
+    finished_matches = last_matches_info(matches.filter(finished=True).order_by('date', 'time')[50:])
     return finished_matches
 
 
 def get_calendar_unfinished(season):
     """"""
     matches = get_matches_by_season(season)
-    unfinished_matches = future_matches_info(matches.filter(finished=False).order_by('date'))
+    unfinished_matches = future_matches_info(matches.filter(finished=False).order_by('date', 'time'))
     return unfinished_matches
