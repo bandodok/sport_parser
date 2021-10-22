@@ -66,18 +66,12 @@ def get_khl_season_match_info(season, webdriver=get_selenium_content, check_fini
 
 
 def get_finished_match_info(match_id):
-    season = 0
-    for s, id in settings.SEASONS_FIRST_MATCH.items():
-        if id <= int(match_id):
-            season = settings.SEASONS.get(s)
-            break
-
-    url = f'https://www.khl.ru/game/{season}/{match_id}/preview/'
+    url = f'https://text.khl.ru/text/{match_id}.html'
     soup = get_request_content(url)
     extra_info = soup.find_all('li', class_="b-match_add_info_item")
 
-    # если матч завершился, но страницу еще не обновили, прерываем обновление чтобы обновить позже
-    if not extra_info:
+    match_status = soup.find('dd', class_="b-period_score").text
+    if match_status != 'матч завершен':
         return 'match not updated'
 
     date_info = extra_info[0]
@@ -91,7 +85,9 @@ def get_finished_match_info(match_id):
 
     info = str(info).split('<br/>')
     arena_city = info[0][6:]
-    arena, city = arena_city.split(',')
+    arena, city = arena_city.split('(')
+    arena = arena[:-1]
+    city = city[:-1]
     viewers = info[1][:-16]
     city = city.strip()
     return {
