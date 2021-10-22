@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Max
 
 from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch
@@ -7,50 +8,61 @@ from datetime import datetime
 def add_khl_protocol_to_database(protocol) -> None:
     """Добавляет данные из протокола в базу данных"""
     for row in protocol:
-        team = _team_name_update(row[0])
-        season = KHLMatch.objects.get(match_id=row[1]).season
-        KHLProtocol.objects.create(
-            team_id=KHLTeams.objects.filter(season=season).get(name=team).id,
-            match_id=KHLMatch.objects.get(match_id=row[1]),
-            g=row[2],
-            sog=row[3],
-            penalty=row[4],
-            faceoff=row[5],
-            faceoff_p=row[6],
-            blocks=row[7],
-            hits=row[8],
-            fop=row[9],
-            time_a=row[10],
-            vvsh=row[11],
-            nshv=row[12],
-            pd=row[13],
-            sh=row[14]
+        team = _team_name_update(row['team'])
+        season = KHLMatch.objects.get(match_id=row['match_id']).season
+        p, _ = KHLProtocol.objects.get_or_create(
+            team_id=KHLTeams.objects.filter(season=season).get(name=team),
+            match_id=KHLMatch.objects.get(match_id=row['match_id'])
         )
+        p.g = row.get('g', '0')
+        p.sog = row.get('sog', '0')
+        p.penalty = row.get('penalty', '0')
+        p.faceoff = row.get('faceoff', '0')
+        p.faceoff_p = row.get('faceoff_p', '00:00')
+        p.blocks = row.get('blocks', '0')
+        p.hits = row.get('hits', '0')
+        p.fop = row.get('fop', '0')
+        p.time_a = row.get('time_a', '00:00:00')
+        p.vvsh = row.get('vvsh', '00:00:00')
+        p.nshv = row.get('nshv', '00:00:00')
+        p.pd = row.get('pd', '00.00')
+        p.sh = row.get('sh', 0)
+        p.save()
 
 
-def add_teams_to_database(team) -> None:
+def add_teams_to_database(team_info) -> None:
     """Добавляет данные команд в базу данных"""
-    KHLTeams.objects.create(
-        name=team[0],
-        img=team[1],
-        city=team[2],
-        arena=team[3],
-        division=team[4],
-        conference=team[5],
-        season=team[6]
-        )
+    team_name = _team_name_update(team_info[0])
+    team, _ = KHLTeams.objects.get_or_create(name=team_name, season=team_info[6])
+    team.img = team_info[1]
+    team.city = team_info[2]
+    team.arena = team_info[3]
+    team.division = team_info[4]
+    team.conference = team_info[5]
+    team.save()
 
 
-def add_matches_to_database(match):
+def add_matches_to_database(matches):
     """Добавляет информацию о матчах в базу данных"""
-    KHLMatch.objects.create(
-        match_id=match[0],
-        match_date=match[1],
-        season=match[2],
-        arena=match[3],
-        city=match[4],
-        viewers=match[5]
-    )
+    for match in matches:
+        with transaction.atomic():
+            a, _ = KHLMatch.objects.get_or_create(
+                match_id=match['match_id'],
+            )
+            a.date = match['date']
+            a.time = match['time']
+            a.season = match['season']
+            a.city = match['city']
+            a.arena = match['arena']
+            a.finished = match['finished']
+            a.viewers = match['viewers']
+            a.save()
+            home_team = _team_name_update(match['home_team'])
+            guest_team = _team_name_update(match['guest_team'])
+            home_team = KHLTeams.objects.filter(season=match['season']).get(name=home_team)
+            guest_team = KHLTeams.objects.filter(season=match['season']).get(name=guest_team)
+            a.teams.add(home_team, guest_team)
+            a.save()
 
 
 def _team_name_update(team):
@@ -60,6 +72,8 @@ def _team_name_update(team):
         new_team = 'Динамо М'
     elif team == 'ХК Динамо М':
         new_team = 'Динамо М'
+    elif team == 'ХК Сочи':
+        new_team = 'Сочи'
     else:
         return team
     return new_team
@@ -70,7 +84,8 @@ def last_updated(*, update=False):
     При update=True обновляет эту дату на текущую"""
     last_update = KHLMatch.objects.aggregate(Max('updated'))['updated__max']
     if update:
-        last = KHLMatch.objects.get(updated=last_update)
+        last_matches = KHLMatch.objects.filter(updated=last_update)
+        last = last_matches[len(last_matches) - 1]
         last.updated = datetime.now()
         last.save()
     return last_update

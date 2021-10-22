@@ -1,13 +1,19 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}KHL Stats{% endblock %}
+
+{% block nav %}
+    {{ block.super }}
+    <a href="{% url 'calendar' season %}">Календарь</a>
+{% endblock %}
 
 {% block header_title %}
     <h4>Континентальная Хоккейная Лига</h4>
 {% endblock %}
 
 {% block right_logo %}
-    <img src="/static/img/KHL.png" alt="KHL" class="leagueLogo">
+    <img src="/static/img/KHL.webp" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}
@@ -23,7 +29,9 @@
 
 {% block main_content %}
 <h3>СЕЗОН {{ season }}</h3>
+    {% language 'ru' %}
 <p class="update">Последнее обновление: {{ update }}</p>
+    {% endlanguage %}
 <table class="table_sort">
     <thead>
         <tr>

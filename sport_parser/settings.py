@@ -86,8 +86,12 @@ WSGI_APPLICATION = 'sport_parser.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),
     }
 }
 
@@ -145,8 +149,6 @@ SEASONS = {
     '19': 851,
     '18': 671,
     '17': 468,
-    '16': 405,
-    '15': 309
 }
 
 SEASONS_FIRST_MATCH = {
@@ -155,6 +157,4 @@ SEASONS_FIRST_MATCH = {
     '19': 81788,
     '18': 69800,
     '17': 55144,
-    '16': 49521,
-    '15': 45900
 }

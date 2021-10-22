@@ -1,22 +1,24 @@
 @font-face{
-    font-family: 'Montserrat';
-    src: url('../fonts/Montserrat-Bold.ttf') format('truetype');
+    font-family: Montserrat;
+    src: url(/static/fonts/Montserrat-Bold.ttf) format('truetype');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face{
-    font-family: 'Montserrat';
-    src: url('../fonts/Montserrat-Regular.ttf') format('truetype');
+    font-family: Montserrat;
+    src: url(/static/fonts/Montserrat-Regular.ttf) format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
-@font-face{
-    font-family: 'Avalors';
-    src: url('../fonts/Avalors.ttf') format('truetype');
+@font-face {
+    font-family: avalorsregular, sans-serif;
+    src: url(/static/fonts/avalors-webfont.woff2) format('woff2'),
+         url(/static/fonts/avalors-webfont.woff) format('woff');
     font-weight: normal;
     font-style: normal;
+
 }
 
 @keyframes onLoadAppear {
@@ -89,11 +91,17 @@ h4 {
     font-size: 105px;
 }
 
-.logo {
+.a_logo {
+    z-index: 2;
     flex-shrink: 0;
     margin-left: auto;
     margin-top: 50px;
     padding-left: 50px;
+}
+
+.logo {
+    z-index: 2;
+    flex-shrink: 0;
     width: 250px;
     height: 210px;
     user-select: none;

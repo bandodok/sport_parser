@@ -3,6 +3,8 @@ google.charts.load('current', {'packages':['corechart']});
 
 window.onload = function() {
     hideChart()
+    createFinishedMatch('team1', last_matches);
+    createUnfinishedMatch('team2', future_matches);
 }
 
 
@@ -44,7 +46,7 @@ stats.forEach(function (item, i) {
 
     var options = {
         curveType: 'function',
-        width: 1200,
+        'min-width': 1200,
         height: 400,
         legend: {
             position: 'bottom',

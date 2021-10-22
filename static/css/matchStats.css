@@ -1,0 +1,92 @@
+.sidebarRight li {
+    width: 80px;
+    user-select: none;
+}
+
+#match_stats th {
+    width: 100px;
+}
+
+
+.teams {
+    margin-top: 70px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.teams p {
+    font-family: Montserrat, sans-serif;
+    margin: 5px 0;
+}
+
+.teams h4 {
+    font-family: Montserrat, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.team1_info {
+    width: 100%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.team2_info {
+    width: 100%;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.leagueLogo {
+    margin-right: 0;
+}
+
+.score {
+    font-family: Montserrat, sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 0 40px;
+    white-space: nowrap;
+}
+
+.score p {
+    color: white;
+}
+
+#score_time {
+    font-family: avalorsregular, sans-serif;
+    font-size: 60px;
+    font-weight: normal;
+    padding-top: 30px;
+}
+
+.arena {
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+#arena {
+    color: #847c7c;
+}
+
+#viewers {
+    color: #847c7c;
+
+}
+
+.lastMatches {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.teams h4 {
+    transition: color 0.2s;
+}
+
+.teams h4:hover {
+    color: #6393ff;
+    transition: color 0.2s;
+}
