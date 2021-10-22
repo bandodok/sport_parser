@@ -15,118 +15,35 @@ def test_get_calendar_view(update_db):
     team2_id = KHLTeams.objects.get(name='test2').id
     team6_id = KHLTeams.objects.get(name='test6').id
 
-    calendar = {
-        'season': 21,
-        'finished_matches': {
-            15: {'date': datetime.datetime(2017, 8, 20, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team1_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test1',
-                 'team1_score': 4,
-                 'team2_id': team2_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test2',
-                 'team2_score': 0,
-                 'time': datetime.time(15, 0)},
-            17: {'date': datetime.datetime(2017, 8, 23, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team1_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test1',
-                 'team1_score': 8,
-                 'team2_id': team6_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test6',
-                 'team2_score': 5,
-                 'time': datetime.time(15, 0)},
-            18: {'date': datetime.datetime(2017, 8, 24, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team2_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test2',
-                 'team1_score': 8,
-                 'team2_id': team6_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test6',
-                 'team2_score': 5,
-                 'time': datetime.time(15, 0)},
-            19: {'date': datetime.datetime(2017, 8, 25, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team2_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test2',
-                 'team1_score': 8,
-                 'team2_id': team1_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test1',
-                 'team2_score': 10,
-                 'time': datetime.time(15, 0)},
-            20: {'date': datetime.datetime(2017, 8, 26, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team6_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test6',
-                 'team1_score': 8,
-                 'team2_id': team2_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test2',
-                 'team2_score': 3,
-                 'time': datetime.time(15, 0)},
-            22: {'date': datetime.datetime(2017, 8, 28, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team6_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test6',
-                 'team1_score': 3,
-                 'team2_id': team1_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test1',
-                 'team2_score': 1,
-                 'time': datetime.time(15, 0)}},
-        'unfinished_matches': {
-            23: {'date': datetime.datetime(2017, 8, 29, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team1_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test1',
-                 'team2_id': team2_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test2',
-                 'time': datetime.time(15, 0)},
-            25: {'date': datetime.datetime(2017, 8, 31, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team1_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test1',
-                 'team2_id': team6_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test6',
-                 'time': datetime.time(15, 0)},
-            26: {'date': datetime.datetime(2017, 9, 1, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team2_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test2',
-                 'team2_id': team6_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test6',
-                 'time': datetime.time(15, 0)},
-            27: {'date': datetime.datetime(2017, 9, 2, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team1_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test1',
-                 'team2_id': team2_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test2',
-                 'time': datetime.time(15, 0)},
-            28: {'date': datetime.datetime(2017, 9, 3, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team2_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test2',
-                 'team2_id': team6_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test6',
-                 'time': datetime.time(15, 0)},
-            30: {'date': datetime.datetime(2017, 9, 5, 21, 0, tzinfo=timezone.utc),
-                 'team1_id': team1_id,
-                 'team1_image': 'img',
-                 'team1_name': 'test1',
-                 'team2_id': team6_id,
-                 'team2_image': 'img',
-                 'team2_name': 'test6',
-                 'time': datetime.time(15, 0)}
-        }
-    }
+    calendar = {'finished_matches': '{"15/2017-08-20 21:00:00+00:00": {"date": '
+                                    '"2017-08-20T21:00:00Z", "time": "15:00:00", "id": 15, '
+                                    '"team1_name": "test1", "team1_score": 4, "team1_image": '
+                                    '"img", "team1_id": 1, "team2_name": "test2", '
+                                    '"team2_score": 0, "team2_image": "img", "team2_id": 2}, '
+                                    '"17/2017-08-23 21:00:00+00:00": {"date": '
+                                    '"2017-08-23T21:00:00Z", "time": "15:00:00", "id": 17, '
+                                    '"team1_name": "test1", "team1_score": 8, "team1_image": '
+                                    '"img", "team1_id": 1, "team2_name": "test6", '
+                                    '"team2_score": 5, "team2_image": "img", "team2_id": 6}, '
+                                    '"18/2017-08-24 21:00:00+00:00": {"date": '
+                                    '"2017-08-24T21:00:00Z", "time": "15:00:00", "id": 18, '
+                                    '"team1_name": "test2", "team1_score": 8, "team1_image": '
+                                    '"img", "team1_id": 2, "team2_name": "test6", '
+                                    '"team2_score": 5, "team2_image": "img", "team2_id": 6}, '
+                                    '"19/2017-08-25 21:00:00+00:00": {"date": '
+                                    '"2017-08-25T21:00:00Z", "time": "15:00:00", "id": 19, '
+                                    '"team1_name": "test2", "team1_score": 8, "team1_image": '
+                                    '"img", "team1_id": 2, "team2_name": "test1", '
+                                    '"team2_score": 10, "team2_image": "img", "team2_id": 1}, '
+                                    '"20/2017-08-26 21:00:00+00:00": {"date": '
+                                    '"2017-08-26T21:00:00Z", "time": "15:00:00", "id": 20, '
+                                    '"team1_name": "test6", "team1_score": 8, "team1_image": '
+                                    '"img", "team1_id": 6, "team2_name": "test2", '
+                                    '"team2_score": 3, "team2_image": "img", "team2_id": 2}, '
+                                    '"22/2017-08-28 21:00:00+00:00": {"date": '
+                                    '"2017-08-28T21:00:00Z", "time": "15:00:00", "id": 22, '
+                                    '"team1_name": "test6", "team1_score": 3, "team1_image": '
+                                    '"img", "team1_id": 6, "team2_name": "test1", '
+                                    '"team2_score": 1, "team2_image": "img", "team2_id": 1}}',
+                'season': 21}
     assert out == calendar
