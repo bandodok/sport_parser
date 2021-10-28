@@ -88,8 +88,13 @@ def get_finished_match_info(match_id):
     arena, city = arena_city.split('(')
     arena = arena[:-1]
     city = city[:-1]
-    viewers = info[1][:-16]
     city = city.strip()
+
+    if info[1] == '</span>':
+        viewers = 0
+    else:
+        viewers = info[1][:-16]
+
     return {
         'arena': arena,
         'city': city,
