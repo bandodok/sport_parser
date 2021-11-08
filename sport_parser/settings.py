@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from os.path import join, dirname
 from dotenv import load_dotenv
+import rollbar
 
 
 dotenv_path = join(dirname(__file__), '.env')
@@ -57,7 +58,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
+
+ROLLBAR = {
+     'access_token': os.getenv('ROLLBAR_TOKEN'),
+     'environment': 'development' if DEBUG else 'production',
+     'root': BASE_DIR,
+ }
+rollbar.init(**ROLLBAR)
 
 ROOT_URLCONF = 'sport_parser.urls'
 
