@@ -6,13 +6,11 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 
 
-@functools.lru_cache(maxsize=5)
 def get_request_content(url):
     r = requests.get(url)
     return BeautifulSoup(r.content, 'html.parser')
 
 
-@functools.lru_cache(maxsize=5)
 def get_selenium_content(url):
     loc = os.getenv('CHROMEDRIVER')
     op = webdriver.ChromeOptions()
