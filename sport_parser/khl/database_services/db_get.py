@@ -13,7 +13,7 @@ def get_team_list(season):
 
 def get_match_list(team):
     """Возвращает список матчей match_id команды team"""
-    match_list = KHLProtocol.objects.filter(team_id=team).values_list('match_id')
+    match_list = KHLProtocol.objects.filter(team=team).values_list('match')
     return [match[0] for match in match_list]
 
 
@@ -25,9 +25,9 @@ def get_team_stat(team, stat, match_list, *, mode='list'):
         list - список
     """
     if mode == 'list':
-        queryset = KHLProtocol.objects.filter(match_id__in=match_list).filter(team_id=team).values_list(stat, flat=True)
+        queryset = KHLProtocol.objects.filter(match__in=match_list).filter(team=team).values_list(stat, flat=True)
         return [v for v in queryset]
-    stat_list = KHLProtocol.objects.filter(match_id__in=match_list).filter(team_id=team).order_by(stat)
+    stat_list = KHLProtocol.objects.filter(match__in=match_list).filter(team=team).order_by(stat)
     return _calculate_stat(stat, stat_list, mode=mode)
 
 
@@ -39,23 +39,23 @@ def get_opponent_stat(team, stat, match_list, *, mode='median'):
         list - список
     """
     if mode == 'list':
-        queryset = KHLProtocol.objects.filter(match_id__in=match_list).exclude(team_id=team).values_list(stat, flat=True)
+        queryset = KHLProtocol.objects.filter(match__in=match_list).exclude(team=team).values_list(stat, flat=True)
         return [v for v in queryset]
-    stat_list = KHLProtocol.objects.filter(match_id__in=match_list).exclude(team_id=team).order_by(stat)
+    stat_list = KHLProtocol.objects.filter(match__in=match_list).exclude(team=team).order_by(stat)
     return _calculate_stat(stat, stat_list, mode=mode)
 
 
 def get_team_stats_per_day(team, *args):
     match_list = get_match_list(team)
-    query = KHLProtocol.objects.filter(match_id__in=match_list).order_by('match_id__date')
+    query = KHLProtocol.objects.filter(match__in=match_list).order_by('match__date')
     out = query.filter(team_id=team).values_list(*args)
     return [[stat for stat in day] for day in out]
 
 
 def get_opp_stats_per_day(team, *args):
     match_list = get_match_list(team)
-    query = KHLProtocol.objects.filter(match_id__in=match_list)
-    out = query.exclude(team_id=team).values_list(*args)
+    query = KHLProtocol.objects.filter(match__in=match_list)
+    out = query.exclude(team=team).values_list(*args)
     return [[stat for stat in day] for day in out]
 
 
@@ -128,12 +128,12 @@ def get_team_id_by_season(team_id):
 
 def get_last_match_id():
     """Возвращает id последнего матча в базе данных"""
-    return KHLMatch.objects.filter(finished=True).aggregate(Max('match_id'))['match_id__max']
+    return KHLMatch.objects.filter(finished=True).aggregate(Max('match'))['match__max']
 
 
 def get_match_by_id(match_id):
     """ """
-    return KHLMatch.objects.get(match_id=match_id)
+    return KHLMatch.objects.get(id=match_id)
 
 
 def get_team_by_id(team_id):
@@ -148,12 +148,12 @@ def get_matches_by_season(season):
 
 def get_finished_matches_id(season):
     """Возвращает список id завершенных матчей сезона"""
-    return KHLMatch.objects.filter(season=season).filter(finished=True).order_by('date').values_list('match_id', flat=True)
+    return KHLMatch.objects.filter(season=season).filter(finished=True).order_by('date').values_list('id', flat=True)
 
 
 def get_unfinished_matches_id():
     """Возвращает список id незавершенных матчей"""
-    return KHLMatch.objects.filter(finished=False).order_by('date').values_list('match_id', flat=True)
+    return KHLMatch.objects.filter(finished=False).order_by('date').values_list('id', flat=True)
 
 
 def get_team_season_stats(team):
@@ -202,8 +202,8 @@ def get_team_season_stats(team):
 def get_match_stats(match_id):
     match = get_match_by_id(match_id)
     team1, team2 = match.teams.all()
-    p1 = match.khlprotocol_set.all().get(team_id=team1.id)
-    p2 = match.khlprotocol_set.all().get(team_id=team2.id)
+    p1 = match.protocols.all().get(team=team1.id)
+    p2 = match.protocols.all().get(team=team2.id)
 
     match_stats = [
         [
@@ -222,13 +222,13 @@ def get_match_stats(match_id):
     ]
 
     team1_stats = [
-        p1.team_id.id,
-        p1.team_id.name,
+        p1.team.id,
+        p1.team.name,
     ]
 
     team2_stats = [
-        p2.team_id.id,
-        p2.team_id.name,
+        p2.team.id,
+        p2.team.name,
     ]
 
     team1_stats.extend(output_format(

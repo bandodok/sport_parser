@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.db.models import Max
 
-from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch
+from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch, KHLSeason
 from datetime import datetime
 
 
@@ -9,10 +9,10 @@ def add_khl_protocol_to_database(protocol) -> None:
     """Добавляет данные из протокола в базу данных"""
     for row in protocol:
         team = _team_name_update(row['team'])
-        season = KHLMatch.objects.get(match_id=row['match_id']).season
+        season = KHLMatch.objects.get(id=row['match_id']).season
         p, _ = KHLProtocol.objects.get_or_create(
-            team_id=KHLTeams.objects.filter(season=season).get(name=team),
-            match_id=KHLMatch.objects.get(match_id=row['match_id'])
+            team=KHLTeams.objects.filter(season=season).get(name=team),
+            match=KHLMatch.objects.get(id=row['match_id'])
         )
         p.g = row.get('g', '0')
         p.sog = row.get('sog', '0')
@@ -33,7 +33,8 @@ def add_khl_protocol_to_database(protocol) -> None:
 def add_teams_to_database(team_info) -> None:
     """Добавляет данные команд в базу данных"""
     team_name = _team_name_update(team_info[0])
-    team, _ = KHLTeams.objects.get_or_create(name=team_name, season=team_info[6])
+    season = KHLSeason.objects.get(id=team_info[6])
+    team, _ = KHLTeams.objects.get_or_create(name=team_name, season=season)
     team.img = team_info[1]
     team.city = team_info[2]
     team.arena = team_info[3]
@@ -46,12 +47,13 @@ def add_matches_to_database(matches):
     """Добавляет информацию о матчах в базу данных"""
     for match in matches:
         with transaction.atomic():
+            season = KHLSeason.objects.get(id=match['season'])
             a, _ = KHLMatch.objects.get_or_create(
-                match_id=match['match_id'],
+                id=match['match_id'],
             )
             a.date = match['date']
             a.time = match['time']
-            a.season = match['season']
+            a.season = season
             a.city = match['city']
             a.arena = match['arena']
             a.finished = match['finished']
@@ -59,8 +61,8 @@ def add_matches_to_database(matches):
             a.save()
             home_team = _team_name_update(match['home_team'])
             guest_team = _team_name_update(match['guest_team'])
-            home_team = KHLTeams.objects.filter(season=match['season']).get(name=home_team)
-            guest_team = KHLTeams.objects.filter(season=match['season']).get(name=guest_team)
+            home_team = KHLTeams.objects.filter(season=season).get(name=home_team)
+            guest_team = KHLTeams.objects.filter(season=season).get(name=guest_team)
             a.teams.add(home_team, guest_team)
             a.save()
 
