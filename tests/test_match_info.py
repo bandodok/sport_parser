@@ -24,7 +24,7 @@ def test_month_to_int_replace():
 
 @pook.on
 def test_get_khl_season_match_info(get_match_info_finished):
-    mock = pook.get('https://www.khl.ru/game/1097/877200/preview/',
+    mock = pook.get(f'https://text.khl.ru/text/877200.html',
                     reply=200,
                     response_body=get_match_info_finished
                     )
@@ -59,6 +59,10 @@ def test_get_khl_season_match_info(get_match_info_finished):
 
 @pook.on
 def test_get_finished_match_info(get_match_info_finished):
+    mock = pook.get(f'https://text.khl.ru/text/877200.html',
+                    reply=200,
+                    response_body=get_match_info_finished
+                    )
     info = get_finished_match_info(877200)
 
     out_info = {
@@ -68,4 +72,5 @@ def test_get_finished_match_info(get_match_info_finished):
         'viewers': '253'
     }
 
+    assert mock.calls == 1
     assert info == out_info
