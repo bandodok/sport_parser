@@ -68,7 +68,10 @@ def get_khl_season_match_info(season, webdriver=get_selenium_content, check_fini
 def get_finished_match_info(match_id):
     url = f'https://text.khl.ru/text/{match_id}.html'
     soup = get_request_content(url)
+
     extra_info = soup.find_all('li', class_="b-match_add_info_item")
+    if not extra_info:
+        return 'match not updated'
 
     match_status = soup.find('dd', class_="b-period_score").text
     if match_status != 'матч завершен':
