@@ -1,8 +1,11 @@
 from django.db.models import Sum
 import datetime
 
+from .formatter import Formatter
+
 
 class TableStats:
+    formatter = Formatter()
     stats = {
         'sh': 'median',
         'sog': 'median',
@@ -80,7 +83,7 @@ class TableStats:
         for stat, expr in self._extra_stats.items():
             team_stats[stat] = eval(expr, {}, team_stats)
 
-        team_stats = self._stat_format(team_stats)
+        team_stats = self.formatter.table_stat_format(team_stats, stat_names=self.stat_names)
         ordered_stat_list = []
         for stat, _ in self.stat_names.items():
             ordered_stat_list.append(team_stats[stat])
@@ -114,20 +117,6 @@ class TableStats:
             return calc_stat[f'{stat}__sum']
         raise ValueError('Invalid mode')
 
-    def _stat_format(self, stats):
-        formatted_stats = {}
-        for stat, value in stats.items():
-            format = self.stat_names.get(stat, [0, 0])[1]
-            if format == 'int':
-                formatted_stats[stat] = "{:.1f}".format(value)
-            elif format == 'percent':
-                formatted_stats[stat] = f'{"{:.2f}".format(round(value, 2))}%'
-            elif format == 'time':
-                formatted_stats[stat] = self.sec_to_time(value)
-            else:
-                continue
-        return formatted_stats
-
     def _parse_stats(self):
         self._team_stats = {}
         self._opponent_stats = {}
@@ -141,31 +130,16 @@ class TableStats:
             else:
                 self._team_stats[stat] = mode
 
-    @classmethod
-    def get_median(cls, items):
+    def get_median(self, items):
         """Возвращает медиану списка"""
         if len(items) % 2 != 0:
             median = int(len(items) // 2)
             if type(items[median]) == datetime.time:
-                return round(cls.time_to_sec(items[median]), 0)
+                return round(self.formatter.time_to_sec(items[median]), 0)
             return items[median]
         median = int(len(items) / 2)
         if type(items[median]) == datetime.time:
-            time1 = cls.time_to_sec(items[median])
-            time2 = cls.time_to_sec(items[median - 1])
+            time1 = self.formatter.time_to_sec(items[median])
+            time2 = self.formatter.time_to_sec(items[median - 1])
             return round((time1 + time2) / 2, 0)
         return (items[median] + items[median - 1]) / 2
-
-    @classmethod
-    def time_to_sec(cls, time):
-        """Возвращает время в секундах"""
-        return time.hour * 3600 + time.minute * 60 + time.second
-
-    @classmethod
-    def sec_to_time(cls, time):
-        """Возвращает время в виде строки в формате HH:MM"""
-        min = int(time // 60)
-        sec = int(time - min * 60)
-        if sec < 10:
-            sec = f'0{sec}'
-        return f'{min}:{sec}'
