@@ -58,10 +58,13 @@ class Season:
             fields.pop(field)
         return fields
 
-    def get_table_stats(self):
-        match_list = self.get_match_list()
-        team_list = self.get_team_list()
-        protocol_list = self.get_protocol_list()
+    def get_table_stats(self, *, match_list=None, team_list=None, protocol_list=None):
+        if not match_list:
+            match_list = self.get_match_list()
+        if not team_list:
+            team_list = self.get_team_list()
+        if not protocol_list:
+            protocol_list = self.get_protocol_list()
         return self.TableStats.calculate(match_list, team_list, protocol_list)
 
 
