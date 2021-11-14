@@ -22,11 +22,14 @@ def update_teams(request):
 
 def stats(request, season):
     s = Season(season)
-    update_date = s.last_updated()
-    stats = s.get_table_stats()
-    if len(stats) == 1:
+    if s.season_does_not_exist:
         raise Http404("Season does not exist")
-    return render(request, 'khl_stats.html', context={'stats': stats, 'update': update_date, 'season': season})
+    context = {
+        'update': s.last_updated(),
+        'stats': s.get_table_stats(),
+        'season': season
+    }
+    return render(request, 'khl_stats.html', context=context)
 
 
 def team(request, team_id):
