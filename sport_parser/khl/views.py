@@ -1,4 +1,4 @@
-from sport_parser.khl.objects import Season
+from sport_parser.khl.objects import Season, Team
 from sport_parser.khl.parsers.season import update_protocols, parse_season_matches
 from sport_parser.khl.parsers.team_info import parse_teams
 from sport_parser.khl.parsers.score_table import get_score_table
@@ -30,7 +30,15 @@ def stats(request, season):
 
 
 def team(request, team_id):
-    return render(request, 'khl_team.html', context=get_team_stats_view(team_id))
+    t = Team(team_id)
+    context = {
+        'stats': t.get_chart_stats(),
+        'team': t.data,
+        'seasons': t.get_another_season_team_ids(),
+        'last_matches': t.get_json_last_matches(5),
+        'future_matches': t.get_json_future_matches(5)
+    }
+    return render(request, 'khl_team.html', context=context)
 
 
 def match(request, match_id):

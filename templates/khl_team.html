@@ -2,7 +2,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{{ team }} - flawlessanalytics{% endblock %}
+{% block title %}{{ team.name }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
@@ -19,21 +19,21 @@
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'stats' season %}">Сезоны</a>
-    <a href="{% url 'calendar' season %}">Календарь</a>
+    <a href="{% url 'stats' team.season_id %}">Сезоны</a>
+    <a href="{% url 'calendar' team.season_id %}">Календарь</a>
 
 {% endblock %}
 
 {% block header_title %}
-    <p class="header_city">Конференция «{{ conference }}»</p>
-    <p class="header_city">Дивизион {{ division }}</p>
-    <h4 class="header_title">{{ team }}</h4>
-    <p class="header_city">{{ city }}</p>
-    <p class="header_city">{{ arena }}</p>
+    <p class="header_city">Конференция «{{ team.conference }}»</p>
+    <p class="header_city">Дивизион {{ team.division }}</p>
+    <h4 class="header_title">{{ team.name }}</h4>
+    <p class="header_city">{{ team.city }}</p>
+    <p class="header_city">{{ team.arena }}</p>
 {% endblock %}
 
 {% block right_logo %}
-    <img src="{{ logo }}" alt="KHL" class="leagueLogo">
+    <img src="{{ team.img }}" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}
@@ -59,7 +59,7 @@
 {% endblock %}
 
 {% block main_content %}
-<h3><a href="{% url 'stats' season %}">СЕЗОН {{ season }}</a></h3>
+<h3><a href="{% url 'stats' team.season_id %}">СЕЗОН {{ team.season_id }}</a></h3>
 <p class="update">Континентальная хоккейная лига</p>
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
