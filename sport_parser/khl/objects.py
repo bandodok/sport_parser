@@ -3,6 +3,7 @@ import datetime
 
 from sport_parser.khl.data_analysis.formatter import Formatter
 from sport_parser.khl.data_analysis.table_stats import TableStats
+from sport_parser.khl.data_analysis.chart_stats import ChartStats
 from sport_parser.khl.models import KHLSeason, KHLMatch, KHLTeams, KHLProtocol
 
 
@@ -69,13 +70,25 @@ class Season:
 
 
 class Team:
+    TableStats = TableStats()
+    ChartStats = ChartStats()
+    season_class = Season
+    formatter = Formatter()
 
-    def __init__(self, model, team_id):
-        self.model = model
-        self.data = model.objects.get(id=team_id)
+    def __init__(self, team_id):
+        self.models = ModelList()
+        self.data = self.models.team_model.objects.get(id=team_id)
 
     def get_match_list(self):
         return self.data.matches.all()
+
+    def get_self_protocol_list(self):
+        return self.data.protocols.all()
+
+    def get_opponent_protocol_list(self):
+        match_list = self.get_match_list()
+        protocol_list = self.models.protocol_model.objects.filter(match__in=match_list).exclude(team=self.data)
+        return protocol_list.order_by('match__date')
 
     def get_last_matches(self, num):
         return self.data.matches.filter(finished=True).order_by('-date')[:num]
@@ -90,7 +103,14 @@ class Team:
         pass
 
     def get_chart_stats(self):
-        pass
+        team = self
+        return self.ChartStats.calculate(team)
+
+    def get_another_season_team_ids(self):
+        """Возвращает список id команды для разных сезонов"""
+        name = self.data.name
+        season_list = self.models.team_model.objects.filter(name=name).order_by('season').values('id', 'season')
+        return [x for x in season_list]
 
 
 class Match:
