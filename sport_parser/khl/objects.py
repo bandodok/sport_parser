@@ -112,8 +112,9 @@ class Team:
         future_matches = self.get_last_matches(num)
         return self.formatter.get_json_future_matches_info(future_matches)
 
-    def season_stats_per_day(self):
-        pass
+    def get_table_stats(self):
+        season = self.season_class(self.data.season_id)
+        return season.get_table_stats(team_list=[self.data])
 
     def get_chart_stats(self):
         team = self
