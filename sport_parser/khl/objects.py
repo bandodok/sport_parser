@@ -1,4 +1,4 @@
-from django.db.models import Sum, Max
+from django.db.models import Max
 import datetime
 
 from sport_parser.khl.data_analysis.formatter import Formatter
@@ -39,8 +39,16 @@ class Season:
     def get_last_matches(self, num):
         return self.data.matches.filter(finished=True).order_by('-date')[:num]
 
+    def get_json_last_matches(self, num):
+        lats_matches = self.get_last_matches(num)
+        return self.formatter.get_json_last_matches_info(lats_matches)
+
     def get_future_matches(self, num):
         return self.data.matches.filter(finished=False).order_by('date')[:num]
+
+    def get_json_future_matches(self, num):
+        future_matches = self.get_last_matches(num)
+        return self.formatter.get_json_future_matches_info(future_matches)
 
     def last_updated(self, *, update=False):
         """Возвращает дату последнего обновления таблицы матчей
@@ -93,11 +101,16 @@ class Team:
     def get_last_matches(self, num):
         return self.data.matches.filter(finished=True).order_by('-date')[:num]
 
+    def get_json_last_matches(self, num):
+        lats_matches = self.get_last_matches(num)
+        return self.formatter.get_json_last_matches_info(lats_matches)
+
     def get_future_matches(self, num):
         return self.data.matches.filter(finished=False).order_by('date')[:num]
 
-    def season_stats_overall(self):
-        pass
+    def get_json_future_matches(self, num):
+        future_matches = self.get_last_matches(num)
+        return self.formatter.get_json_future_matches_info(future_matches)
 
     def season_stats_per_day(self):
         pass
