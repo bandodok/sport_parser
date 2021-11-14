@@ -1,6 +1,7 @@
 from django.db.models import Sum, Max
 import datetime
 
+from sport_parser.khl.data_analysis.formatter import Formatter
 from sport_parser.khl.data_analysis.table_stats import TableStats
 from sport_parser.khl.models import KHLSeason, KHLMatch, KHLTeams, KHLProtocol
 
@@ -15,10 +16,15 @@ class ModelList:
 class Season:
     TableStats = TableStats()
     ChartStats = 'ChartStats'
+    formatter = Formatter()
+    season_does_not_exist = False
 
     def __init__(self, season_id):
         self.models = ModelList()
-        self.data = self.models.season_model.objects.get(id=season_id)
+        try:
+            self.data = self.models.season_model.objects.get(id=season_id)
+        except self.models.season_model.DoesNotExist:
+            self.season_does_not_exist = True
 
     def get_match_list(self):
         return self.data.matches.all()
