@@ -1,10 +1,8 @@
-from sport_parser.khl.objects import Season, Team
+from sport_parser.khl.objects import Season, Team, Match
 from sport_parser.khl.parsers.season import update_protocols, parse_season_matches
 from sport_parser.khl.parsers.team_info import parse_teams
 from sport_parser.khl.parsers.score_table import get_score_table
 from sport_parser.khl.view_data.calendar import get_calendar_view, get_calendar_finished, get_calendar_unfinished
-from sport_parser.khl.view_data.match_stats import get_match_stats_view
-from sport_parser.khl.view_data.team_stats import get_team_stats_view
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 
@@ -45,7 +43,23 @@ def team(request, team_id):
 
 
 def match(request, match_id):
-    context = get_match_stats_view(match_id)
+    m = Match(match_id)
+    context = {
+        'match': m.data,
+        'match_stats': m.get_match_stats(),
+        'season_stats': m.get_table_stats(),
+        'chart_stats': m.get_chart_stats(),
+        'team1': {
+            'data': m.team1.data,
+            'score': m.get_team1_score(),
+            'last_matches': m.get_team1_last_matches(5)
+        },
+        'team2': {
+            'data': m.team2.data,
+            'score': m.get_team2_score(),
+            'last_matches': m.get_team2_last_matches(5)
+        },
+    }
     return render(request, 'khl_match.html', context=context)
 
 

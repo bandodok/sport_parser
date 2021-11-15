@@ -3,9 +3,13 @@ google.charts.load('current', {'packages':['corechart']});
 
 window.onload = function() {
     hideChart()
+    if (typeof team1_matches !== 'undefined') {
+        createFinishedMatch('team1', team1_matches);
+        createFinishedMatch('team2', team2_matches);
+    }
     createFinishedMatch('team1', last_matches);
     createUnfinishedMatch('team2', future_matches);
-}
+    }
 
 
 function hideChart() {
@@ -24,6 +28,36 @@ function filterChart(elementID) {
         document.getElementById(item).style.display = 'none';
     });
     document.getElementById(elementID).style.display = 'block';
+    switch (elementID) {
+        case 'chartSh':
+            document.getElementById('chartTitle1').innerHTML = 'Все броски';
+            document.getElementById('chartTitle2').innerHTML = 'Sh';
+            break;
+        case 'chartSog':
+            document.getElementById('chartTitle1').innerHTML = 'Броски в створ';
+            document.getElementById('chartTitle2').innerHTML = 'Sog';
+            break;
+        case 'chartG':
+            document.getElementById('chartTitle1').innerHTML = 'Голы';
+            document.getElementById('chartTitle2').innerHTML = 'G';
+            break;
+        case 'chartBlocks':
+            document.getElementById('chartTitle1').innerHTML = 'Блокированные броски';
+            document.getElementById('chartTitle2').innerHTML = 'Blocks';
+            break;
+        case 'chartHits':
+            document.getElementById('chartTitle1').innerHTML = 'Силовые приемы';
+            document.getElementById('chartTitle2').innerHTML = 'Hits';
+            break;
+        case 'chartPenalty':
+            document.getElementById('chartTitle1').innerHTML = 'Все броски';
+            document.getElementById('chartTitle2').innerHTML = 'Sh';
+            break;
+        case 'chartTime_a':
+            document.getElementById('chartTitle1').innerHTML = 'Время в атаке';
+            document.getElementById('chartTitle2').innerHTML = 'TimeA';
+            break;
+    }
 }
 
 var statsSh = [];
@@ -39,8 +73,8 @@ stats.forEach(function (item, i) {
     statsSog.push([i.toString(), item[1], item[8]])
     statsG.push([i.toString(), item[2], item[9]])
     statsBlocks.push([i.toString(), item[3], item[10]])
-    statsHits.push([i.toString(), item[5]])
-    statsPenalty.push([i.toString(), item[4]])
+    statsHits.push([i.toString(), item[5], item[12]])
+    statsPenalty.push([i.toString(), item[4], item[11]])
     statsTime_a.push([i.toString(), item[6], item[13]])
 });
 
