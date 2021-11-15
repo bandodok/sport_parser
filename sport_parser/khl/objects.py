@@ -132,16 +132,71 @@ class Team:
 
 
 class Match:
+    TableStats = TableStats()
+    ChartStats = ChartStats()
+    season_class = Season
+    team_class = Team
+    formatter = Formatter()
 
-    def __init__(self, model, match_id):
-        self.model = model
-        self.data = model.objects.get(match_id=match_id)
+    def __init__(self, match_id):
+        self.models = ModelList()
+        self.data = self.models.match_model.objects.get(id=match_id)
         self._set_teams()
+        self._set_exclude()
 
-    def get_current_match_stats(self):
-        pass
+    def get_match_stats(self):
+        if not self.data.finished:
+            return 'The match is not over yet'
+        return self.TableStats.match_stats_calculate(self.data)
+
+    def get_team1_score(self):
+        if not self.data.finished:
+            return 'The match is not over yet'
+        return self.team1.data.protocols.get(match=self.data).g
+
+    def get_team2_score(self):
+        if not self.data.finished:
+            return 'The match is not over yet'
+        return self.team2.data.protocols.get(match=self.data).g
+
+    def get_team1_last_matches(self, num):
+        return self.team1.get_json_last_matches(num, exclude=self._exclude)
+
+    def get_team1_json_last_matches(self, num):
+        return self.team1.get_json_last_matches(num, exclude=self._exclude)
+
+    def get_team1_future_matches(self, num):
+        return self.team1.get_json_future_matches(num, exclude=self._exclude)
+
+    def get_team1_json_future_matches(self, num):
+        return self.team1.get_json_future_matches(num, exclude=self._exclude)
+
+    def get_team2_last_matches(self, num):
+        return self.team2.get_json_last_matches(num, exclude=self._exclude)
+
+    def get_team2_json_last_matches(self, num):
+        return self.team2.get_json_last_matches(num, exclude=self._exclude)
+
+    def get_team2_future_matches(self, num):
+        return self.team2.get_json_future_matches(num, exclude=self._exclude)
+
+    def get_team2_json_future_matches(self, num):
+        return self.team2.get_json_future_matches(num, exclude=self._exclude)
+
+    def get_table_stats(self):
+        season = self.season_class(self.data.season_id)
+        return season.get_table_stats(team_list=[self.team1.data, self.team2.data])
+
+    def get_chart_stats(self):
+        team_list = (self.team1, self.team2)
+        return self.ChartStats.calculate(team_list)
 
     def _set_teams(self):
         team1, team2 = self.data.teams.all()
-        self.team1 = Team(self.model, team1.id)
-        self.team2 = Team(self.model, team2.id)
+        self.team1 = self.team_class(team1.id)
+        self.team2 = self.team_class(team2.id)
+
+    def _set_exclude(self):
+        self._exclude = 0
+        if self.data.finished:
+            self._exclude = self.data.id
