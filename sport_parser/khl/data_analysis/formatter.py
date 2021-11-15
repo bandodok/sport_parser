@@ -9,9 +9,11 @@ class Formatter:
         """Возвращает время в секундах"""
         return time.hour * 3600 + time.minute * 60 + time.second
 
-    @staticmethod
-    def sec_to_time(time):
+    @classmethod
+    def sec_to_time(cls, time):
         """Возвращает время в виде строки в формате HH:MM"""
+        if isinstance(time, datetime.time):
+            time = cls.time_to_sec(time)
         min = int(time // 60)
         sec = int(time - min * 60)
         if sec < 10:
