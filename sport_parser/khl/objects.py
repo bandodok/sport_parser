@@ -116,9 +116,10 @@ class Team:
         season = self.season_class(self.data.season_id)
         return season.get_table_stats(team_list=[self.data])
 
-    def get_chart_stats(self):
-        team = self
-        return self.ChartStats.calculate(team)
+    def get_chart_stats(self, team_list=None):
+        if not team_list:
+            team_list = self
+        return self.ChartStats.calculate(team_list)
 
     def get_another_season_team_ids(self):
         """Возвращает список id команды для разных сезонов"""
