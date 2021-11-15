@@ -15,13 +15,24 @@ class ChartStats:
         'time_a': ('TimeA', 'time'),
     }
 
-    def calculate(self, team):
+    def calculate(self, team_list):
         stat_list = [*self.stat_names.keys()]
-        team_stats = self.get_team_stats_per_day(team, stat_list)
-        opponent_stats = self.get_opp_stats_per_day(team, stat_list)
+        if len(team_list) > 1:
+            team_stats = self.get_team_stats_per_day(team_list[0], stat_list)
+            opponent_stats = self.get_team_stats_per_day(team_list[1], stat_list)
+            self_headers = [team_list[0].data.name for _ in self.stat_names]
+            opponent_headers = [team_list[1].data.name for _ in self.stat_names]
+        else:
+            team_stats = self.get_team_stats_per_day(team_list, stat_list)
+            opponent_stats = self.get_opp_stats_per_day(team_list, stat_list)
+            self_headers = [value[0] for value in self.stat_names.values()]
+            opponent_headers = [f'{value[0]}(A)' for value in self.stat_names.values()]
 
-        self_headers = [value[0] for value in self.stat_names.values()]
-        opponent_headers = [f'{value[0]}(A)' for value in self.stat_names.values()]
+        while len(team_stats) != len(opponent_stats):
+            if len(team_stats) < len(opponent_stats):
+                opponent_stats.pop()
+            else:
+                team_stats.pop()
 
         output_stats = [[*self_headers, *opponent_headers]]
 
