@@ -74,7 +74,7 @@ class Season:
             team_list = self.get_team_list()
         if not protocol_list:
             protocol_list = self.get_protocol_list()
-        return self.TableStats.calculate(match_list, team_list, protocol_list)
+        return self.TableStats.season_stats_calculate(match_list, team_list, protocol_list)
 
 
 class Team:
