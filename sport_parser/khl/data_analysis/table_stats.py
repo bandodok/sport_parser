@@ -55,7 +55,19 @@ class TableStats:
         'penalty': ('Penalty', 'int'),
     }
 
-    def calculate(self, match_list, team_list, protocol_list):
+    match_stats_names = {
+        'sh': ('Sh', 'int'),
+        'sog': ('SoG', 'int'),
+        'g': ('G', 'int'),
+        'faceoff': ('FaceOff', 'int'),
+        'faceoff_p': ('FaceOff%', 'percent'),
+        'hits': ('Hits', 'int'),
+        'blocks': ('Blocks', 'int'),
+        'penalty': ('Penalty', 'int'),
+        'time_a': ('TimeA', 'time'),
+    }
+
+    def season_stats_calculate(self, match_list, team_list, protocol_list):
         self.protocol_list = protocol_list
         self._parse_stats()
 
@@ -70,6 +82,32 @@ class TableStats:
             stats.append(team_stats)
 
         return stats
+
+    def match_stats_calculate(self, match):
+        table_headers = ['Team']
+        for name in self.match_stats_names.values():
+            table_headers.append(name[0])
+
+        stats = [table_headers]
+        for team in match.teams.all():
+            team_stats = [team.id, team.name]
+            team_stats.extend(self.get_team_match_stats(team, match))
+            stats.append(team_stats)
+
+        return stats
+
+    def get_team_match_stats(self, team, match):
+        stats = {}
+        t = match.protocols.get(team=team)
+        for stat in self.match_stats_names.keys():
+            stats[stat] = t.__dict__.get(stat)
+
+        stats = self.formatter.table_stat_format(stats, stat_names=self.match_stats_names)
+        ordered_stat_list = []
+        for stat, _ in self.match_stats_names.items():
+            ordered_stat_list.append(stats[stat])
+
+        return ordered_stat_list
 
     def get_team_season_stats(self, team, match_list):
         team_match_list = match_list.filter(teams=team)
