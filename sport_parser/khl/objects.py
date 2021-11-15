@@ -87,6 +87,9 @@ class Team:
         self.models = ModelList()
         self.data = self.models.team_model.objects.get(id=team_id)
 
+    def __len__(self):
+        return 1
+
     def get_match_list(self):
         return self.data.matches.all()
 
