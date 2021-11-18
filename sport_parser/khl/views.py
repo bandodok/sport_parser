@@ -64,7 +64,12 @@ def match(request, match_id):
 
 
 def calendar(request, season):
-    return render(request, 'khl_calendar.html', context=get_calendar_view(season))
+    s = Season(season)
+    context = {
+        'season': season,
+        'teams': s.get_team_list()
+    }
+    return render(request, 'khl_calendar.html', context=context)
 
 
 def calendar_f(request, season):
