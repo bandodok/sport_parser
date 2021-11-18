@@ -19,9 +19,9 @@ class Season:
     ChartStats = 'ChartStats'
     formatter = Formatter()
     season_does_not_exist = False
+    models = ModelList()
 
     def __init__(self, season_id):
-        self.models = ModelList()
         try:
             self.data = self.models.season_model.objects.get(id=season_id)
         except self.models.season_model.DoesNotExist:
@@ -82,9 +82,9 @@ class Team:
     ChartStats = ChartStats()
     season_class = Season
     formatter = Formatter()
+    models = ModelList()
 
     def __init__(self, team_id):
-        self.models = ModelList()
         self.data = self.models.team_model.objects.get(id=team_id)
 
     def __len__(self):
@@ -137,9 +137,9 @@ class Match:
     season_class = Season
     team_class = Team
     formatter = Formatter()
+    models = ModelList()
 
     def __init__(self, match_id):
-        self.models = ModelList()
         self.data = self.models.match_model.objects.get(id=match_id)
         self._set_teams()
         self._set_exclude()
