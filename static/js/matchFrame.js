@@ -1,4 +1,4 @@
-function createFinishedMatch(block, finished_matches) {
+function createMatchFrame(block, finished_matches) {
 
     Object.keys(finished_matches).forEach(function(key) {
         // key - ключ, match[key] - значение
@@ -44,7 +44,12 @@ function createFinishedMatch(block, finished_matches) {
 
         var score_p = document.createElement('p');
         score_p.className = "last_score";
-        score_p.innerHTML = match_data["team1_score"] + " - " + match_data["team2_score"]; // "4 - 0"
+        if (match_data["finished"] === true) {
+            score_p.innerHTML = match_data["team1_score"] + " - " + match_data["team2_score"]; // "4 - 0"
+        }
+        else {
+            score_p.innerHTML = match_data["time"].substring(0, 5);
+        }
 
         score.appendChild(score_p);
         match_info.appendChild(date);

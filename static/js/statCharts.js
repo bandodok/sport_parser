@@ -4,11 +4,11 @@ google.charts.load('current', {'packages':['corechart']});
 window.onload = function() {
     hideChart()
     if (typeof team1_matches !== 'undefined') {
-        createFinishedMatch('team1', team1_matches);
-        createFinishedMatch('team2', team2_matches);
+        createMatchFrame('team1', team1_matches);
+        createMatchFrame('team2', team2_matches);
     }
-    createFinishedMatch('team1', last_matches);
-    createUnfinishedMatch('team2', future_matches);
+    createMatchFrame('team1', last_matches);
+    createMatchFrame('team2', future_matches);
     }
 
 
