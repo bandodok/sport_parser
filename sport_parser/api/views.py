@@ -9,3 +9,4 @@ class Calendar(generics.ListAPIView):
     serializer_class = CalendarSerializer
     filterset_class = CalendarFilter
     queryset = Season.models.match_model.objects.all().order_by('date', 'time')
+    ordering_fields = ['date']
