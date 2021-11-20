@@ -384,6 +384,7 @@ footer div a {
     width: 100px;
     height: 100px;
     margin: 0 10px;
+    filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.68));
 }
 
 .match_info p {

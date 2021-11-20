@@ -81,3 +81,26 @@ window.addEventListener( "load", function () {
     sendData();
   } );
 } );
+
+
+function toggleOrdering() {
+   var element = document.getElementById("ordering-checkbox");
+   var input = document.getElementById("id_ordering");
+   element.classList.toggle("on");
+   switch (input.value) {
+       case "-date": {
+           input.value = 'date'
+           break
+       }
+       case "date":
+           input.value = '-date'
+           break
+       }
+}
+
+function toggleOrderingAsc() {
+   var element = document.getElementById("ordering-checkbox");
+   var input = document.getElementById("id_ordering");
+   element.classList = "ordering-checkbox";
+   input.value = 'date'
+}
