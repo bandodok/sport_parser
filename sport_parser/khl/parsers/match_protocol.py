@@ -11,32 +11,50 @@ def get_khl_protocol(match_id):
 
     # Общего количества бросков нет в протоколе, берется отдельно из текстовой трансляции
     text_stats = soup.find_all('p', class_='e-action_txt')
-    team_stats_row = [x for x in text_stats if 'Статистика матча:' in x.text or 'Game stats:' in x.text]
-    if team_stats_row:
-        team_stats_row = team_stats_row[0].text
-        sh_home = team_stats_row.split(':')[2].split('-')[0].strip()
-        sh_guest = team_stats_row.split(':')[2].split('-')[1].split(' ')[0]
-    # Если в тексте нет отчета по игре, броски складываются из отчетов по периодам
-    else:
-        p1 = [x for x in text_stats if 'Stats of 1st period:' in x.text or 'Статистика 1-го периода:' in x.text][0].text
-        p1_home = p1.split(':')[2].split('-')[0].strip()
-        p1_guest = p1.split(':')[2].split('-')[1].split(' ')[0]
-        p2 = [x for x in text_stats if 'Stats of 2nd period:' in x.text or 'Статистика 2-го периода:' in x.text][0].text
-        p2_home = p2.split(':')[2].split('-')[0].strip()
-        p2_guest = p2.split(':')[2].split('-')[1].split(' ')[0]
-        p3 = [x for x in text_stats if 'Stats of 3rd period:' in x.text or 'Статистика 3-го периода:' in x.text][0].text
-        p3_home = p3.split(':')[2].split('-')[0].strip()
-        p3_guest = p3.split(':')[2].split('-')[1].split(' ')[0]
-        p4 = [x for x in text_stats if 'Stats of overtime:' in x.text or 'Статистика овертайма:' in x.text]
-        p4_home = 0
-        p4_guest = 0
-        if p4:
-            p4 = p4[0].text
-            p4_home = p4.split(':')[2].split('-')[0].strip()
-            p4_guest = p4.split(':')[2].split('-')[1].split(' ')[0]
 
-        sh_home = int(p1_home) + int(p2_home) + int(p3_home) + int(p4_home)
-        sh_guest = int(p1_guest) + int(p2_guest) + int(p3_guest) + int(p4_guest)
+    match_stats = {}
+    for stats in text_stats:
+        if 'Статистика матча:' in stats.text or 'Game stats:' in stats.text:
+            if match_stats.get('match'):
+                continue
+            match_stats['match'] = stats.text
+        if 'Статистика 1-го периода:' in stats.text or 'Stats of 1st period:' in stats.text:
+            match_stats['p1'] = stats.text
+        if 'Статистика 2-го периода:' in stats.text or 'Stats of 2nd period:' in stats.text:
+            match_stats['p2'] = stats.text
+        if 'Статистика 3-го периода:' in stats.text or 'Stats of 3rd period:' in stats.text:
+            match_stats['p3'] = stats.text
+        if 'Статистика овертайма:' in stats.text or 'Stats of overtime:' in stats.text:
+            match_stats['ot'] = stats.text
+
+    sh_home = 0
+    sh_guest = 0
+    g_home = {}
+    g_guest = {}
+
+    score_status = soup.find('dt', class_="b-total_score").h3
+    if 'Б' in score_status.text:
+        score = score_status.text.split('–')
+        score[0] = int(score[0])
+        score[1] = int(score[1][:-1])
+        if score[0] > score[1]:
+            g_home['b'] = 1
+            g_guest['b'] = 0
+        else:
+            g_home['b'] = 0
+            g_guest['b'] = 1
+
+    if not match_stats.get('p1') or not match_stats.get('p2') or not match_stats.get('p3'):
+        sh_home = match_stats['match'].split(':')[2].split('-')[0].strip()
+        sh_guest = match_stats['match'].split(':')[2].split('-')[1].split(' ')[0]
+    else:
+        for key, value in match_stats.items():
+            if key == 'match':
+                continue
+            sh_home += int(value.split(':')[2].split('-')[0].strip())
+            sh_guest += int(value.split(':')[2].split('-')[1].split(' ')[0])
+            g_home[key] = int(value.split(':')[4].split('-')[0].strip())
+            g_guest[key] = int(value.split(':')[4].split('-')[1].split(' ')[0])
 
     team_stats = soup.find_all('div', class_="table-responsive")
     head = [x.find_all('th') for x in team_stats][0]
@@ -69,8 +87,24 @@ def get_khl_protocol(match_id):
     row_home = {stat_dict[stat]: value for stat, value in zip(columns, rows)}
     row_guest = {stat_dict[stat]: value for stat, value in zip(columns, rows[len(columns):])}
 
-    row_home.update({'match_id': match_id, 'sh': sh_home})
-    row_guest.update({'match_id': match_id, 'sh': sh_guest})
+    row_home.update({
+        'match_id': match_id,
+        'sh': sh_home,
+        'g_1': g_home.get('p1'),
+        'g_2': g_home.get('p2'),
+        'g_3': g_home.get('p3'),
+        'g_ot': g_home.get('ot'),
+        'g_b': g_home.get('b'),
+    })
+    row_guest.update({
+        'match_id': match_id,
+        'sh': sh_guest,
+        'g_1': g_guest.get('p1'),
+        'g_2': g_guest.get('p2'),
+        'g_3': g_guest.get('p3'),
+        'g_ot': g_guest.get('ot'),
+        'g_b': g_guest.get('b'),
+    })
 
     return row_update_type(row_home), row_update_type(row_guest)
 
