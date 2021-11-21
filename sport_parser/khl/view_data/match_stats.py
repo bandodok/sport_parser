@@ -45,7 +45,7 @@ def get_match_stats_view(match_id):
         'arena': match.arena,
         'viewers': match.viewers,
         'season_stats': season_stats,
-        'season': match.season,
+        'season': match.season.id,
         'finished': match.finished,
     }
 
@@ -53,9 +53,9 @@ def get_match_stats_view(match_id):
     team1_score = '-'
     team2_score = '-'
     if match_info['finished']:
-        exclude = match.match_id
-        team1_score = match.khlprotocol_set.all().get(team_id=team1.id).g
-        team2_score = match.khlprotocol_set.all().get(team_id=team2.id).g
+        exclude = match.id
+        team1_score = match.protocols.all().get(team=team1.id).g
+        team2_score = match.protocols.all().get(team=team2.id).g
 
         match_info.update({'match_stats': get_match_stats(match_id)})
 

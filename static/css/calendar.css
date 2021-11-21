@@ -20,3 +20,101 @@ h3 {
     width: 1400px;
     justify-content: center;
 }
+
+.form {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.form label {
+    margin-left: 30px;
+    margin-right: 10px;
+    color: #dedede;
+    font-family: Montserrat, sans-serif;
+}
+
+select {
+    background-color: rgba(132, 124, 124, 0.25);
+    color: #dedede;
+    height: 30px;
+    width: 172px;
+    cursor: pointer;
+    outline-width: 0;
+    border: solid 1px #FFFFFF33;
+    font-family: Montserrat, sans-serif;
+}
+
+option {
+    color: #484848;
+}
+
+button {
+    margin-left: 20px;
+    margin-right: 0;
+    background-color: rgba(132, 124, 124, 0.25);
+    color: #dedede;
+    height: 30px;
+    width: 110px;
+    cursor: pointer;
+    outline-width: 0;
+    border: solid 1px #FFFFFF33;
+    font-family: Montserrat, sans-serif;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #47639f;
+    transition: none;
+}
+
+select.ordering-checkbox {
+    visibility: hidden;
+    margin: 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+.ordering-checkbox {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    padding-left: 20px;
+    font-family: Montserrat, sans-serif;
+    position: relative;
+    margin: 10px;
+    height: 28px;
+    width: 80px;
+    color: #dedede;
+    background-color: rgba(132, 124, 124, 0.25);
+    border: solid 1px #FFFFFF33;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ordering-checkbox:hover {
+    background-color: #47639f;
+    transition: none;
+}
+
+.ordering-checkbox div {
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    color: #dedede;
+    user-select: none;
+}
+
+.ordering-checkbox:after {
+    font-size: 30px;
+    position: relative;
+    left: 10px;
+    top: -3px;
+    content: "△";
+    transition: content 0.2s;
+}
+
+.ordering-checkbox.on:after {
+    content: "▽";
+    transition: content 0.2s;
+}

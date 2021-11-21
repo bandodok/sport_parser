@@ -4,10 +4,17 @@ import pytest
 
 from sport_parser.khl.database_services.db_add import add_khl_protocol_to_database, add_teams_to_database, \
     add_matches_to_database
+from sport_parser.khl.models import KHLSeason
 
 
 @pytest.fixture()
 def update_db():
+    seasons = {
+        '21': 1097,
+        '20': 1045,
+        '19': 851,
+        '18': 671
+    }
     teams = [
         ['test1', 'img', 'city', 'arena', 'division', 'conference', 21],
         ['test2', 'img', 'city', 'arena', 'division', 'conference', 21],
@@ -117,6 +124,11 @@ def update_db():
           'faceoff_p': '44.83', 'blocks': '14', 'hits': '14', 'fop': '1', 'time_a': '00:10:37', 'vvsh': '00:19:11',
           'nshv': '00:06:40', 'pd': '68.97', 'sh': '66'}],
     ]
+    for id, external_id in seasons.items():
+        KHLSeason.objects.create(
+            id=id,
+            external_id=external_id
+        )
     for team in teams:
         add_teams_to_database(team)
     add_matches_to_database(matches)

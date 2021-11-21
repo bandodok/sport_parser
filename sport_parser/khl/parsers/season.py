@@ -47,7 +47,7 @@ def update_protocols(season=0, *, finished=False) -> None:
         last_matches_id = get_finished_matches_id(season)
     else:
         last_matches_id = get_unfinished_matches_id()
-        season = get_match_by_id(last_matches_id[0]).season
+        season = get_match_by_id(last_matches_id[0]).season.id
     matches_info = get_khl_season_match_info(season, check_finished=False)
     add_matches_to_database(matches_info)
     parse_season(last_matches_id)
