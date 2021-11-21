@@ -45,13 +45,13 @@ def get_khl_season_match_info(season, webdriver=get_selenium_content, check_fini
                 finished = False
                 time = score.dt.h3.text.split(' ')[0]
                 city = score.dd.p.text
-                arena = ''
-                viewers = 0
                 match_info = {
-                    'arena': arena,
+                    'arena': '',
                     'city': city,
                     'time': time,
-                    'viewers': viewers
+                    'viewers': 0,
+                    'penalties': False,
+                    'overtime': False
                 }
             match_info.update({
                 'finished': finished,
@@ -76,6 +76,14 @@ def get_finished_match_info(match_id):
     match_status = soup.find('dd', class_="b-period_score").text
     if match_status != 'матч завершен':
         return 'match not updated'
+
+    penalties = False
+    overtime = False
+    score_status = soup.find('dt', class_="b-total_score").h3
+    if 'Б' in score_status.text:
+        penalties = True
+    if 'ОТ' in score_status.text:
+        overtime = True
 
     date_info = extra_info[0]
     arena_info = extra_info[1]
@@ -102,7 +110,9 @@ def get_finished_match_info(match_id):
         'arena': arena,
         'city': city,
         'time': time,
-        'viewers': viewers
+        'viewers': viewers,
+        'penalties': penalties,
+        'overtime': overtime
     }
 
 

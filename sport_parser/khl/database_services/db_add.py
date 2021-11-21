@@ -63,6 +63,8 @@ def add_matches_to_database(matches):
             a.arena = match['arena']
             a.finished = match['finished']
             a.viewers = match['viewers']
+            a.penalties = match['penalties']
+            a.overtime = match['overtime']
             a.save()
             home_team = _team_name_update(match['home_team'])
             guest_team = _team_name_update(match['guest_team'])

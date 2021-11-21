@@ -54,6 +54,8 @@ class KHLMatch(models.Model):
     viewers = models.IntegerField(default=0)
     finished = models.BooleanField(default=False)
     teams = models.ManyToManyField(KHLTeams, related_name='matches')
+    penalties = models.BooleanField(default=False)
+    overtime = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
