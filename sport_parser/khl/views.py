@@ -1,21 +1,8 @@
 from sport_parser.khl.objects import Season, Team, Match
 from sport_parser.khl.parsers.season import update_protocols, parse_season_matches
 from sport_parser.khl.parsers.team_info import parse_teams
-from sport_parser.khl.parsers.score_table import get_score_table
-from sport_parser.khl.view_data.calendar import get_calendar_view, get_calendar_finished, get_calendar_unfinished
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
-
-
-def index(request):
-    data = get_score_table()
-    return HttpResponse(data.to_html())
-   # return render(request, 'khl_index.html', context={'data': data.to_html()})
-
-
-def update_teams(request):
-    parse_teams()
-    return HttpResponse('Complete!')
 
 
 def stats(request, season):
@@ -72,12 +59,9 @@ def calendar(request, season):
     return render(request, 'khl_calendar.html', context=context)
 
 
-def calendar_f(request, season):
-    return HttpResponse(get_calendar_finished(season), content_type='application/json')
-
-
-def calendar_u(request, season):
-    return HttpResponse(get_calendar_unfinished(season), content_type='application/json')
+def update_teams(request):
+    parse_teams()
+    return HttpResponse('Complete!')
 
 
 def update_protocol(request):
