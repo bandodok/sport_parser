@@ -45,13 +45,36 @@ function createMatchFrame(block, finished_matches) {
         var score_p = document.createElement('p');
         score_p.className = "last_score";
         if (match_data["finished"] === true) {
-            score_p.innerHTML = match_data["team1_score"] + " - " + match_data["team2_score"]; // "4 - 0"
+            score_p.innerHTML = match_data["team1_score"]['match'] + " - " + match_data["team2_score"]['match']; // "4 - 0"
         }
         else {
             score_p.innerHTML = match_data["time"].substring(0, 5);
         }
 
+        var score_p_extra = document.createElement('p');
+        score_p_extra.className = "last_score_extra";
+        var period_score = {};
+        period_score['p1'] = " " + match_data["team1_score"]['p1'] + "-" + match_data["team2_score"]['p1'] + " "
+        period_score['p2'] = " " + match_data["team1_score"]['p2'] + "-" + match_data["team2_score"]['p2'] + " "
+        period_score['p3'] = " " + match_data["team1_score"]['p3'] + "-" + match_data["team2_score"]['p3'] + " "
+
+        if (match_data["finished"] === true) {
+            if (match_data["penalties"] === true) {
+                score_p_extra.innerHTML = 'Б<br>'
+                period_score['ot'] = match_data["team1_score"]['ot'] + "-" + match_data["team2_score"]['ot']
+                period_score['b'] = match_data["team1_score"]['b'] + "-" + match_data["team2_score"]['b']
+            }
+            if (match_data["overtime"] === true) {
+                score_p_extra.innerHTML = 'ОТ<br>'
+                period_score['ot'] = match_data["team1_score"]['ot'] + "-" + match_data["team2_score"]['ot']
+            }
+        }
+        for (const [key, value] of Object.entries(period_score)) {
+            score_p_extra.innerHTML = score_p_extra.innerHTML + " " + value
+        }
+
         score.appendChild(score_p);
+        score.appendChild(score_p_extra);
         match_info.appendChild(date);
         match_info.appendChild(score);
 

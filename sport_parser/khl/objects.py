@@ -152,12 +152,16 @@ class Match:
     def get_team1_score(self):
         if not self.data.finished:
             return 'The match is not over yet'
-        return self.team1.data.protocols.get(match=self.data).g
+        goals = self.team1.data.protocols.get(match=self.data).g
+        penalties = self.team1.data.protocols.get(match=self.data).g_b
+        return goals + penalties
 
     def get_team2_score(self):
         if not self.data.finished:
             return 'The match is not over yet'
-        return self.team2.data.protocols.get(match=self.data).g
+        goals = self.team2.data.protocols.get(match=self.data).g
+        penalties = self.team2.data.protocols.get(match=self.data).g_b
+        return goals + penalties
 
     def get_team1_last_matches(self, num):
         return self.team1.get_json_last_matches(num, exclude=self._exclude)

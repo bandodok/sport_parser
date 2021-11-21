@@ -38,6 +38,8 @@ def update_match_status(match_id):
     match.finished = True
     match.arena = info['arena']
     match.viewers = info['viewers']
+    match.penalties = info['penalties']
+    match.overtime = info['overtime']
     match.save()
 
 

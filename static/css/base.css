@@ -377,7 +377,11 @@ footer div a {
 }
 
 .match .match_info {
-    width: 210px;
+    width: 380px;
+    height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .match .last_logo {
@@ -389,11 +393,22 @@ footer div a {
 
 .match_info p {
     color: #FFFFFF;
-    margin-top: 10px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
-.last_score {
+p.last_score {
     color: #FFFFFF;
     font-size: 25px;
     font-family: avalorsregular, sans-serif;
+    padding-bottom: 0;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.last_score_extra {
+    color: #FFFFFF;
+    font-size: 13px;
+    word-spacing: 0.5em;
+    white-space: nowrap;
 }
