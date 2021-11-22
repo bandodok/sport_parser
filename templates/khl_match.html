@@ -69,7 +69,30 @@
                 {% language 'ru' %}
                 <p class="header_city">{{ match.date|date:'j E Y' }}</p>
                     {% if match.finished == True %}
-                        <p id="score_time">{{ team1.score }} - {{ team2.score }}</p>
+                        <p id="score_time">{{ team1.score.match }} - {{ team2.score.match }}</p>
+
+                        {% if overtime == True %}
+                            <p class="arena" id="score_by_period">ОТ<br>
+                                {{ team1.score.p1 }}-{{ team2.score.p1 }}
+                                {{ team1.score.p2 }}-{{ team2.score.p2 }}
+                                {{ team1.score.p3 }}-{{ team2.score.p3 }}
+                                {{ team1.score.ot }}-{{ team2.score.ot }}
+                            </p>
+                        {% elif penalties == True %}
+                            <p class="arena" id="score_by_period">Б<br>
+                                {{ team1.score.p1 }}-{{ team2.score.p1 }}
+                                {{ team1.score.p2 }}-{{ team2.score.p2 }}
+                                {{ team1.score.p3 }}-{{ team2.score.p3 }}
+                                {{ team1.score.ot }}-{{ team2.score.ot }}
+                                {{ team1.score.b }}-{{ team2.score.b }}
+                            </p>
+                        {% else %}
+                            <p class="arena" id="score_by_period">
+                                {{ team1.score.p1 }}-{{ team2.score.p1 }}
+                                {{ team1.score.p2 }}-{{ team2.score.p2 }}
+                                {{ team1.score.p3 }}-{{ team2.score.p3 }}
+                            </p>
+                        {% endif %}
                         <p class="arena" id="arena">{{ match.arena }}</p>
                         <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
                         {%  else %}

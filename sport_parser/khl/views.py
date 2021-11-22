@@ -36,14 +36,16 @@ def match(request, match_id):
         'match_stats': m.get_match_stats(),
         'season_stats': m.get_table_stats(),
         'chart_stats': m.get_chart_stats(),
+        'overtime': m.data.overtime,
+        'penalties': m.data.penalties,
         'team1': {
             'data': m.team1.data,
-            'score': m.get_team1_score(),
+            'score': m.get_team1_score_by_period(),
             'last_matches': m.get_team1_last_matches(5)
         },
         'team2': {
             'data': m.team2.data,
-            'score': m.get_team2_score(),
+            'score': m.get_team2_score_by_period(),
             'last_matches': m.get_team2_last_matches(5)
         },
     }

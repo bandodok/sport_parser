@@ -149,12 +149,38 @@ class Match:
             return 'The match is not over yet'
         return self.TableStats.match_stats_calculate(self.data)
 
+    def get_team1_score_by_period(self):
+        if not self.data.finished:
+            return 'The match is not over yet'
+        protocol = self.team1.data.protocols.get(match=self.data)
+        return {
+            'match': self.get_team1_score(),
+            'p1': protocol.g_1,
+            'p2': protocol.g_2,
+            'p3': protocol.g_3,
+            'ot': protocol.g_ot,
+            'b': protocol.g_b,
+        }
+
     def get_team1_score(self):
         if not self.data.finished:
             return 'The match is not over yet'
         goals = self.team1.data.protocols.get(match=self.data).g
         penalties = self.team1.data.protocols.get(match=self.data).g_b
         return goals + penalties
+
+    def get_team2_score_by_period(self):
+        if not self.data.finished:
+            return 'The match is not over yet'
+        protocol = self.team2.data.protocols.get(match=self.data)
+        return {
+            'match': self.get_team2_score(),
+            'p1': protocol.g_1,
+            'p2': protocol.g_2,
+            'p3': protocol.g_3,
+            'ot': protocol.g_ot,
+            'b': protocol.g_b,
+        }
 
     def get_team2_score(self):
         if not self.data.finished:
