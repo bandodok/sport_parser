@@ -1,9 +1,9 @@
 from django.conf import settings
 
-from sport_parser.khl.parsers.request import get_selenium_content, get_request_content
+from sport_parser.khl.parsers.request import calendar_request_content, get_request_content
 
 
-def get_khl_season_match_info(season, webdriver=get_selenium_content, check_finished=True):
+def get_khl_season_match_info(season, webdriver=calendar_request_content, check_finished=True):
     s = settings.SEASONS.get(str(season), 0)
     if s == 0:
         return f'season {s} not found'

@@ -1,4 +1,4 @@
-import functools
+import tempfile
 import os
 
 import requests
@@ -23,3 +23,14 @@ def get_selenium_content(url):
     r = driver.page_source
     driver.close()
     return BeautifulSoup(r, 'html.parser')
+
+
+def calendar_request_content(url):
+    r = requests.get(url)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        with open(f'{tmpdirname}\\file1.txt', 'w', encoding='utf-8') as f:
+            a = r.text.replace('<!--div align="center" style="margin-top: 1em;">', ' ')
+            f.write(a)
+        with open(f'{tmpdirname}\\file1.txt', 'rb') as f:
+            soup = BeautifulSoup(f, 'html.parser')
+        return soup
