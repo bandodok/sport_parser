@@ -192,25 +192,13 @@ class Match:
     def get_team1_last_matches(self, num):
         return self.team1.get_json_last_matches(num, exclude=self._exclude)
 
-    def get_team1_json_last_matches(self, num):
-        return self.team1.get_json_last_matches(num, exclude=self._exclude)
-
     def get_team1_future_matches(self, num):
-        return self.team1.get_json_future_matches(num, exclude=self._exclude)
-
-    def get_team1_json_future_matches(self, num):
         return self.team1.get_json_future_matches(num, exclude=self._exclude)
 
     def get_team2_last_matches(self, num):
         return self.team2.get_json_last_matches(num, exclude=self._exclude)
 
-    def get_team2_json_last_matches(self, num):
-        return self.team2.get_json_last_matches(num, exclude=self._exclude)
-
     def get_team2_future_matches(self, num):
-        return self.team2.get_json_future_matches(num, exclude=self._exclude)
-
-    def get_team2_json_future_matches(self, num):
         return self.team2.get_json_future_matches(num, exclude=self._exclude)
 
     def get_table_stats(self):
@@ -221,8 +209,16 @@ class Match:
         team_list = (self.team1, self.team2)
         return self.ChartStats.calculate(team_list)
 
+    def _get_m2m_table_name(self):
+        meta = self.models.match_model._meta
+        app_label = meta.app_label
+        match_model = meta.model_name
+        team_model = meta.many_to_many[0].column
+        return f'{app_label}_{match_model}_{team_model}'
+
     def _set_teams(self):
-        team1, team2 = self.data.teams.all()
+        m2m_table = self._get_m2m_table_name()
+        team1, team2 = self.data.teams.all().extra(select={'add_id': f'{m2m_table}.id'}).order_by('add_id')
         self.team1 = self.team_class(team1.id)
         self.team2 = self.team_class(team2.id)
 
