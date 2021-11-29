@@ -6,7 +6,7 @@ from rest_framework import serializers
 class CalendarSerializer(serializers.BaseSerializer, ABC):
     def to_representation(self, match):
         if match.finished:
-            protocol1, protocol2 = match.protocols.all()
+            protocol1, protocol2 = match.protocols.all().order_by('id')
             return {
                 'date': match.date,
                 'time': match.time,
