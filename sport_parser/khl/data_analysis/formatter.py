@@ -45,6 +45,32 @@ class Formatter:
                 continue
         return formatted_stats
 
+    def date_format(self, date):
+        splitted_date = date.split(' ')[:-1]
+        if not splitted_date[0]:
+            splitted_date.pop(0)
+        day, month, year = splitted_date
+        if len(day) == 1:
+            day = f'0{day}'
+        month = self.month_to_int_replace(month)
+        year = year[:-1]
+        return f'{year}-{month}-{day}'
+
+    @staticmethod
+    def month_to_int_replace(month: str):
+        """Возвращает номер месяца по слову"""
+        months = {
+            'января': '01',
+            'февраля': '02',
+            'марта': '03',
+            'августа': '08',
+            'сентября': '09',
+            'октября': '10',
+            'ноября': '11',
+            'декабря': '12'
+        }
+        return months.get(month)
+
     def get_json_last_matches_info(self, matches):
         last_matches = {}
         for match in matches:
