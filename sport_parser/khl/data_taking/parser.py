@@ -64,6 +64,8 @@ class Parser:
                     'season': season
                 }
                 score = match.find('dl', class_='b-score')
+                if '+' in score.dt.h3.text:
+                    continue
                 if '—' in score.dt.h3.text:
                     finished = True
                     match_extra_info = {
@@ -203,10 +205,10 @@ class Parser:
             for key, value in match_stats.items():
                 if key == 'match':
                     continue
-                sh_home += int(value.split(':')[2].split('-')[0].strip())
-                sh_guest += int(value.split(':')[2].split('-')[1].split(' ')[0])
-                g_home[key] = int(value.split(':')[4].split('-')[0].strip())
-                g_guest[key] = int(value.split(':')[4].split('-')[1].split(' ')[0])
+                sh_home += int(value.split(';')[0].strip().split(' ').pop().split('-')[0])
+                sh_guest += int(value.split(';')[0].strip().split(' ').pop().split('-')[1])
+                g_home[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[0])
+                g_guest[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[1])
 
         team_stats = soup.find_all('div', class_="table-responsive")
         head = [x.find_all('th') for x in team_stats][0]

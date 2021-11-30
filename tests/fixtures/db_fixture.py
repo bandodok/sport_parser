@@ -2,10 +2,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from sport_parser.khl.database_services.db_add import add_khl_protocol_to_database, add_teams_to_database, \
-    add_matches_to_database
 from sport_parser.khl.models import KHLSeason
-from sport_parser.khl.db import DB
+from sport_parser.khl.data_taking.db import DB
 
 
 @pytest.fixture()

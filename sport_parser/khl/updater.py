@@ -1,14 +1,15 @@
 import datetime
 
-from sport_parser.khl.db import DB
+from sport_parser.khl.data_taking.db import DB
 from sport_parser.khl.objects import ModelList
-from sport_parser.khl.parser import Parser
+from sport_parser.khl.data_taking.parser import Parser
 
 
 class Updater:
     model_list = ModelList
     parser = Parser()
     db = DB()
+    ignore = ['872325', '872404', '872667']
 
     def update(self):
         season = self._get_first_unfinished_match_season()
@@ -39,7 +40,7 @@ class Updater:
     def _add_calendar_to_db(self, season, *, skip_finished=False):
         calendar = self.parser.parse_calendar(season)
         for match in calendar:
-            if skip_finished:
+            if skip_finished or match['match_id'] in self.ignore:
                 continue
             self.db.add_match(match)
         return self.model_list.match_model.objects.filter(season=season)
@@ -52,6 +53,8 @@ class Updater:
 
     def _add_match_to_db(self, match):
         match = self.parser.parse_match(match)
+        if match == 'match not updated':
+            return
         self.db.add_match(match)
 
     def _add_protocol_to_db(self, match):
