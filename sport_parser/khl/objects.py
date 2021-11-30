@@ -65,7 +65,7 @@ class Season:
         fields = self.data.matches.all()[0].protocols.all()[0].__dict__
         for field in ['_state', 'id', 'created', 'updated', 'team_id', 'match_id']:
             fields.pop(field)
-        return fields
+        return [key for key, value in fields.items()]
 
     def get_table_stats(self, *, match_list=None, team_list=None, protocol_list=None):
         if not match_list:
