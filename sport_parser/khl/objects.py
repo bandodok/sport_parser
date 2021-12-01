@@ -144,11 +144,6 @@ class Match:
         self._set_teams()
         self._set_exclude()
 
-    def get_match_stats(self):
-        if not self.data.finished:
-            return 'The match is not over yet'
-        return self.TableStats.match_stats_calculate(self.data)
-
     def get_team1_score_by_period(self):
         if not self.data.finished:
             return 'The match is not over yet'
@@ -200,6 +195,11 @@ class Match:
 
     def get_team2_future_matches(self, num):
         return self.team2.get_json_future_matches(num, exclude=self._exclude)
+
+    def get_match_stats(self):
+        if not self.data.finished:
+            return 'The match is not over yet'
+        return self.TableStats.match_stats_calculate(self.data)
 
     def get_table_stats(self):
         season = self.season_class(self.data.season_id)
