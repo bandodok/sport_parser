@@ -1,17 +1,13 @@
 import pytest
-from datetime import datetime, timezone
-from freezegun import freeze_time
 
-from sport_parser.khl.data_taking.db import DB
 from sport_parser.khl.objects import Team
-from sport_parser.khl.models import KHLSeason, KHLTeams
-from fixtures.db_fixture import update_db, get_protocol, get_teams, get_matches
+from fixtures.db_fixture import update_db
 
 from sport_parser.khl.models import KHLTeams
 
 
 @pytest.mark.django_db(transaction=True)
-def test_team_get_match_list(update_db):
+def test_get_match_list(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
     t = Team(team_id)
     team = t.data
@@ -22,7 +18,7 @@ def test_team_get_match_list(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_team_get_self_protocol_list(update_db):
+def test_get_self_protocol_list(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
     t = Team(team_id)
     team = t.data
@@ -33,7 +29,7 @@ def test_team_get_self_protocol_list(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_team_get_opponent_protocol_list(update_db):
+def test_get_opponent_protocol_list(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
     t = Team(team_id)
     team = t.data
@@ -44,7 +40,7 @@ def test_team_get_opponent_protocol_list(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_team_get_last_matches(update_db):
+def test_get_last_matches(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
     t = Team(team_id)
     team = t.data
@@ -55,7 +51,7 @@ def test_team_get_last_matches(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_team_get_future_matches(update_db):
+def test_get_future_matches(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
     t = Team(team_id)
     team = t.data

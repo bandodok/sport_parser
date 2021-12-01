@@ -4,14 +4,13 @@ from freezegun import freeze_time
 
 from sport_parser.khl.data_taking.db import DB
 from sport_parser.khl.objects import Season
-from sport_parser.khl.models import KHLSeason
-from fixtures.db_fixture import update_db, get_protocol, get_teams, get_matches
+from fixtures.db_fixture import update_db, get_teams, get_matches
 
 from sport_parser.khl.models import KHLTeams
 
 
 @pytest.mark.django_db(transaction=True)
-def test_season_get_match_list(update_db):
+def test_get_match_list(update_db):
     s = Season(21)
     match_list = s.get_match_list()
     assert len(match_list) == 12
@@ -20,14 +19,14 @@ def test_season_get_match_list(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_season_get_team_list(update_db):
+def test_get_team_list(update_db):
     s = Season(21)
     team_list = s.get_team_list()
     assert [team.name for team in team_list] == ['test1', 'test2', 'test6']
 
 
 @pytest.mark.django_db(transaction=True)
-def test_season_get_protocol_list(update_db):
+def test_get_protocol_list(update_db):
     s = Season(21)
     protocol_list = s.get_protocol_list()
     assert len(protocol_list) == 12
@@ -36,7 +35,7 @@ def test_season_get_protocol_list(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_season_get_last_matches(update_db):
+def test_get_last_matches(update_db):
     s = Season(21)
     match_list = s.get_last_matches(5)
     assert len(match_list) == 5
@@ -45,7 +44,7 @@ def test_season_get_last_matches(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_season_get_future_matches(update_db):
+def test_get_future_matches(update_db):
     s = Season(21)
     match_list = s.get_future_matches(5)
     assert len(match_list) == 5
@@ -54,7 +53,7 @@ def test_season_get_future_matches(update_db):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_season_last_updated(get_teams, get_matches):
+def test_last_updated(get_teams, get_matches):
     db = DB()
     s = Season(21)
     with freeze_time(datetime(2012, 1, 14, tzinfo=timezone.utc)):
