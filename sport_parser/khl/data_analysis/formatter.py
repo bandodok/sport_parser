@@ -1,9 +1,12 @@
 import datetime
 import json
+from sport_parser.api.serializers import CalendarSerializer
 from django.core.serializers.json import DjangoJSONEncoder
 
 
 class Formatter:
+    calendar_serializer = CalendarSerializer()
+
     @staticmethod
     def time_to_sec(time):
         """Возвращает время в секундах"""
@@ -42,42 +45,40 @@ class Formatter:
                 continue
         return formatted_stats
 
-    @staticmethod
-    def get_json_last_matches_info(matches):
-        last_matches = {}
-        for match in matches:
-            protocol1, protocol2 = match.protocols.all()
-            last_matches[f'{match.id}/{match.date}'] = {
-                'date': match.date,
-                'time': match.time,
-                'id': match.id,
-                'finished': match.finished,
-                'team1_name': protocol1.team.name,
-                'team1_score': protocol1.g,
-                'team1_image': protocol1.team.img,
-                'team1_id': protocol1.team.id,
-                'team2_name': protocol2.team.name,
-                'team2_score': protocol2.g,
-                'team2_image': protocol2.team.img,
-                'team2_id': protocol2.team.id,
-            }
-        return json.dumps(last_matches, cls=DjangoJSONEncoder)
+    def date_format(self, date):
+        splitted_date = date.split(' ')[:-1]
+        if not splitted_date[0]:
+            splitted_date.pop(0)
+        day, month, year = splitted_date
+        if len(day) == 1:
+            day = f'0{day}'
+        month = self.month_to_int_replace(month)
+        year = year[:-1]
+        return f'{year}-{month}-{day}'
 
     @staticmethod
-    def get_json_future_matches_info(matches):
+    def month_to_int_replace(month: str):
+        """Возвращает номер месяца по слову"""
+        months = {
+            'января': '01',
+            'февраля': '02',
+            'марта': '03',
+            'августа': '08',
+            'сентября': '09',
+            'октября': '10',
+            'ноября': '11',
+            'декабря': '12'
+        }
+        return months.get(month)
+
+    def get_json_last_matches_info(self, matches):
+        last_matches = {}
+        for match in matches:
+            last_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
+        return json.dumps(last_matches, cls=DjangoJSONEncoder)
+
+    def get_json_future_matches_info(self, matches):
         future_matches = {}
         for match in matches:
-            team1, team2 = match.teams.all()
-            future_matches[f'{match.id}/{match.date}'] = {
-                'date': match.date,
-                'time': match.time,
-                'id': match.id,
-                'finished': match.finished,
-                'team1_name': team1.name,
-                'team1_image': team1.img,
-                'team1_id': team1.id,
-                'team2_name': team2.name,
-                'team2_image': team2.img,
-                'team2_id': team2.id,
-            }
+            future_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
         return json.dumps(future_matches, cls=DjangoJSONEncoder)

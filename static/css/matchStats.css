@@ -73,7 +73,10 @@
 
 #viewers {
     color: #847c7c;
+}
 
+#score_by_period {
+    word-spacing: 0.5em;
 }
 
 .lastMatches {

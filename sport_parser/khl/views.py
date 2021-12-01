@@ -1,7 +1,6 @@
 from sport_parser.khl.objects import Season, Team, Match
-from sport_parser.khl.parsers.season import update_protocols, parse_season_matches
-from sport_parser.khl.parsers.team_info import parse_teams
-from django.http import HttpResponse, Http404
+from sport_parser.khl.updater import Updater
+from django.http import Http404
 from django.shortcuts import render, redirect
 
 
@@ -36,14 +35,16 @@ def match(request, match_id):
         'match_stats': m.get_match_stats(),
         'season_stats': m.get_table_stats(),
         'chart_stats': m.get_chart_stats(),
+        'overtime': m.data.overtime,
+        'penalties': m.data.penalties,
         'team1': {
             'data': m.team1.data,
-            'score': m.get_team1_score(),
+            'score': m.get_team1_score_by_period(),
             'last_matches': m.get_team1_last_matches(5)
         },
         'team2': {
             'data': m.team2.data,
-            'score': m.get_team2_score(),
+            'score': m.get_team2_score_by_period(),
             'last_matches': m.get_team2_last_matches(5)
         },
     }
@@ -59,21 +60,13 @@ def calendar(request, season):
     return render(request, 'khl_calendar.html', context=context)
 
 
-def update_teams(request):
-    parse_teams()
-    return HttpResponse('Complete!')
-
-
 def update_protocol(request):
-    update_protocols()
+    u = Updater()
+    u.update()
     return redirect('/khl/stats/21')
 
 
-def update_finished(request, season):
-    update_protocols(season, finished=True)
-    return HttpResponse('Complete!')
-
-
 def update_season_matches(request, season):
-    parse_season_matches(season)
+    u = Updater()
+    u.parse_season(season)
     return redirect('/khl/stats/21')
