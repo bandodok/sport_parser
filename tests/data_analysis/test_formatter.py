@@ -1,11 +1,7 @@
-import pytest
 from datetime import time
 
 from sport_parser.khl.data_analysis.formatter import Formatter
-from sport_parser.khl.objects import Season, Match, Team
-from fixtures.db_fixture import update_db, get_teams, get_matches
 
-from sport_parser.khl.models import KHLTeams, KHLMatch
 
 
 def test_time_to_sec():

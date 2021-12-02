@@ -1,11 +1,10 @@
 import pytest
-from datetime import time
 
 from sport_parser.khl.data_analysis.chart_stats import ChartStats
-from sport_parser.khl.objects import Season, Match, Team
-from fixtures.db_fixture import update_db, get_teams, get_matches
+from sport_parser.khl.objects import Team
+from fixtures.db_fixture import update_db
 
-from sport_parser.khl.models import KHLTeams, KHLMatch
+from sport_parser.khl.models import KHLTeams
 
 
 @pytest.mark.django_db(transaction=True)

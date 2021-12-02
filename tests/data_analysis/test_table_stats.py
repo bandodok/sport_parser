@@ -3,7 +3,7 @@ from datetime import time
 
 from sport_parser.khl.data_analysis.table_stats import TableStats
 from sport_parser.khl.objects import Season
-from fixtures.db_fixture import update_db, get_teams, get_matches
+from fixtures.db_fixture import update_db
 
 from sport_parser.khl.models import KHLTeams, KHLMatch
 
