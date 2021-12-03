@@ -6,14 +6,6 @@ from sport_parser.khl.data_analysis.table_stats import TableStats
 from sport_parser.khl.data_analysis.chart_stats import ChartStats
 from sport_parser.khl.models import KHLSeason, KHLMatch, KHLTeams, KHLProtocol
 
-
-class ModelList:
-    season_model = KHLSeason
-    match_model = KHLMatch
-    team_model = KHLTeams
-    protocol_model = KHLProtocol
-
-
 class Season:
     TableStats = TableStats()
     ChartStats = 'ChartStats'
