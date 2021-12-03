@@ -14,7 +14,7 @@ class Formatter:
 
     @classmethod
     def sec_to_time(cls, time):
-        """Возвращает время в виде строки в формате HH:MM"""
+        """Возвращает время в виде строки в формате MM:SS"""
         if isinstance(time, datetime.time):
             time = cls.time_to_sec(time)
         min = int(time // 60)
