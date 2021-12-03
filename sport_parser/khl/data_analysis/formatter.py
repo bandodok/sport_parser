@@ -5,7 +5,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 
 class Formatter:
-    calendar_serializer = CalendarSerializer()
+    def __init__(self, config):
+        self.calendar_serializer = config.calendar_serializer
 
     @staticmethod
     def time_to_sec(time):
