@@ -1,16 +1,12 @@
 from django.db import transaction
 
-from sport_parser.khl.objects import ModelList
+from sport_parser.khl.models import ModelList
 
 
 class DB:
-    model_list = ModelList
-    updated_team_names = {
-        'Торпедо НН': 'Торпедо',
-        'Динамо Мск': 'Динамо М',
-        'ХК Динамо М': 'Динамо М',
-        'ХК Сочи': 'Сочи'
-    }
+    def __init__(self, config):
+        self.model_list = config.models
+        self.updated_team_names = config.updated_team_names
 
     def add_team(self, team):
         team_name = self._team_name_update(team['name'])
