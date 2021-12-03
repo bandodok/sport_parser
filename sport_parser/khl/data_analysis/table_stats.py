@@ -5,67 +5,11 @@ from .formatter import Formatter
 
 
 class TableStats:
-    formatter = Formatter()
-    stats = {
-        'sh': 'median',
-        'sog': 'median',
-        'g': 'median',
-        'time_a': 'median',
-        'hits': 'median',
-        'blocks': 'median',
-        'penalty': 'median',
-
-        'sh__a': 'median',
-        'sog__a': 'median',
-        'g__a': 'median',
-        'time_a__a': 'median',
-        'blocks__a': 'median',
-
-        'faceoff': 'sum',
-        'faceoff__a': 'sum',
-
-        'sh__e': 'sh / (sh + sh__a) * 100',
-        'sog__e': 'sog / sh * 100',
-        'faceoff__e': 'faceoff / (faceoff + faceoff__a) * 100',
-        'blocks__e': 'blocks / (blocks + blocks__a) * 100',
-        'dev__e': '(1 - (sog__a / sh__a)) * 100',
-        'time_a__e': 'time_a / (time_a + time_a__a) * 100',
-        'pdo__e': '((sh / (sh + sh__a)) + (sog / sh)) * 100',
-    }
-    #
-    stat_names = {
-        'sh': ('Sh', 'int'),
-        'sh__a': ('Sh(A)', 'int'),
-        'sh__e': ('Sh%', 'percent'),
-        'sog': ('SoG', 'int'),
-        'sog__a': ('SoG(A)', 'int'),
-        'sog__e': ('AQ', 'percent'),
-        'g': ('G', 'int'),
-        'g__a': ('G(A)', 'int'),
-        'faceoff__e': ('FaceOff%', 'percent'),
-        'time_a': ('TimeA', 'time'),
-        'time_a__a': ('TimeA(A)', 'time'),
-        'time_a__e': ('TimeA%', 'percent'),
-        'dev__e': ('DEV%', 'percent'),
-        'pdo__e': ('PDO%', 'percent'),
-        'hits': ('Hits', 'int'),
-        'blocks': ('Blocks', 'int'),
-        'blocks__a': ('Blocks(A)', 'int'),
-        'blocks__e': ('Blocks%', 'percent'),
-        'penalty': ('Penalty', 'int'),
-    }
-
-    match_stats_names = {
-        'sh': ('Sh', 'int'),
-        'sog': ('SoG', 'int'),
-        'g': ('G', 'int'),
-        'faceoff': ('FaceOff', 'int'),
-        'faceoff_p': ('FaceOff%', 'percent'),
-        'hits': ('Hits', 'int'),
-        'blocks': ('Blocks', 'int'),
-        'penalty': ('Penalty', 'int'),
-        'time_a': ('TimeA', 'time'),
-    }
+    def __init__(self, config):
+        self.formatter = config.formatter
+        self.stats = config.table_stats
+        self.stat_names = config.table_stats_names
+        self.match_stats_names = config.match_stats_names
 
     def season_stats_calculate(self, match_list, team_list, protocol_list):
         self.protocol_list = protocol_list
