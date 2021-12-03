@@ -2,6 +2,7 @@ import pook
 import pytest
 from sport_parser.khl.models import KHLSeason, KHLMatch
 from sport_parser.khl.updater import Updater
+from sport_parser.khl.config import Config
 from fixtures.db_fixture import update_db
 
 
@@ -70,7 +71,7 @@ def test_parse_season(get_teams, get_html_teams, get_calendar, get_protocol):
                               reply=200,
                               response_body=get_protocol
                               )
-    updater = Updater()
+    updater = Updater(config=Config)
     updater.parse_season(21)
 
     assert mock.calls == 1

@@ -3,11 +3,12 @@ import pytest
 from fixtures.db_fixture import get_protocol, get_teams, get_matches
 from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch, KHLSeason
 from sport_parser.khl.data_taking.db import DB
+from sport_parser.khl.config import Config
 
 
 @pytest.mark.django_db(transaction=True)
 def test_add_team(get_teams):
-    db = DB()
+    db = DB(config=Config)
     db.add_team(get_teams[0])
     team = KHLTeams.objects.get(name='test1')
     assert team.img == 'img'
@@ -20,7 +21,7 @@ def test_add_team(get_teams):
 
 @pytest.mark.django_db(transaction=True)
 def test_add_match(get_teams, get_matches):
-    db = DB()
+    db = DB(config=Config)
     db.add_team(get_teams[0])
     db.add_team(get_teams[1])
     for match in get_matches:
@@ -33,7 +34,7 @@ def test_add_match(get_teams, get_matches):
 
 @pytest.mark.django_db(transaction=True)
 def test_add_protocol(get_teams, get_matches, get_protocol):
-    db = DB()
+    db = DB(config=Config)
     db.add_team(get_teams[0])
     db.add_team(get_teams[1])
     for match in get_matches:

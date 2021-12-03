@@ -1,6 +1,7 @@
 import pytest
 
 from sport_parser.khl.objects import Team
+from sport_parser.khl.config import Config
 from fixtures.db_fixture import update_db
 
 from sport_parser.khl.models import KHLTeams
@@ -9,7 +10,7 @@ from sport_parser.khl.models import KHLTeams
 @pytest.mark.django_db(transaction=True)
 def test_get_match_list(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
-    t = Team(team_id)
+    t = Team(team_id, config=Config)
     team = t.data
     match_list = t.get_match_list()
     assert len(match_list) == 8
@@ -20,7 +21,7 @@ def test_get_match_list(update_db):
 @pytest.mark.django_db(transaction=True)
 def test_get_self_protocol_list(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
-    t = Team(team_id)
+    t = Team(team_id, config=Config)
     team = t.data
     protocol_list = t.get_self_protocol_list()
     assert len(protocol_list) == 4
@@ -31,7 +32,7 @@ def test_get_self_protocol_list(update_db):
 @pytest.mark.django_db(transaction=True)
 def test_get_opponent_protocol_list(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
-    t = Team(team_id)
+    t = Team(team_id, config=Config)
     team = t.data
     protocol_list = t.get_self_protocol_list()
     assert len(protocol_list) == 4
@@ -42,7 +43,7 @@ def test_get_opponent_protocol_list(update_db):
 @pytest.mark.django_db(transaction=True)
 def test_get_last_matches(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
-    t = Team(team_id)
+    t = Team(team_id, config=Config)
     team = t.data
     match_list = t.get_last_matches(5)
     assert len(match_list) == 4
@@ -53,7 +54,7 @@ def test_get_last_matches(update_db):
 @pytest.mark.django_db(transaction=True)
 def test_get_future_matches(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
-    t = Team(team_id)
+    t = Team(team_id, config=Config)
     team = t.data
     match_list = t.get_future_matches(5)
     assert len(match_list) == 4
@@ -64,7 +65,7 @@ def test_get_future_matches(update_db):
 @pytest.mark.django_db(transaction=True)
 def test_get_table_stats(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
-    t = Team(team_id)
+    t = Team(team_id, config=Config)
 
     stats = t.get_table_stats()
     assert stats == [
@@ -77,7 +78,7 @@ def test_get_table_stats(update_db):
 @pytest.mark.django_db(transaction=True)
 def test_get_chart_stats(update_db):
     team_id = KHLTeams.objects.get(name='test1').id
-    t = Team(team_id)
+    t = Team(team_id, config=Config)
 
     stats = t.get_chart_stats()
     assert stats == [
@@ -94,7 +95,7 @@ def test_get_another_season_team_ids(update_db):
     test2_18_id = KHLTeams.objects.get(name='test2', season_id=18).id
     test2_19_id = KHLTeams.objects.get(name='test2', season_id=19).id
     test2_21_id = KHLTeams.objects.get(name='test2', season_id=21).id
-    t = Team(test2_21_id)
+    t = Team(test2_21_id, config=Config)
     id_list = t.get_another_season_team_ids()
     assert id_list == [
         {'season': 18, 'id': test2_18_id},
