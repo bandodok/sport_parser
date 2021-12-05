@@ -1,27 +1,14 @@
 from django.db.models import Max
 import datetime
 
-from sport_parser.khl.data_analysis.formatter import Formatter
-from sport_parser.khl.data_analysis.table_stats import TableStats
-from sport_parser.khl.data_analysis.chart_stats import ChartStats
-from sport_parser.khl.models import KHLSeason, KHLMatch, KHLTeams, KHLProtocol
-
-
-class ModelList:
-    season_model = KHLSeason
-    match_model = KHLMatch
-    team_model = KHLTeams
-    protocol_model = KHLProtocol
-
 
 class Season:
-    TableStats = TableStats()
-    ChartStats = 'ChartStats'
-    formatter = Formatter()
     season_does_not_exist = False
-    models = ModelList()
 
-    def __init__(self, season_id):
+    def __init__(self, season_id, *, config):
+        self.TableStats = config.TableStats(config=config)
+        self.formatter = config.formatter(config=config)
+        self.models = config.models
         try:
             self.data = self.models.season_model.objects.get(id=season_id)
         except self.models.season_model.DoesNotExist:
@@ -78,13 +65,14 @@ class Season:
 
 
 class Team:
-    TableStats = TableStats()
-    ChartStats = ChartStats()
-    season_class = Season
-    formatter = Formatter()
-    models = ModelList()
+    def __init__(self, team_id, *, config):
+        self.config = config
+        self.TableStats = config.TableStats(config=config)
+        self.ChartStats = config.ChartStats(config=config)
+        self.season_class = config.season_class
+        self.formatter = config.formatter(config=config)
+        self.models = config.models
 
-    def __init__(self, team_id):
         self.data = self.models.team_model.objects.get(id=team_id)
 
     def __len__(self):
@@ -116,7 +104,7 @@ class Team:
         return self.formatter.get_json_future_matches_info(future_matches)
 
     def get_table_stats(self):
-        season = self.season_class(self.data.season_id)
+        season = self.season_class(self.data.season_id, config=self.config)
         return season.get_table_stats(team_list=[self.data])
 
     def get_chart_stats(self, team_list=None):
@@ -132,14 +120,15 @@ class Team:
 
 
 class Match:
-    TableStats = TableStats()
-    ChartStats = ChartStats()
-    season_class = Season
-    team_class = Team
-    formatter = Formatter()
-    models = ModelList()
+    def __init__(self, match_id, *, config):
+        self.config = config
+        self.TableStats = config.TableStats(config=config)
+        self.ChartStats = config.ChartStats(config=config)
+        self.season_class = config.season_class
+        self.team_class = config.team_class
+        self.formatter = config.formatter(config=config)
+        self.models = config.models
 
-    def __init__(self, match_id):
         self.data = self.models.match_model.objects.get(id=match_id)
         self._set_teams()
         self._set_exclude()
@@ -202,7 +191,7 @@ class Match:
         return self.TableStats.match_stats_calculate(self.data)
 
     def get_table_stats(self):
-        season = self.season_class(self.data.season_id)
+        season = self.season_class(self.data.season_id, config=self.config)
         return season.get_table_stats(team_list=[self.team1.data, self.team2.data])
 
     def get_chart_stats(self):
@@ -219,8 +208,8 @@ class Match:
     def _set_teams(self):
         m2m_table = self._get_m2m_table_name()
         team1, team2 = self.data.teams.all().extra(select={'add_id': f'{m2m_table}.id'}).order_by('add_id')
-        self.team1 = self.team_class(team1.id)
-        self.team2 = self.team_class(team2.id)
+        self.team1 = self.team_class(team1.id, config=self.config)
+        self.team2 = self.team_class(team2.id, config=self.config)
 
     def _set_exclude(self):
         self._exclude = 0

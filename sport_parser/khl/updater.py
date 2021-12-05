@@ -1,15 +1,16 @@
 import datetime
 
 from sport_parser.khl.data_taking.db import DB
-from sport_parser.khl.objects import ModelList
+from sport_parser.khl.models import ModelList
 from sport_parser.khl.data_taking.parser import Parser
 
 
 class Updater:
-    model_list = ModelList
-    parser = Parser()
-    db = DB()
-    ignore = ['872325', '872404', '872667']
+    def __init__(self, config):
+        self.model_list = config.models
+        self.parser = config.parser(config)
+        self.db = config.db(config)
+        self.ignore = config.updater_ignore
 
     def update(self):
         season = self._get_first_unfinished_match_season()

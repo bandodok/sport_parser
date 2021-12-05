@@ -4,11 +4,12 @@ import pytest
 
 from sport_parser.khl.models import KHLSeason
 from sport_parser.khl.data_taking.db import DB
+from sport_parser.khl.config import Config
 
 
 @pytest.fixture()
 def update_db():
-    db = DB()
+    db = DB(config=Config)
     seasons = {
         '21': 1097,
         '20': 1045,

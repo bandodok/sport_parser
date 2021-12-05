@@ -9,7 +9,8 @@ from selenium import webdriver
 
 
 class Parser:
-    formatter = Formatter()
+    def __init__(self, config):
+        self.formatter = Formatter(config)
 
     def parse_teams(self, season):
         url = f'https://www.khl.ru/standings/{season.external_id}/division/'

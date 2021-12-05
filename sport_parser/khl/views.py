@@ -1,11 +1,14 @@
-from sport_parser.khl.objects import Season, Team, Match
-from sport_parser.khl.updater import Updater
 from django.http import Http404
 from django.shortcuts import render, redirect
+from sport_parser.khl.config import Creator
 
 
 def stats(request, season):
-    s = Season(season)
+    config = 'khl'
+    request.app_name = config
+    creator = Creator(request)
+    s = creator.get_season_class(season)
+
     if s.season_does_not_exist:
         raise Http404("Season does not exist")
     context = {
@@ -17,7 +20,11 @@ def stats(request, season):
 
 
 def team(request, team_id):
-    t = Team(team_id)
+    config = 'khl'
+    request.app_name = config
+    creator = Creator(request)
+    t = creator.get_team_class(team_id)
+
     context = {
         'stats': t.get_chart_stats(),
         'team': t.data,
@@ -29,7 +36,11 @@ def team(request, team_id):
 
 
 def match(request, match_id):
-    m = Match(match_id)
+    config = 'khl'
+    request.app_name = config
+    creator = Creator(request)
+    m = creator.get_match_class(match_id)
+
     context = {
         'match': m.data,
         'match_stats': m.get_match_stats(),
@@ -52,7 +63,11 @@ def match(request, match_id):
 
 
 def calendar(request, season):
-    s = Season(season)
+    config = 'khl'
+    request.app_name = config
+    creator = Creator(request)
+    s = creator.get_season_class(season)
+
     context = {
         'season': season,
         'teams': s.get_team_list()
@@ -61,12 +76,20 @@ def calendar(request, season):
 
 
 def update_protocol(request):
-    u = Updater()
+    config = 'khl'
+    request.app_name = config
+    creator = Creator(request)
+    u = creator.get_updater()
+
     u.update()
     return redirect('/khl/stats/21')
 
 
 def update_season_matches(request, season):
-    u = Updater()
+    config = 'khl'
+    request.app_name = config
+    creator = Creator(request)
+    u = creator.get_updater()
+
     u.parse_season(season)
     return redirect('/khl/stats/21')

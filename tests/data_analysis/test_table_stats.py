@@ -3,6 +3,7 @@ from datetime import time
 
 from sport_parser.khl.data_analysis.table_stats import TableStats
 from sport_parser.khl.objects import Season
+from sport_parser.khl.config import Config
 from fixtures.db_fixture import update_db
 
 from sport_parser.khl.models import KHLTeams, KHLMatch
@@ -10,9 +11,9 @@ from sport_parser.khl.models import KHLTeams, KHLMatch
 
 @pytest.mark.django_db(transaction=True)
 def test_season_stats_calculate(update_db):
-    ts = TableStats()
+    ts = TableStats(config=Config)
 
-    s = Season(21)
+    s = Season(21, config=Config)
     test1_id = KHLTeams.objects.get(name='test1', season_id=21).id
     test2_id = KHLTeams.objects.get(name='test2', season_id=21).id
     test6_id = KHLTeams.objects.get(name='test6', season_id=21).id
@@ -35,7 +36,7 @@ def test_season_stats_calculate(update_db):
 
 @pytest.mark.django_db(transaction=True)
 def test_match_stats_calculate(update_db):
-    ts = TableStats()
+    ts = TableStats(config=Config)
 
     team1_id = KHLTeams.objects.get(name='test1').id
     team2_id = KHLTeams.objects.get(name='test2', season_id=21).id
@@ -50,7 +51,7 @@ def test_match_stats_calculate(update_db):
 
 @pytest.mark.django_db(transaction=True)
 def test_get_team_match_stats(update_db):
-    ts = TableStats()
+    ts = TableStats(config=Config)
 
     team = KHLTeams.objects.get(name='test1')
     match = KHLMatch.objects.filter(teams=team.id)[0]
@@ -60,9 +61,9 @@ def test_get_team_match_stats(update_db):
 
 @pytest.mark.django_db(transaction=True)
 def test_get_team_season_stats(update_db):
-    ts = TableStats()
+    ts = TableStats(config=Config)
 
-    s = Season(21)
+    s = Season(21, config=Config)
     team = KHLTeams.objects.get(name='test1', season_id=21)
     match_list = s.get_match_list()
     protocol_list = s.get_protocol_list()
@@ -75,9 +76,9 @@ def test_get_team_season_stats(update_db):
 
 @pytest.mark.django_db(transaction=True)
 def test_get_team_stat(update_db):
-    ts = TableStats()
+    ts = TableStats(config=Config)
 
-    s = Season(21)
+    s = Season(21, config=Config)
     team = KHLTeams.objects.get(name='test1', season_id=21)
     match_list = s.get_match_list()
     protocol_list = s.get_protocol_list()
@@ -94,9 +95,9 @@ def test_get_team_stat(update_db):
 
 @pytest.mark.django_db(transaction=True)
 def test_get_opponent_stat(update_db):
-    ts = TableStats()
+    ts = TableStats(config=Config)
 
-    s = Season(21)
+    s = Season(21, config=Config)
     team = KHLTeams.objects.get(name='test1', season_id=21)
     match_list = s.get_match_list()
     protocol_list = s.get_protocol_list()
@@ -112,7 +113,7 @@ def test_get_opponent_stat(update_db):
 
 
 def test_get_median():
-    ts = TableStats()
+    ts = TableStats(config=Config)
     items1 = [1, 2, 3, 4, 5]
     items2 = [1, 2, 3, 4, 5, 6]
 

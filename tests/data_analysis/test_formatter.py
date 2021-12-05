@@ -1,10 +1,11 @@
 from datetime import time
 
 from sport_parser.khl.data_analysis.formatter import Formatter
+from sport_parser.khl.config import Config
 
 
 class TestFormatter:
-    f = Formatter()
+    f = Formatter(config=Config)
 
     def test_time_to_sec(self):
         time1 = time(1, 30, 0)
