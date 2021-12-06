@@ -47,6 +47,12 @@ class Creator:
 
 
 class Config:
+    title = 'КХЛ'
+    league_title = 'Континентальная хоккейная лига'
+    league_logo = 'KHL.webp'
+    background_image = 'tribuna.webp'
+    theme = 'khlTheme.css'
+
     models = ModelList()
     season_class = Season
     team_class = Team
