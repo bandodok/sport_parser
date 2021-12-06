@@ -1,8 +1,55 @@
+from abc import abstractmethod
+
 from django.http import Http404
 from django.shortcuts import render, redirect
 from sport_parser.khl.config import Creator
 
 from django.views import View
+
+
+class HockeyView(View):
+    config = 'khl'
+    template = ''
+
+    def get(self, request, **kwargs):
+        request.app_name = self.config
+        self.creator = Creator(request)
+        object1 = self.get_object(*kwargs.values())
+        context = self.get_context(object1)
+        context.update(self.get_meta_context())
+        return render(request, self.template, context=context)
+
+    @abstractmethod
+    def get_context(self, s):
+        pass
+
+    @abstractmethod
+    def get_object(self, *args):
+        pass
+
+    def get_meta_context(self):
+        return {
+            'theme': self.get_theme(),
+            'background_image': self.get_background_image(),
+            'title': self.get_title(),
+            'league_title': self.get_league_title(),
+            'league_logo': self.get_league_logo(),
+        }
+
+    def get_theme(self):
+        return f'css/themes/{self.creator.get_theme()}'
+
+    def get_background_image(self):
+        return f'/static/img/{self.creator.get_background_image()}'
+
+    def get_title(self):
+        return self.creator.get_title()
+
+    def get_league_title(self):
+        return self.creator.get_league_title()
+
+    def get_league_logo(self):
+        return f'/static/img/{self.creator.get_league_logo()}'
 
 
 class StatsView(View):
