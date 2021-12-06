@@ -1,7 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 {% load i18n %}
 
-{% block title %}KHL Stats{% endblock %}
+{% block title %}Сезон {{ season }} - {{ title }}{% endblock %}
+
+{% block static %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static theme %}" type="text/css">
+{% endblock %}
 
 {% block nav %}
     {{ block.super }}
@@ -9,11 +15,11 @@
 {% endblock %}
 
 {% block header_title %}
-    <h4>Континентальная Хоккейная Лига</h4>
+    <h4>{{ league_title }}</h4>
 {% endblock %}
 
 {% block right_logo %}
-    <img src="/static/img/KHL.webp" alt="KHL" class="leagueLogo">
+    <img src="{{ league_logo }}" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}

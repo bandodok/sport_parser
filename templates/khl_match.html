@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
-{% block title %}{{ team1.data.name }} - {{ team2.data.name }} - КХЛ - flawlessanalytics{% endblock %}
+{% block title %}{{ team1.data.name }} - {{ team2.data.name }} - {{ title }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
@@ -14,6 +14,7 @@
     <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/matchStats.css'%}" type="text/css">
+    <link rel="stylesheet" href="{% static theme %}" type="text/css">
 {% endblock %}
 
 {% block nav %}
@@ -24,11 +25,11 @@
 {% endblock %}
 
 {% block header_title %}
-    <h4>Континентальная Хоккейная Лига</h4>
+    <h4>{{ league_title }}</h4>
 {% endblock %}
 
 {% block right_logo %}
-    <img src="/static/img/KHL.webp" alt="KHL" class="leagueLogo">
+    <img src="{{ league_logo }}" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}
