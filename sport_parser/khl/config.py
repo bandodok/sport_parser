@@ -29,6 +29,22 @@ class Creator:
     def get_updater(self):
         return self.config.updater(config=self.config)
 
+    # методы для шаблонов
+    def get_title(self):
+        return self.config.title
+
+    def get_league_title(self):
+        return self.config.league_title
+
+    def get_league_logo(self):
+        return self.config.league_logo
+
+    def get_background_image(self):
+        return self.config.background_image
+
+    def get_theme(self):
+        return self.config.theme
+
 
 class Config:
     models = ModelList()
