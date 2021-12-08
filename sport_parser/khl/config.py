@@ -11,7 +11,10 @@ from sport_parser.khl.updater import Updater
 
 class Creator:
     def __init__(self, request):
-        app_name = request.app_name
+        if isinstance(request, str):
+            app_name = request
+        else:
+            app_name = request.app_name
         if app_name == 'khl':
             self.config = Config
         else:
