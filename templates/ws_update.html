@@ -1,0 +1,37 @@
+<!-- тут будет текст сообщений -->
+<body style="background: black; color: #858585">
+    <div id=messages>/</div>
+</body>
+
+
+
+<script>
+    // открытие соединения с вебсокетом
+    const updatews = new WebSocket(
+        `ws://${window.location.host}/ws/update_protocol`
+    )
+
+    // функция добавления сообщения
+    const addUpdateStatus = (message) => {
+        document.getElementById('messages').innerHTML =
+        document.getElementById('messages').innerHTML + `
+        ${message}<br>
+        `
+        window.scrollTo(0,document.body.scrollHeight);
+    }
+
+    updatews.onopen = (event_) => {
+        addUpdateStatus('connected to websocket')
+    }
+
+    // событие при получении сообщения из вебсокета
+    updatews.onmessage = (event_) => {
+        const message = event_.data
+        addUpdateStatus(message)
+    }
+
+    // событие при закрытии соединения
+    updatews.onclose = (event_) => {
+        console.error('update socket close')
+    }
+</script>
