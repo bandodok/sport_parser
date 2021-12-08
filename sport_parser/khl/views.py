@@ -1,10 +1,11 @@
 from abc import abstractmethod
 
 from django.http import Http404
-from django.shortcuts import render, redirect
-from sport_parser.khl.config import Creator
-
+from django.shortcuts import render
 from django.views import View
+
+from sport_parser.khl.config import Creator
+from sport_parser.khl.tasks import update, parse_season
 
 
 class HockeyView(View):
@@ -133,22 +134,13 @@ class UpdateView(View):
     config = 'khl'
 
     def get(self, request):
-        request.app_name = self.config
-        creator = Creator(request)
-        u = creator.get_updater()
-
-        u.update()
-        return redirect('/khl/stats/21')
+        update.delay(self.config)
+        return render(request, 'ws_update.html', {})
 
 
 class UpdateSeasonView(View):
     config = 'khl'
 
     def get(self, request, season):
-
-        request.app_name = self.config
-        creator = Creator(request)
-        u = creator.get_updater()
-
-        u.parse_season(season)
-        return redirect('/khl/stats/21')
+        parse_season.delay(self.config, season)
+        return render(request, 'ws_update.html', {})
