@@ -6,6 +6,11 @@
 
 {% block static %}
 {{ block.super }}
+    <script>
+    var left_matches = {{ last_matches|safe }};
+    var right_matches = {{ future_matches|safe }};
+    </script>
+    <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static theme %}" type="text/css">
 {% endblock %}
 
@@ -57,4 +62,18 @@
     {% endfor %}
     </tbody>
 </table>
+
+<div style="display: flex; justify-content: space-between">
+        <h3>Последние матчи</h3><h3>Ближайшие матчи</h3>
+    </div>
+
+    <div class="lastMatches">
+        <div class="team1" id="team1">
+
+        </div>
+        <div class="team2" id="team2">
+
+        </div>
+</div>
+
 {% endblock %}

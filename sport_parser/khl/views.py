@@ -67,7 +67,9 @@ class StatsView(HockeyView):
         return {
             'update': s.last_updated(),
             'stats': s.get_table_stats(),
-            'season': s.data.id
+            'season': s.data.id,
+            'last_matches': s.get_json_last_matches(5),
+            'future_matches': s.get_json_future_matches(5)
         }
 
 

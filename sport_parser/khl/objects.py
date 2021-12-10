@@ -34,7 +34,7 @@ class Season:
         return self.data.matches.filter(finished=False).order_by('date')[:num]
 
     def get_json_future_matches(self, num):
-        future_matches = self.get_last_matches(num)
+        future_matches = self.get_future_matches(num)
         return self.formatter.get_json_future_matches_info(future_matches)
 
     def last_updated(self, *, update=False):
