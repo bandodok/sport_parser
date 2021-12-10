@@ -8,8 +8,8 @@
 {{ block.super }}
     <script>
     var stats = {{ stats|safe }};
-    var last_matches = {{ last_matches|safe }};
-    var future_matches = {{ future_matches|safe }};
+    var left_matches = {{ last_matches|safe }};
+    var right_matches = {{ future_matches|safe }};
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
