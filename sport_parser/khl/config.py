@@ -11,7 +11,10 @@ from sport_parser.khl.updater import Updater
 
 class Creator:
     def __init__(self, request):
-        app_name = request.app_name
+        if isinstance(request, str):
+            app_name = request
+        else:
+            app_name = request.app_name
         if app_name == 'khl':
             self.config = Config
         else:
@@ -29,8 +32,30 @@ class Creator:
     def get_updater(self):
         return self.config.updater(config=self.config)
 
+    # методы для шаблонов
+    def get_title(self):
+        return self.config.title
+
+    def get_league_title(self):
+        return self.config.league_title
+
+    def get_league_logo(self):
+        return self.config.league_logo
+
+    def get_background_image(self):
+        return self.config.background_image
+
+    def get_theme(self):
+        return self.config.theme
+
 
 class Config:
+    title = 'КХЛ'
+    league_title = 'Континентальная хоккейная лига'
+    league_logo = 'KHL.webp'
+    background_image = 'tribuna.webp'
+    theme = 'khlTheme.css'
+
     models = ModelList()
     season_class = Season
     team_class = Team

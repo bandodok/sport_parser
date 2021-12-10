@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
-{% block title %}Сезон {{ season }} - КХЛ - flawlessanalytics{% endblock %}
+{% block title %}Сезон {{ season }} - {{ title }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/calendar.css'%}" type="text/css">
+    <link rel="stylesheet" href="{% static theme %}" type="text/css">
     <script>
     var season = {{ season|safe  }};
     </script>
@@ -20,7 +21,7 @@
 {% endblock %}
 
 {% block header_title %}
-    <h4>Континентальная Хоккейная Лига</h4>
+    <h4>{{ league_title }}</h4>
 {% endblock %}
 
 {% block right_logo %}
