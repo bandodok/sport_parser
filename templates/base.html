@@ -11,6 +11,23 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static '/img/favicons/favicon_32_rounded.png'%}">
     {% endblock %}
 
+    {% block script_exec %}
+    <script>
+    window.onload = function() {
+        if (typeof left_matches !== 'undefined') {
+            createMatchFrame('team1', left_matches);
+            createMatchFrame('team2', right_matches);
+        }
+        if (typeof hideChart !== 'undefined') {
+            hideChart()
+        }
+        if (typeof initCalendar !== 'undefined') {
+            initCalendar()
+        }
+    }
+    </script>
+    {% endblock %}
+
 {% block metrika %}
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript" >

@@ -1,17 +1,6 @@
 google.charts.load('current', {'packages':['corechart']});
 
 
-window.onload = function() {
-    hideChart()
-    if (typeof team1_matches !== 'undefined') {
-        createMatchFrame('team1', team1_matches);
-        createMatchFrame('team2', team2_matches);
-    }
-    createMatchFrame('team1', last_matches);
-    createMatchFrame('team2', future_matches);
-    }
-
-
 function hideChart() {
     const chartsID = ['chartSh', 'chartSog', 'chartG', 'chartBlocks', 'chartHits', 'chartPenalty', 'chartTime_a']
     chartsID.forEach(function (item) {

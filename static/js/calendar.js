@@ -1,7 +1,8 @@
 var SEASON = window.season
 var NEXT_PAGE_URL = 2
 
-window.onload = function() {
+
+initCalendar = () => {
     let url = '/api/khl/calendar/?season=' + SEASON;
     let f = new XMLHttpRequest();
     f.open('GET', url);
