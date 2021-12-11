@@ -124,6 +124,7 @@ class Match:
         self.config = config
         self.TableStats = config.TableStats(config=config)
         self.ChartStats = config.ChartStats(config=config)
+        self.BarStats = config.BarStats(config=config)
         self.season_class = config.season_class
         self.team_class = config.team_class
         self.formatter = config.formatter(config=config)
@@ -193,6 +194,11 @@ class Match:
     def get_table_stats(self):
         season = self.season_class(self.data.season_id, config=self.config)
         return season.get_table_stats(team_list=[self.team1.data, self.team2.data])
+
+    def get_bar_stats(self):
+        if not self.data.finished:
+            return 'The match is not over yet'
+        return self.BarStats.calculate(self)
 
     def get_chart_stats(self):
         team_list = (self.team1, self.team2)

@@ -36,15 +36,22 @@ class Formatter:
         formatted_stats = {}
         for stat, value in stats.items():
             format = stat_names.get(stat, [0, 0])[1]
-            if format == 'int':
-                formatted_stats[stat] = "{:.1f}".format(value)
-            elif format == 'percent':
-                formatted_stats[stat] = f'{"{:.2f}".format(round(value, 2))}%'
-            elif format == 'time':
-                formatted_stats[stat] = cls.sec_to_time(value)
-            else:
+            if format not in ('int', 'percent', 'time'):
                 continue
+            else:
+                formatted_stats[stat] = cls._set_format(value, format)
         return formatted_stats
+
+    @classmethod
+    def bar_stat_format(cls, stats, stat_names):
+        for stat, value in stats.items():
+            format = stat_names.get(stat, [0, 0, 0])[2]
+            if format not in ('int', 'percent', 'time'):
+                continue
+            else:
+                stats[stat]['left_value'] = cls._set_format(value['left_value'], format)
+                stats[stat]['right_value'] = cls._set_format(value['right_value'], format)
+        return stats
 
     def date_format(self, date):
         splitted_date = date.split(' ')[:-1]
@@ -83,3 +90,12 @@ class Formatter:
         for match in matches:
             future_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
         return json.dumps(future_matches, cls=DjangoJSONEncoder)
+
+    @classmethod
+    def _set_format(cls, stat, format):
+        if format == 'int':
+            return "{:.1f}".format(stat)
+        elif format == 'percent':
+            return f'{"{:.2f}".format(round(stat, 2))}%'
+        elif format == 'time':
+            return cls.sec_to_time(stat)

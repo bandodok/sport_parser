@@ -3,6 +3,7 @@ from sport_parser.khl.models import ModelList
 from sport_parser.khl.objects import Season, Team, Match
 from sport_parser.khl.data_analysis.chart_stats import ChartStats
 from sport_parser.khl.data_analysis.table_stats import TableStats
+from sport_parser.khl.data_analysis.bar_stats import BarStats
 from sport_parser.khl.data_analysis.formatter import Formatter
 from sport_parser.khl.data_taking.parser import Parser
 from sport_parser.khl.data_taking.db import DB
@@ -62,6 +63,7 @@ class Config:
     match_class = Match
     TableStats = TableStats
     ChartStats = ChartStats
+    BarStats = BarStats
     formatter = Formatter
     parser = Parser
     db = DB
@@ -123,6 +125,16 @@ class Config:
         'blocks': ('Blocks', 'int'),
         'penalty': ('Penalty', 'int'),
         'time_a': ('TimeA', 'time'),
+    }
+    bar_stats_names = {
+        'sh': ('Sh', 'Все броски', 'int'),
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
     chart_stats_names = {
         'sh': ('Sh', 'int'),
