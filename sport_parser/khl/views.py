@@ -100,7 +100,7 @@ class MatchView(HockeyView):
     def get_context(self, m):
         return {
             'match': m.data,
-            'match_stats': m.get_match_stats(),
+            'match_stats': m.get_bar_stats(),
             'season_stats': m.get_table_stats(),
             'chart_stats': m.get_chart_stats(),
             'overtime': m.data.overtime,

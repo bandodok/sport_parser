@@ -103,3 +103,31 @@ footer {
 p.last_score {
     color: #FFFFFF;
 }
+
+
+/* bar stats */
+
+/* цвет текста в статистике матча */
+.match_stat_text {
+    color: #ffffff;
+}
+
+/* цвет бэкграунда правой полоски  */
+.progress_right {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* цвет бэкграунда левой полоски  */
+.progress_left {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* цвет правой полоски  */
+.progress-bar_right {
+    background: #d93131;
+}
+
+/* цвет левой полоски  */
+.progress-bar_left {
+    background: #4c8cd5;
+}

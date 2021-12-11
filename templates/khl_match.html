@@ -37,10 +37,10 @@
 
 {% block right_sidebar %}
     {% if match.finished == True %}
-    <div style="margin-top: 550px">
+        <div style="margin-top: 850px">
     {% else %}
         <div style="margin-top: 380px">
-        {% endif %}
+    {% endif %}
     <p>Параметры:</p>
 <ul class="chartList">
     <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
@@ -113,28 +113,31 @@
         </div>
     </div>
 
-    {% if match.finished == True %}
+
+{% if match.finished == True %}
     <h3>Статистика матча</h3>
     {% language 'ru' %}
-    <table class="table_sort" id="match_stats">
-    <thead>
-        <tr>
-            {% for name in match_stats.0 %}
-            <th>{{ name }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for row in match_stats|slice:"1:" %}
-        <tr>
-        <td onmousedown="middleGotoTeam({{ row.0 }})" onmouseup="gotoTeam({{ row.0 }})" class="urlToTeam">{{ row.1 }}</td>
-        {% for stat in row|slice:"2:" %}
-            <td align="right">{{ stat }}</td>
-        {% endfor %}
-        </tr>
+<div class="match_stats">
+    {% for _, stat in match_stats.items %}
+    <div class="match_stat">
+        <span class="match_stat_text">{{ stat.long_title }} ({{ stat.short_title }})</span>
+        <div class="stat_lines">
+            <span class="match_stat_text" style="text-align: right">{{ stat.left_value }}</span>
+            <div class="progress_left">
+                {% with stat.left_perc as percent %}
+                <span class="progress-bar_left" style="width: {{ percent }}%"></span>
+                {% endwith %}
+            </div>
+            <div class="progress_right">
+            {% with stat.right_perc as percent %}
+                <span class="progress-bar_right" style="width: {{ percent }}%"></span>
+            {% endwith %}
+            </div>
+            <span class="match_stat_text" style="text-align: left">{{ stat.right_value }}</span>
+        </div>
+    </div>
     {% endfor %}
-    </tbody>
-    </table>
+</div>
     {% endlanguage %}
     {% endif %}
 
