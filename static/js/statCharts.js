@@ -39,8 +39,8 @@ function filterChart(elementID) {
             document.getElementById('chartTitle2').innerHTML = 'Hits';
             break;
         case 'chartPenalty':
-            document.getElementById('chartTitle1').innerHTML = 'Все броски';
-            document.getElementById('chartTitle2').innerHTML = 'Sh';
+            document.getElementById('chartTitle1').innerHTML = 'Штрафное время';
+            document.getElementById('chartTitle2').innerHTML = 'Penalty';
             break;
         case 'chartTime_a':
             document.getElementById('chartTitle1').innerHTML = 'Время в атаке';
