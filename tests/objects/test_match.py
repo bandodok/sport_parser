@@ -2,6 +2,7 @@ import pytest
 import json
 
 from sport_parser.khl.objects import Match
+from sport_parser.khl.config import Config
 from sport_parser.khl.models import KHLMatch
 from fixtures.db_fixture import update_db
 
@@ -12,7 +13,7 @@ from sport_parser.khl.models import KHLTeams
 def test_get_team1_score(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     score = m.get_team1_score()
     assert score == 4
@@ -22,7 +23,7 @@ def test_get_team1_score(update_db):
 def test_get_team2_score(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     score = m.get_team2_score()
     assert score == 0
@@ -32,7 +33,7 @@ def test_get_team2_score(update_db):
 def test_get_team1_score_by_period(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     score = m.get_team1_score_by_period()
     assert score == {
@@ -49,7 +50,7 @@ def test_get_team1_score_by_period(update_db):
 def test_get_team2_score_by_period(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     score = m.get_team2_score_by_period()
     assert score == {
@@ -66,7 +67,7 @@ def test_get_team2_score_by_period(update_db):
 def test_get_team1_last_matches(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     team1 = m.team1
     match_list_json = m.get_team1_last_matches(5)
@@ -80,7 +81,7 @@ def test_get_team1_last_matches(update_db):
 def test_get_team2_last_matches(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     team2 = m.team2
     match_list_json = m.get_team2_last_matches(5)
@@ -94,7 +95,7 @@ def test_get_team2_last_matches(update_db):
 def test_get_team1_future_matches(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     team1 = m.team1
     match_list_json = m.get_team1_future_matches(5)
@@ -108,7 +109,7 @@ def test_get_team1_future_matches(update_db):
 def test_get_team2_future_matches(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     team2 = m.team2
     match_list_json = m.get_team2_future_matches(5)
@@ -122,7 +123,7 @@ def test_get_team2_future_matches(update_db):
 def test_get_match_stats(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     team2_id = KHLTeams.objects.get(name='test2', season_id=21).id
     stats = m.get_match_stats()
@@ -137,7 +138,7 @@ def test_get_match_stats(update_db):
 def test_get_table_stats(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     team2_id = KHLTeams.objects.get(name='test2', season_id=21).id
     stats = m.get_table_stats()
@@ -155,7 +156,7 @@ def test_get_table_stats(update_db):
 def test_get_chart_stats(update_db):
     team1_id = KHLTeams.objects.get(name='test1').id
     match_id = KHLMatch.objects.filter(teams=team1_id)[0].id
-    m = Match(match_id)
+    m = Match(match_id, config=Config)
 
     stats = m.get_chart_stats()
     assert stats == [

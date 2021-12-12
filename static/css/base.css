@@ -305,8 +305,10 @@ footer div a {
 /* match frames */
 
 .lastMatches {
-    justify-content: center;
     width: 1400px;
+    min-width: 1364px;
+    display: flex;
+    justify-content: space-between;
 }
 
 

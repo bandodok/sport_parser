@@ -4,16 +4,9 @@ from .formatter import Formatter
 
 
 class ChartStats:
-    formatter = Formatter()
-    stat_names = {
-        'sh': ('Sh', 'int'),
-        'sog': ('Sog', 'int'),
-        'g': ('G', 'int'),
-        'blocks': ('Blocks', 'int'),
-        'penalty': ('Penalty', 'int'),
-        'hits': ('Hits', 'int'),
-        'time_a': ('TimeA', 'time'),
-    }
+    def __init__(self, *, config):
+        self.formatter = config.formatter(config=config)
+        self.stat_names = config.chart_stats_names
 
     def calculate(self, team_list):
         stat_list = [*self.stat_names.keys()]

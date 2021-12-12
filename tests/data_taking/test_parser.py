@@ -2,6 +2,7 @@ import pook
 import pytest
 from sport_parser.khl.models import KHLSeason, KHLMatch
 from sport_parser.khl.data_taking.parser import Parser
+from sport_parser.khl.config import Config
 from fixtures.db_fixture import update_db
 
 
@@ -59,7 +60,7 @@ def test_parse_calendar(update_db, get_calendar, get_match_info_finished):
                     reply=200,
                     response_body=get_calendar
                     )
-    parser = Parser()
+    parser = Parser(config=Config)
     season = KHLSeason.objects.get(id=21)
     info = parser.parse_calendar(season)
 
@@ -93,7 +94,7 @@ def test_parse_calendar(update_db, get_calendar, get_match_info_finished):
 @pytest.mark.django_db(transaction=True)
 @pook.on
 def test_parse_finished_match(update_db, get_match_info_finished):
-    parser = Parser()
+    parser = Parser(config=Config)
     mock = pook.get(f'https://text.khl.ru/text/877200.html',
                     reply=200,
                     response_body=get_match_info_finished
@@ -121,7 +122,7 @@ def test_parse_finished_match(update_db, get_match_info_finished):
 @pytest.mark.django_db(transaction=True)
 @pook.on
 def test_parse_teams(update_db, get_teams_html, get_teams):
-    parser = Parser()
+    parser = Parser(config=Config)
     season = KHLSeason.objects.get(id=21)
     mock1 = pook.get('https://www.khl.ru/standings/1097/division/',
                      reply=200,
@@ -292,7 +293,7 @@ def test_parse_protocol(update_db, get_protocol, get_protocol1):
         'time_a': '00:09:47',
         'vvsh': '00:17:13'
     }
-    parser = Parser()
+    parser = Parser(config=Config)
     row_home, row_guest = parser.parse_protocol(match1)
     assert row_home == out_home
     assert row_guest == out_guest
@@ -349,7 +350,7 @@ def test_parse_protocol(update_db, get_protocol, get_protocol1):
 
 
 def test_row_update_type():
-    parser = Parser()
+    parser = Parser(config=Config)
     row = {
         'sh': '66',
         'sog': '',

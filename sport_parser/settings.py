@@ -48,8 +48,10 @@ INSTALLED_APPS = [
     'django_extensions',
     'dbview',
     'sport_parser.khl',
+    'sport_parser.api',
     'rest_framework',
-    'django_filters'
+    'django_filters',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -99,6 +101,26 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'sport_parser.wsgi.application'
+ASGI_APPLICATION = "sport_parser.asgi.application"
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+            "capacity": 1500,
+            "expiry": 10,
+        },
+    },
+}
+
+# REDIS related settings
+REDIS_HOST = 'localhost'
+REDIS_PORT = '6379'
+BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 
 
 # Database

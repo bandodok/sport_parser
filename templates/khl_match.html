@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
-{% block title %}{{ team1.data.name }} - {{ team2.data.name }} - КХЛ - flawlessanalytics{% endblock %}
+{% block title %}{{ team1.data.name }} - {{ team2.data.name }} - {{ title }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
     <script>
     var stats = {{ chart_stats|safe }};
-    var team1_matches = {{ team1.last_matches|safe }};
-    var team2_matches = {{ team2.last_matches|safe }};
+    var left_matches = {{ team1.last_matches|safe }};
+    var right_matches = {{ team2.last_matches|safe }};
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/matchStats.css'%}" type="text/css">
+    <link rel="stylesheet" href="{% static theme %}" type="text/css">
 {% endblock %}
 
 {% block nav %}
@@ -24,11 +25,11 @@
 {% endblock %}
 
 {% block header_title %}
-    <h4>Континентальная Хоккейная Лига</h4>
+    <h4>{{ league_title }}</h4>
 {% endblock %}
 
 {% block right_logo %}
-    <img src="/static/img/KHL.webp" alt="KHL" class="leagueLogo">
+    <img src="{{ league_logo }}" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}
@@ -36,10 +37,10 @@
 
 {% block right_sidebar %}
     {% if match.finished == True %}
-    <div style="margin-top: 550px">
+        <div style="margin-top: 810px">
     {% else %}
         <div style="margin-top: 380px">
-        {% endif %}
+    {% endif %}
     <p>Параметры:</p>
 <ul class="chartList">
     <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
@@ -112,28 +113,31 @@
         </div>
     </div>
 
-    {% if match.finished == True %}
-    <h3>Статистика матча</h3>
+
+{% if match.finished == True %}
+    <h3></h3>
     {% language 'ru' %}
-    <table class="table_sort" id="match_stats">
-    <thead>
-        <tr>
-            {% for name in match_stats.0 %}
-            <th>{{ name }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for row in match_stats|slice:"1:" %}
-        <tr>
-        <td onmousedown="middleGotoTeam({{ row.0 }})" onmouseup="gotoTeam({{ row.0 }})" class="urlToTeam">{{ row.1 }}</td>
-        {% for stat in row|slice:"2:" %}
-            <td align="right">{{ stat }}</td>
-        {% endfor %}
-        </tr>
+<div class="match_stats">
+    {% for _, stat in match_stats.items %}
+    <div class="match_stat">
+        <span class="match_stat_text">{{ stat.long_title }} ({{ stat.short_title }})</span>
+        <div class="stat_lines">
+            <span class="match_stat_text" style="text-align: right">{{ stat.left_value }}</span>
+            <div class="progress_left">
+                {% with stat.left_perc as percent %}
+                <span class="progress-bar_left" style="width: {{ percent }}%"></span>
+                {% endwith %}
+            </div>
+            <div class="progress_right">
+            {% with stat.right_perc as percent %}
+                <span class="progress-bar_right" style="width: {{ percent }}%"></span>
+            {% endwith %}
+            </div>
+            <span class="match_stat_text" style="text-align: left">{{ stat.right_value }}</span>
+        </div>
+    </div>
     {% endfor %}
-    </tbody>
-    </table>
+</div>
     {% endlanguage %}
     {% endif %}
 

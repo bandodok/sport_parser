@@ -1,16 +1,16 @@
 from django.urls import path
-from sport_parser.khl.views import stats, team, match, update_protocol, update_season_matches, calendar
+from sport_parser.khl.views import UpdateView, UpdateSeasonView, CalendarView, StatsView, TeamView, MatchView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 urlpatterns = [
-    path('stats/<int:season>', stats, name='stats'),
-    path('team/<int:team_id>', team, name='team'),
-    path('match/<int:match_id>/', match, name='match'),
-    path('calendar/<int:season>/', calendar, name='calendar'),
+    path('stats/<int:season_id>', StatsView.as_view(), name='stats'),
+    path('team/<int:team_id>', TeamView.as_view(), name='team'),
+    path('match/<int:match_id>/', MatchView.as_view(), name='match'),
+    path('calendar/<int:season_id>/', CalendarView.as_view(), name='calendar'),
 
-    path('update/season_matches/<int:season>', update_season_matches),
-    path('update/protocol/', update_protocol),
+    path('update/season/<int:season>', UpdateSeasonView.as_view()),
+    path('update/protocol/', UpdateView.as_view()),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

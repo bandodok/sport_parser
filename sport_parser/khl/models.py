@@ -105,3 +105,10 @@ class KHLProtocol(models.Model):
     pd = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True, default=0)
 
     objects = KHLProtocolManager()
+
+
+class ModelList:
+    season_model = KHLSeason
+    match_model = KHLMatch
+    team_model = KHLTeams
+    protocol_model = KHLProtocol
