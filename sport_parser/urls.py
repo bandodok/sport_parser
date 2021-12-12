@@ -22,7 +22,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
-    path('khl/', include('sport_parser.khl.urls'))
+    path('khl/', include('sport_parser.khl.urls')),
+    path('api/', include('sport_parser.api.urls'))
 ]
 
 urlpatterns += staticfiles_urlpatterns()

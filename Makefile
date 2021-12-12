@@ -9,3 +9,6 @@ freeze:
 
 shell:
 	python manage.py shell_plus
+
+celery:
+	celery -A sport_parser worker -l info -P eventlet

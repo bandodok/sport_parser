@@ -2,38 +2,39 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{{ team }} - flawlessanalytics{% endblock %}
+{% block title %}{{ team.name }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
     <script>
     var stats = {{ stats|safe }};
-    var last_matches = {{ last_matches|safe }};
-    var future_matches = {{ future_matches|safe }};
+    var left_matches = {{ last_matches|safe }};
+    var right_matches = {{ future_matches|safe }};
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/teamStats.css'%}" type="text/css">
+    <link rel="stylesheet" href="{% static theme %}" type="text/css">
 {% endblock %}
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'stats' season %}">Сезоны</a>
-    <a href="{% url 'calendar' season %}">Календарь</a>
+    <a href="{% url 'stats' team.season_id %}">Сезоны</a>
+    <a href="{% url 'calendar' team.season_id %}">Календарь</a>
 
 {% endblock %}
 
 {% block header_title %}
-    <p class="header_city">Конференция «{{ conference }}»</p>
-    <p class="header_city">Дивизион {{ division }}</p>
-    <h4 class="header_title">{{ team }}</h4>
-    <p class="header_city">{{ city }}</p>
-    <p class="header_city">{{ arena }}</p>
+    <p class="header_city">Конференция «{{ team.conference }}»</p>
+    <p class="header_city">Дивизион {{ team.division }}</p>
+    <h4 class="header_title">{{ team.name }}</h4>
+    <p class="header_city">{{ team.city }}</p>
+    <p class="header_city">{{ team.arena }}</p>
 {% endblock %}
 
 {% block right_logo %}
-    <img src="{{ logo }}" alt="KHL" class="leagueLogo">
+    <img src="{{ team.img }}" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}
@@ -59,8 +60,8 @@
 {% endblock %}
 
 {% block main_content %}
-<h3><a href="{% url 'stats' season %}">СЕЗОН {{ season }}</a></h3>
-<p class="update">Континентальная хоккейная лига</p>
+<h3><a href="{% url 'stats' team.season_id %}">СЕЗОН {{ team.season_id }}</a></h3>
+<p class="update">{{ league_title }}</p>
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
     <div id="chartG" class="charts"></div>

@@ -1,48 +1,46 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
-{% block title %}{{ team1_info.name }} - {{ team2_info.name }} - КХЛ - flawlessanalytics{% endblock %}
+{% block title %}{{ team1.data.name }} - {{ team2.data.name }} - {{ title }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
     <script>
-    var team1_stats = {{ team1_info.stats|safe }};
-    var team2_stats = {{ team2_info.stats|safe }};
-    var team1_name = "{{ team1_info.name|safe }}";
-    var team2_name = "{{ team2_info.name|safe }}";
-    var team1_matches = {{ team1_info.last_matches|safe }};
-    var team2_matches = {{ team2_info.last_matches|safe }};
+    var stats = {{ chart_stats|safe }};
+    var left_matches = {{ team1.last_matches|safe }};
+    var right_matches = {{ team2.last_matches|safe }};
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="{% static 'js/matchStats.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/matchStats.css'%}" type="text/css">
+    <link rel="stylesheet" href="{% static theme %}" type="text/css">
 {% endblock %}
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'stats' match_info.season %}">Сезоны</a>
-    <a href="{% url 'calendar' match_info.season %}">Календарь</a>
+    <a href="{% url 'stats' match.season %}">Сезоны</a>
+    <a href="{% url 'calendar' match.season %}">Календарь</a>
 
 {% endblock %}
 
 {% block header_title %}
-    <h4>Континентальная Хоккейная Лига</h4>
+    <h4>{{ league_title }}</h4>
 {% endblock %}
 
 {% block right_logo %}
-    <img src="/static/img/KHL.webp" alt="KHL" class="leagueLogo">
+    <img src="{{ league_logo }}" alt="KHL" class="leagueLogo">
 {% endblock %}
 
 {% block left_sidebar %}
 {% endblock %}
 
 {% block right_sidebar %}
-    {% if match_info.finished == True %}
-    <div style="margin-top: 550px">
+    {% if match.finished == True %}
+        <div style="margin-top: 810px">
     {% else %}
         <div style="margin-top: 380px">
-        {% endif %}
+    {% endif %}
     <p>Параметры:</p>
 <ul class="chartList">
     <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
@@ -59,75 +57,101 @@
 {% block main_content %}
     <div class="teams">
         <div class="team1_info">
-            <p class="header_city">Конференция «{{ team1_info.conference }}»</p>
-            <p class="header_city">Дивизион {{ team1_info.division }}</p>
-            <a href="{% url 'team' team1_info.id %}"><h4 class="header_title">{{ team1_info.name }}</h4></a>
-            <p class="header_city">{{ team1_info.city }}</p>
-            <p class="header_city">{{ team1_info.arena }}</p>
+            <p class="header_city">Конференция «{{ team1.data.conference }}»</p>
+            <p class="header_city">Дивизион {{ team1.data.division }}</p>
+            <a href="{% url 'team' team1.data.id %}"><h4 class="header_title">{{ team1.data.name }}</h4></a>
+            <p class="header_city">{{ team1.data.city }}</p>
+            <p class="header_city">{{ team1.data.arena }}</p>
         </div>
 
-        <img src="{{ team1_info.image }}" alt="KHL" class="leagueLogo" id="team_logo">
+        <img src="{{ team1.data.img }}" alt="KHL" class="leagueLogo" id="team_logo">
 
             <div class="score">
                 {% language 'ru' %}
-                <p class="header_city">{{ match_info.date|date:'j E Y' }}</p>
-                    {% if match_info.finished == True %}
-                        <p id="score_time">{{ team1_info.score }} - {{ team2_info.score }}</p>
-                        <p class="arena" id="arena">{{ match_info.arena }}</p>
-                        <p class="arena" id="viewers">Зрителей: {{ match_info.viewers }}</p>
+                <p class="header_city">{{ match.date|date:'j E Y' }}</p>
+                    {% if match.finished == True %}
+                        <p id="score_time">{{ team1.score.match }} - {{ team2.score.match }}</p>
+
+                        {% if overtime == True %}
+                            <p class="arena" id="score_by_period">ОТ<br>
+                                {{ team1.score.p1 }}-{{ team2.score.p1 }}
+                                {{ team1.score.p2 }}-{{ team2.score.p2 }}
+                                {{ team1.score.p3 }}-{{ team2.score.p3 }}
+                                {{ team1.score.ot }}-{{ team2.score.ot }}
+                            </p>
+                        {% elif penalties == True %}
+                            <p class="arena" id="score_by_period">Б<br>
+                                {{ team1.score.p1 }}-{{ team2.score.p1 }}
+                                {{ team1.score.p2 }}-{{ team2.score.p2 }}
+                                {{ team1.score.p3 }}-{{ team2.score.p3 }}
+                                {{ team1.score.ot }}-{{ team2.score.ot }}
+                                {{ team1.score.b }}-{{ team2.score.b }}
+                            </p>
+                        {% else %}
+                            <p class="arena" id="score_by_period">
+                                {{ team1.score.p1 }}-{{ team2.score.p1 }}
+                                {{ team1.score.p2 }}-{{ team2.score.p2 }}
+                                {{ team1.score.p3 }}-{{ team2.score.p3 }}
+                            </p>
+                        {% endif %}
+                        <p class="arena" id="arena">{{ match.arena }}</p>
+                        <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
                         {%  else %}
-                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match_info.time }}</p>
+                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.time }}</p>
                     {% endif %}
                 {% endlanguage %}
             </div>
 
-        <img src="{{ team2_info.image }}" alt="KHL" class="leagueLogo" id="team_logo">
+        <img src="{{ team2.data.img }}" alt="KHL" class="leagueLogo" id="team_logo">
 
         <div class="team2_info">
-            <p class="header_city">Конференция «{{ team2_info.conference }}»</p>
-            <p class="header_city">Дивизион {{ team2_info.division }}</p>
-            <a href="{% url 'team' team2_info.id %}"><h4 class="header_title">{{ team2_info.name }}</h4></a>
-            <p class="header_city">{{ team2_info.city }}</p>
-            <p class="header_city">{{ team2_info.arena }}</p>
+            <p class="header_city">Конференция «{{ team2.data.conference }}»</p>
+            <p class="header_city">Дивизион {{ team2.data.division }}</p>
+            <a href="{% url 'team' team2.data.id %}"><h4 class="header_title">{{ team2.data.name }}</h4></a>
+            <p class="header_city">{{ team2.data.city }}</p>
+            <p class="header_city">{{ team2.data.arena }}</p>
         </div>
     </div>
 
-    {% if match_info.finished == True %}
-    <h3>Статистика матча</h3>
+
+{% if match.finished == True %}
+    <h3></h3>
     {% language 'ru' %}
-    <table class="table_sort" id="match_stats">
-    <thead>
-        <tr>
-            {% for name in match_info.match_stats.0|slice:"1:" %}
-            <th>{{ name }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for row in match_info.match_stats|slice:"1:" %}
-        <tr>
-        <td onmousedown="middleGotoTeam({{ row.0 }})" onmouseup="gotoTeam({{ row.0 }})" class="urlToTeam">{{ row.1 }}</td>
-        {% for stat in row|slice:"2:" %}
-            <td align="right">{{ stat }}</td>
-        {% endfor %}
-        </tr>
+<div class="match_stats">
+    {% for _, stat in match_stats.items %}
+    <div class="match_stat">
+        <span class="match_stat_text">{{ stat.long_title }} ({{ stat.short_title }})</span>
+        <div class="stat_lines">
+            <span class="match_stat_text" style="text-align: right">{{ stat.left_value }}</span>
+            <div class="progress_left">
+                {% with stat.left_perc as percent %}
+                <span class="progress-bar_left" style="width: {{ percent }}%"></span>
+                {% endwith %}
+            </div>
+            <div class="progress_right">
+            {% with stat.right_perc as percent %}
+                <span class="progress-bar_right" style="width: {{ percent }}%"></span>
+            {% endwith %}
+            </div>
+            <span class="match_stat_text" style="text-align: left">{{ stat.right_value }}</span>
+        </div>
+    </div>
     {% endfor %}
-    </tbody>
-    </table>
+</div>
     {% endlanguage %}
     {% endif %}
 
-    <h3>Статистика команд в {{ match_info.season }} сезоне</h3>
+    <h3>Статистика команд в {{ match.season }} сезоне</h3>
     <table class="table_sort">
     <thead>
         <tr>
-            {% for name in match_info.season_stats.0 %}
+            {% for name in season_stats.0 %}
             <th>{{ name }}</th>
             {% endfor %}
         </tr>
     </thead>
     <tbody>
-    {% for row in match_info.season_stats|slice:"1:" %}
+    {% for row in season_stats|slice:"1:" %}
         <tr>
         <td onmousedown="middleGotoTeam({{ row.0 }})" onmouseup="gotoTeam({{ row.0 }})" class="urlToTeam">{{ row.1 }}</td>
         {% for stat in row|slice:"2:" %}

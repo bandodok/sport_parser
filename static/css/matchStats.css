@@ -73,7 +73,10 @@
 
 #viewers {
     color: #847c7c;
+}
 
+#score_by_period {
+    word-spacing: 0.5em;
 }
 
 .lastMatches {
@@ -90,3 +93,63 @@
     color: #6393ff;
     transition: color 0.2s;
 }
+
+.match_stats {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.stat_lines {
+    display: flex;
+    justify-content: center;
+    margin-top: -7px;
+    margin-bottom: 7px;
+}
+
+.match_stat_text {
+    width: 30px;
+    color: #ffffff;
+    font-family: Montserrat, sans-serif;
+    font-size: 16px;
+    margin: 0 15px;
+}
+
+.progress_right {
+    margin: 10px 5px;
+    width: 100%;
+    max-width: 560px;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    display: flex;
+    justify-content: left;
+    background-size: 300% 100%;
+    animation: progress-animation 2s linear infinite;
+}
+
+.progress_left {
+    margin: 10px 5px;
+    width: 100%;
+    max-width: 560px;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    display: flex;
+    justify-content: right;
+    background-size: 300% 100%;
+    animation: progress-animation 2s linear infinite;
+}
+
+  .progress-bar_right {
+      display: block;
+      height: 100%;
+      background: #d93131;
+      background-size: 300% 100%;
+  }
+
+  .progress-bar_left {
+      display: block;
+      height: 100%;
+      background: #4c8cd5;
+      background-size: 300% 100%;
+  }

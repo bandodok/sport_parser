@@ -1,65 +1,148 @@
-from sport_parser.khl.database_services.db_add import last_updated
-from sport_parser.khl.parsers.season import update_protocols, parse_season_matches
-from sport_parser.khl.parsers.team_info import parse_teams
-from sport_parser.khl.parsers.score_table import get_score_table
-from sport_parser.khl.view_data.calendar import get_calendar_view, get_calendar_finished, get_calendar_unfinished
-from sport_parser.khl.view_data.match_stats import get_match_stats_view
-from sport_parser.khl.view_data.season_stats import get_season_stats_view
-from sport_parser.khl.view_data.team_stats import get_team_stats_view
-from django.http import HttpResponse, Http404, JsonResponse
-from django.shortcuts import render, redirect
+from abc import abstractmethod
+
+from django.http import Http404
+from django.shortcuts import render
+from django.views import View
+
+from sport_parser.khl.config import Creator
+from sport_parser.khl.tasks import update, parse_season
 
 
-def index(request):
-    data = get_score_table()
-    return HttpResponse(data.to_html())
-   # return render(request, 'khl_index.html', context={'data': data.to_html()})
+class HockeyView(View):
+    config = 'khl'
+    template = ''
+
+    def get(self, request, **kwargs):
+        request.app_name = self.config
+        self.creator = Creator(request)
+        object1 = self.get_object(*kwargs.values())
+        context = self.get_context(object1)
+        context.update(self.get_meta_context())
+        return render(request, self.template, context=context)
+
+    @abstractmethod
+    def get_context(self, s):
+        pass
+
+    @abstractmethod
+    def get_object(self, *args):
+        pass
+
+    def get_meta_context(self):
+        return {
+            'theme': self.get_theme(),
+            'background_image': self.get_background_image(),
+            'title': self.get_title(),
+            'league_title': self.get_league_title(),
+            'league_logo': self.get_league_logo(),
+        }
+
+    def get_theme(self):
+        return f'css/themes/{self.creator.get_theme()}'
+
+    def get_background_image(self):
+        return f'/static/img/{self.creator.get_background_image()}'
+
+    def get_title(self):
+        return self.creator.get_title()
+
+    def get_league_title(self):
+        return self.creator.get_league_title()
+
+    def get_league_logo(self):
+        return f'/static/img/{self.creator.get_league_logo()}'
 
 
-def update_teams(request):
-    parse_teams()
-    return HttpResponse('Complete!')
+class StatsView(HockeyView):
+    config = 'khl'
+    template = 'khl_stats.html'
+
+    def get_object(self, season_id):
+        s = self.creator.get_season_class(season_id)
+        if s.season_does_not_exist:
+            raise Http404("Season does not exist")
+        return s
+
+    def get_context(self, s):
+        return {
+            'update': s.last_updated(),
+            'stats': s.get_table_stats(),
+            'season': s.data.id,
+            'last_matches': s.get_json_last_matches(5),
+            'future_matches': s.get_json_future_matches(5)
+        }
 
 
-def stats(request, season):
-    update_date = last_updated()
-    stats = get_season_stats_view(season)
-    if len(stats) == 1:
-        raise Http404("Season does not exist")
-    return render(request, 'khl_stats.html', context={'stats': stats, 'update': update_date, 'season': season})
+class TeamView(HockeyView):
+    config = 'khl'
+    template = 'khl_team.html'
+
+    def get_object(self, team_id):
+        return self.creator.get_team_class(team_id)
+
+    def get_context(self, t):
+        return {
+            'stats': t.get_chart_stats(),
+            'team': t.data,
+            'seasons': t.get_another_season_team_ids(),
+            'last_matches': t.get_json_last_matches(5),
+            'future_matches': t.get_json_future_matches(5)
+        }
 
 
-def team(request, team_id):
-    return render(request, 'khl_team.html', context=get_team_stats_view(team_id))
+class MatchView(HockeyView):
+    config = 'khl'
+    template = 'khl_match.html'
+
+    def get_object(self, match_id):
+        return self.creator.get_match_class(match_id)
+
+    def get_context(self, m):
+        return {
+            'match': m.data,
+            'match_stats': m.get_bar_stats(),
+            'season_stats': m.get_table_stats(),
+            'chart_stats': m.get_chart_stats(),
+            'overtime': m.data.overtime,
+            'penalties': m.data.penalties,
+            'team1': {
+                'data': m.team1.data,
+                'score': m.get_team1_score_by_period(),
+                'last_matches': m.get_team1_last_matches(5)
+            },
+            'team2': {
+                'data': m.team2.data,
+                'score': m.get_team2_score_by_period(),
+                'last_matches': m.get_team2_last_matches(5)
+            },
+        }
 
 
-def match(request, match_id):
-    context = get_match_stats_view(match_id)
-    return render(request, 'khl_match.html', context=context)
+class CalendarView(HockeyView):
+    config = 'khl'
+    template = 'khl_calendar.html'
+
+    def get_object(self, season_id):
+        return self.creator.get_season_class(season_id)
+
+    def get_context(self, s):
+        return {
+            'season': s.data.id,
+            'teams': s.get_team_list()
+        }
 
 
-def calendar(request, season):
-    return render(request, 'khl_calendar.html', context=get_calendar_view(season))
+class UpdateView(View):
+    config = 'khl'
+
+    def get(self, request):
+        update.delay(self.config)
+        return render(request, 'ws_update.html', {})
 
 
-def calendar_f(request, season):
-    return HttpResponse(get_calendar_finished(season), content_type='application/json')
+class UpdateSeasonView(View):
+    config = 'khl'
 
-
-def calendar_u(request, season):
-    return HttpResponse(get_calendar_unfinished(season), content_type='application/json')
-
-
-def update_protocol(request):
-    update_protocols()
-    return redirect('/khl/stats/21')
-
-
-def update_finished(request, season):
-    update_protocols(season, finished=True)
-    return HttpResponse('Complete!')
-
-
-def update_season_matches(request, season):
-    parse_season_matches(season)
-    return redirect('/khl/stats/21')
+    def get(self, request, season):
+        parse_season.delay(self.config, season)
+        return render(request, 'ws_update.html', {})

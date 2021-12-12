@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
-{% block title %}Сезон {{ season }} - КХЛ - flawlessanalytics{% endblock %}
+{% block title %}Сезон {{ season }} - {{ title }} - flawlessanalytics{% endblock %}
 
 {% block static %}
 {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/calendar.css'%}" type="text/css">
+    <link rel="stylesheet" href="{% static theme %}" type="text/css">
     <script>
     var season = {{ season|safe  }};
-    var first_matches = {{ finished_matches|safe }};
     </script>
     <script type="text/javascript" src="{% static 'js/calendar.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block header_title %}
-    <h4>Континентальная Хоккейная Лига</h4>
+    <h4>{{ league_title }}</h4>
 {% endblock %}
 
 {% block right_logo %}
@@ -40,17 +40,40 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <p>Отображение:</p>
-    <ul class="calendarFilter">
-        <a onclick=filterCalendar('all')><li>Все</li></a>
-        <a onclick=filterCalendar('past')><li>Прошедшие</li></a>
-        <a onclick=filterCalendar('future')><li>Будущие</li></a>
-    </ul>
 {% endblock %}
 
 {% block main_content %}
     <h3>Сезон {{ season }}</h3>
-    <h3 id="calendarTitle">Все матчи</h3>
+    <div class="filter">
+        <form class="form" id="calendar_filter" action="{% url 'calendar_api' %}" method="get">
+            <p><label for="id_teams">Команда:</label>
+                <select name="teams" id="id_teams">
+                    <option value="" selected="">---------</option>
+                    {% for team in teams %}
+                        <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select></p>
+            <p><label for="id_finished">Завершенные матчи:</label>
+                <select name="finished" id="id_finished">
+                  <option value="" selected="">---------</option>
+                  <option value="true">Да</option>
+                  <option value="false">Нет</option>
+                </select></p>
+
+                <label for="id_ordering">Сортировка:</label>
+                <div id="ordering-checkbox" class="ordering-checkbox" onclick="toggleOrdering()">
+                    <div>Дата</div>
+                </div>
+                <select class="ordering-checkbox" name="ordering" id="id_ordering">
+                  <option value="date">По возрастанию</option>
+                  <option value="-date">По убыванию</option>
+                </select>
+
+            <button type="reset" onclick="toggleOrderingAsc()">Сбросить</button>
+            <button type="submit">Применить</button>
+        </form>
+    </div>
+
     <div class="lastMatches">
         <div class="team1" id="team1">
 
