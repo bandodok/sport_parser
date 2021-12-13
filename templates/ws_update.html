@@ -6,9 +6,14 @@
 
 
 <script>
+    let protocol = 'ws';
+    if (window.location.protocol === 'https') {
+        protocol = 'wss'
+        }
+
     // открытие соединения с вебсокетом
     const updatews = new WebSocket(
-        `ws://${window.location.host}/ws/update_protocol`
+        `${protocol}://${window.location.host}/ws/update_protocol`
     )
 
     // функция добавления сообщения
@@ -32,6 +37,7 @@
 
     // событие при закрытии соединения
     updatews.onclose = (event_) => {
+        addUpdateStatus('update socket close')
         console.error('update socket close')
     }
 </script>
