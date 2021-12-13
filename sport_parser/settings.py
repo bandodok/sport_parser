@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'dbview',
     'sport_parser.khl',
+    'sport_parser.nhl',
     'sport_parser.api',
     'rest_framework',
     'django_filters',
