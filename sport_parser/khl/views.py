@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 from django.http import Http404
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.views import View
 
 from sport_parser.khl.creator import Creator
@@ -35,6 +36,12 @@ class HockeyView(View):
             'title': self.get_title(),
             'league_title': self.get_league_title(),
             'league_logo': self.get_league_logo(),
+
+            'url_stats': reverse_lazy(f'{self.config}:index_stats'),
+            'url_team': reverse_lazy(f'{self.config}:index_team'),
+            'url_match': reverse_lazy(f'{self.config}:index_match'),
+            'url_calendar': reverse_lazy(f'{self.config}:index_calendar'),
+            'url_calendar_api': reverse_lazy(f'{self.config}_calendar_api'),
         }
 
     def get_theme(self):
