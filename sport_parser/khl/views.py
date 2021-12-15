@@ -4,7 +4,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.views import View
 
-from sport_parser.khl.config import Creator
+from sport_parser.khl.creator import Creator
 from sport_parser.khl.tasks import update, parse_season
 
 

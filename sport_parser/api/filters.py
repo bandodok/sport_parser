@@ -1,5 +1,6 @@
 from django_filters import rest_framework as filters
-from sport_parser.khl.config import Creator, Config
+from sport_parser.khl.config import Config
+from sport_parser.khl.creator import Creator
 
 
 def teams_field(request):
