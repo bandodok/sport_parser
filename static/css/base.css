@@ -66,7 +66,7 @@ h4 {
     color: white;
     font-variant: small-caps;
     font-size: 45px;
-    white-space: nowrap;
+    line-height: 1;
 }
 
 nav {
@@ -357,7 +357,7 @@ footer div a {
 .match .team_left #teamLeft {
     margin-left: auto;
     text-align: right;
-    padding: 0;
+    padding: 0 10px 0 20px;
     margin-right: 0;
 }
 
@@ -374,7 +374,7 @@ footer div a {
 .match .team_right #teamRight {
     margin-right: auto;
     text-align: left;
-    padding: 0;
+    padding: 0 20px 0 10px;
     margin-left: 0;
 }
 
@@ -387,9 +387,9 @@ footer div a {
 }
 
 .match .last_logo {
-    width: 100px;
-    height: 100px;
-    margin: 0 10px;
+    max-width: 80px;
+    max-height: 80px;
+    margin: 15px 10px;
     filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.68));
 }
 
