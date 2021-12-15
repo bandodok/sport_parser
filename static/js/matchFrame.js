@@ -8,7 +8,7 @@ function createMatchFrame(block, finished_matches) {
         var body = document.getElementById(block)
 
         var match = document.createElement('a');
-        match.href =  "/khl/match/" + match_data["id"] + "/"; // 877160
+        match.href =  `/${CONFIG}/match/${match_data["id"]}/`; // 877160
 
         var div = document.createElement('div');
         div.className = "match";
@@ -21,7 +21,7 @@ function createMatchFrame(block, finished_matches) {
         var team_left_name = document.createElement('a');
 	    team_left_name.id = "teamLeft";
 	    team_left_name.setAttribute("id", "teamLeft");
-        team_left_name.href = "/khl/team/" +  match_data["team1_id"]; // 199
+        team_left_name.href = `/${CONFIG}/team/${match_data["team1_id"]}`; // 199
         team_left_name.innerHTML = match_data["team1_name"]; // "Авангард"
 
         var team_left_img = document.createElement('img');
@@ -40,7 +40,7 @@ function createMatchFrame(block, finished_matches) {
         date.innerHTML = new Date(match_data["date"]).toLocaleDateString(); // "1.09.2021"
 
         var score = document.createElement('a');
-        score.href = "/khl/match/" + match_data["id"] + "/"; // 877160
+        score.href = `/${CONFIG}/match/${match_data["id"]}/`; // 877160
 
         var score_p = document.createElement('p');
         score_p.className = "last_score";
@@ -91,7 +91,7 @@ function createMatchFrame(block, finished_matches) {
 
         var team_right_name = document.createElement('a');
 	    team_right_name.id = "teamRight";
-        team_right_name.href = "/khl/team/" + match_data["team2_id"]; // 189
+        team_right_name.href = `/${CONFIG}/team/${match_data["team2_id"]}`; // 189
         team_right_name.innerHTML = match_data["team2_name"]; // "ЦСКА"
 
         team_right.appendChild(team_right_img);

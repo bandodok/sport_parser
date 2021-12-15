@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function gotoTeam(team_id) {
-    const path = "/khl/team/";
+    const path = `/${CONFIG}/team/`;
     if (window.event.ctrlKey) {
         open(path + team_id).focus();
     }
@@ -31,8 +31,8 @@ function gotoTeam(team_id) {
 }
 
 function middleGotoTeam(team_id) {
-    const path = "/khl/team/";
-    e = window.event
+    const path = `/${CONFIG}/team/`;
+    let e = window.event
     if ((e.button === 4) || (e.button === 1)) {
         open(path + team_id).focus();
     }
