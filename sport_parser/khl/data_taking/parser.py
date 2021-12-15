@@ -1,3 +1,4 @@
+import json
 import tempfile
 
 from sport_parser.khl.data_analysis.formatter import Formatter
@@ -305,6 +306,11 @@ class Parser:
     def get_request_content(url):
         r = requests.get(url)
         return BeautifulSoup(r.content, 'html.parser')
+
+    @staticmethod
+    def get_api_request_content(url):
+        r = requests.get(url).content
+        return json.loads(r)
 
     @staticmethod
     def get_selenium_content(url):
