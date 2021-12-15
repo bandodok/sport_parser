@@ -1,3 +1,5 @@
+from django.db.models import Max
+
 from sport_parser.khl.config import Config
 from sport_parser.nhl.config import NHLConfig
 
@@ -16,12 +18,18 @@ class Creator:
             raise AttributeError('no config selected')
 
     def get_season_class(self, season_id):
+        if season_id == 0:
+            season_id = self.config.models.season_model.objects.aggregate(Max('id'))['id__max']
         return self.config.season_class(season_id, config=self.config)
 
     def get_team_class(self, team_id):
+        if team_id == 0:
+            team_id = self.config.models.team_model.objects.aggregate(Max('id'))['id__max']
         return self.config.team_class(team_id, config=self.config)
 
     def get_match_class(self, match_id):
+        if match_id == 0:
+            match_id = self.config.models.match_model.objects.aggregate(Max('id'))['id__max']
         return self.config.match_class(match_id, config=self.config)
 
     def get_updater(self):

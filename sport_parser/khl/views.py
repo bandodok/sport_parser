@@ -57,7 +57,7 @@ class StatsView(HockeyView):
     config = 'khl'
     template = 'khl_stats.html'
 
-    def get_object(self, season_id):
+    def get_object(self, season_id=0):
         s = self.creator.get_season_class(season_id)
         if s.season_does_not_exist:
             raise Http404("Season does not exist")
@@ -77,7 +77,7 @@ class TeamView(HockeyView):
     config = 'khl'
     template = 'khl_team.html'
 
-    def get_object(self, team_id):
+    def get_object(self, team_id=0):
         return self.creator.get_team_class(team_id)
 
     def get_context(self, t):
@@ -94,7 +94,7 @@ class MatchView(HockeyView):
     config = 'khl'
     template = 'khl_match.html'
 
-    def get_object(self, match_id):
+    def get_object(self, match_id=0):
         return self.creator.get_match_class(match_id)
 
     def get_context(self, m):
@@ -122,7 +122,7 @@ class CalendarView(HockeyView):
     config = 'khl'
     template = 'khl_calendar.html'
 
-    def get_object(self, season_id):
+    def get_object(self, season_id=0):
         return self.creator.get_season_class(season_id)
 
     def get_context(self, s):
