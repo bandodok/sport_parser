@@ -3,7 +3,7 @@ var NEXT_PAGE_URL = 2
 
 
 initCalendar = () => {
-    let url = `/api/${CONFIG}/calendar/?season=${SEASON}`;
+    let url = `/api/calendar/?config=${CONFIG}&season=${SEASON}`;
     let f = new XMLHttpRequest();
     f.open('GET', url);
     f.responseType = 'json';
@@ -64,7 +64,7 @@ window.addEventListener( "load", function () {
         params += a['value'][0] + "=" + a['value'][1] + "&"
         a = fd.next()
     }
-    url = `/api/${CONFIG}/calendar/${params}season=${SEASON}`
+    url = `/api/calendar/${params}config=${CONFIG}&season=${SEASON}`
     XHR.open( "GET", url );
     XHR.responseType = 'json';
 

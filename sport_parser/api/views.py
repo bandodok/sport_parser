@@ -1,18 +1,16 @@
 from rest_framework import generics
 
-from .filters import CalendarFilter
 from .serializers import CalendarSerializer
 from ..khl.creator import Creator
 
 
 class Calendar(generics.ListAPIView):
     serializer_class = CalendarSerializer
-    filterset_class = CalendarFilter
     ordering_fields = ['date']
     filterset_fields = ['teams', 'finished', 'season']
 
     def get_queryset(self):
-        config = 'khl'
+        config = self.request.query_params['config']
         self.request.app_name = config
         creator = Creator(self.request)
         season = creator.get_season_class(self.request.query_params['season'])

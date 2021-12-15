@@ -19,7 +19,7 @@ from sport_parser.api import views
 
 
 urlpatterns = [
-    path('khl/calendar/', views.Calendar.as_view(), name='calendar_api')
+    path('calendar/', views.Calendar.as_view(), name='calendar_api')
 ]
 
 urlpatterns += staticfiles_urlpatterns()
