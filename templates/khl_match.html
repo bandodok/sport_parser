@@ -19,8 +19,8 @@
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'stats' match.season %}">Сезоны</a>
-    <a href="{% url 'calendar' match.season %}">Календарь</a>
+    <a href="{{ url_stats }}{{ match.season }}">Сезоны</a>
+    <a href="{{ url_calendar }}{{ match.season }}">Календарь</a>
 
 {% endblock %}
 
@@ -59,7 +59,7 @@
         <div class="team1_info">
             <p class="header_city">Конференция «{{ team1.data.conference }}»</p>
             <p class="header_city">Дивизион {{ team1.data.division }}</p>
-            <a href="{% url 'team' team1.data.id %}"><h4 class="header_title">{{ team1.data.name }}</h4></a>
+            <a href="{{ url_team }}{{ team1.data.id }}"><h4 class="header_title">{{ team1.data.name }}</h4></a>
             <p class="header_city">{{ team1.data.city }}</p>
             <p class="header_city">{{ team1.data.arena }}</p>
         </div>
@@ -107,7 +107,7 @@
         <div class="team2_info">
             <p class="header_city">Конференция «{{ team2.data.conference }}»</p>
             <p class="header_city">Дивизион {{ team2.data.division }}</p>
-            <a href="{% url 'team' team2.data.id %}"><h4 class="header_title">{{ team2.data.name }}</h4></a>
+            <a href="{{ url_team }}{{ team2.data.id }}"><h4 class="header_title">{{ team2.data.name }}</h4></a>
             <p class="header_city">{{ team2.data.city }}</p>
             <p class="header_city">{{ team2.data.arena }}</p>
         </div>

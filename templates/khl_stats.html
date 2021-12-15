@@ -16,7 +16,7 @@
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'calendar' season %}">Календарь</a>
+    <a href="{{ url_calendar }}{{ season }}">Календарь</a>
 {% endblock %}
 
 {% block header_title %}
@@ -30,11 +30,11 @@
 {% block left_sidebar %}
     <p>Cезоны:</p>
     <ul>
-        <a href="/khl/stats/17"><li>17</li></a>
-        <a href="/khl/stats/18"><li>18</li></a>
-        <a href="/khl/stats/19"><li>19</li></a>
-        <a href="/khl/stats/20"><li>20</li></a>
-        <a href="/khl/stats/21"><li>21</li></a>
+        <a href="{% url 'stats' 17 %}"><li>17</li></a>
+        <a href="{% url 'stats' 18 %}"><li>18</li></a>
+        <a href="{% url 'stats' 19 %}"><li>19</li></a>
+        <a href="{% url 'stats' 20 %}"><li>20</li></a>
+        <a href="{% url 'stats' 21 %}"><li>21</li></a>
     </ul>
 {% endblock %}
 

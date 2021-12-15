@@ -20,8 +20,8 @@
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'stats' team.season_id %}">Сезоны</a>
-    <a href="{% url 'calendar' team.season_id %}">Календарь</a>
+    <a href="{{ url_stats }}{{ team.season_id }}">Сезоны</a>
+    <a href="{{ url_calendar }}{{ team.season_id }}">Календарь</a>
 
 {% endblock %}
 
@@ -41,7 +41,7 @@
     <p>Сезоны:</p>
 <ul class="chartList">
     {% for season in seasons %}
-        <a href="{% url 'team' season.id %}"><li>{{ season.season }}</li></a>
+        <a href="{{ url_team }}{{ season.id }}"><li>{{ season.season }}</li></a>
     {% endfor %}
 </ul>
 {% endblock %}
@@ -60,7 +60,7 @@
 {% endblock %}
 
 {% block main_content %}
-<h3><a href="{% url 'stats' team.season_id %}">СЕЗОН {{ team.season_id }}</a></h3>
+<h3><a href="{{ url_stats }}{{ team.season_id }}">СЕЗОН {{ team.season_id }}</a></h3>
 <p class="update">{{ league_title }}</p>
     <div id="chartSh" class="charts"></div>
     <div id="chartSog" class="charts"></div>
