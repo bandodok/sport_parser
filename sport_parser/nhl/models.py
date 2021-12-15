@@ -14,7 +14,7 @@ class NHLSeason(models.Model):
 class NHLTeam(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    api_id = models.IntegerField()
+    api_id = models.IntegerField(null=True)
     name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=100)
     abbreviation = models.CharField(max_length=4)
@@ -60,10 +60,10 @@ class NHLProtocol(models.Model):
 
     sog = models.IntegerField(null=True, default=0)
     penalty = models.IntegerField(null=True, default=0)
-    faceoff_p = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True, default=0)
+    faceoff_p = models.DecimalField(max_length=100, decimal_places=2, max_digits=5, null=True, blank=True, default=0)
     blocks = models.IntegerField(null=True, default=0)
     hits = models.IntegerField(null=True, default=0)
-    ppp = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True, default=0)
+    ppp = models.DecimalField(max_length=100, decimal_places=2, max_digits=5, null=True, blank=True, default=0)
     ppg = models.IntegerField(null=True, default=0)
     takeaways = models.IntegerField(null=True, default=0)
     giveaways = models.IntegerField(null=True, default=0)
