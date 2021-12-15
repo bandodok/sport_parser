@@ -23,6 +23,7 @@ urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
     path('khl/', include('sport_parser.khl.urls')),
+    path('nhl/', include('sport_parser.nhl.urls')),
     path('api/', include('sport_parser.api.urls'))
 ]
 
