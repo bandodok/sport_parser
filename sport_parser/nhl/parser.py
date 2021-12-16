@@ -112,6 +112,7 @@ class NHLParser(Parser):
 
         match_data = self.get_api_request_content(url)
         live_data = match_data.get('liveData')
+        plays_data = match_data.get('liveData').get('plays').get('allPlays')
 
         boxscore = live_data['boxscore']
         home_stats = boxscore['teams']['home']['teamStats']['teamSkaterStats']
@@ -162,6 +163,50 @@ class NHLParser(Parser):
             home_protocol['g_b'] += 1
         if home_b < guest_b:
             guest_protocol['g_b'] += 1
+
+        # сбор статистики из всех ивентов матча
+        events = {
+            'home': {},
+            'guest': {}
+        }
+
+        for event in plays_data:
+            event_name = event['result']['event']
+            team = event.get('team')
+            if not team:
+                continue
+            team = team.get('name')
+
+            if team == home_protocol['team']:
+                event_team = 'home'
+            elif team == guest_protocol['team']:
+                event_team = 'guest'
+            else:
+                event_team = 'unknown'
+
+            if event_name in events[event_team]:
+                events[event_team][event_name] += 1
+            else:
+                events[event_team][event_name] = 1
+
+        home_protocol.update({
+            'faceoff': events['home'].get('Faceoff'),
+            'sh': sum((
+                events['home'].get('Shot') or 0,
+                events['home'].get('Goal') or 0,
+                events['home'].get('Blocked Shot') or 0,
+                events['home'].get('Missed Shot') or 0
+            )),
+        })
+        guest_protocol.update({
+            'faceoff': events['guest'].get('Faceoff'),
+            'sh': sum((
+                events['guest'].get('Shot') or 0,
+                events['guest'].get('Goal') or 0,
+                events['guest'].get('Blocked Shot') or 0,
+                events['guest'].get('Missed Shot') or 0
+            )),
+        })
 
         return home_protocol, guest_protocol
 
