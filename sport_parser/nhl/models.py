@@ -58,8 +58,10 @@ class NHLProtocol(models.Model):
     g_ot = models.IntegerField(null=True, default=0)
     g_b = models.IntegerField(null=True, default=0)
 
+    sh = models.IntegerField(null=True, default=0)
     sog = models.IntegerField(null=True, default=0)
     penalty = models.IntegerField(null=True, default=0)
+    faceoff = models.IntegerField(null=True, default=0)
     faceoff_p = models.DecimalField(max_length=100, decimal_places=2, max_digits=5, null=True, blank=True, default=0)
     blocks = models.IntegerField(null=True, default=0)
     hits = models.IntegerField(null=True, default=0)
