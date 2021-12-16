@@ -63,12 +63,12 @@ class NHLConfig(Config):
         'giveaways': ('Giveaways', 'Потери', 'int'),
     }
     chart_stats_names = {
-        'sog': ('Sog', 'int'),
-        'g': ('G', 'int'),
-        'blocks': ('Blocks', 'int'),
-        'penalty': ('Penalty', 'int'),
-        'hits': ('Hits', 'int'),
-        'ppg': ('PowerPlayGoals', 'int'),
-        'takeaways': ('Takeaways', 'int'),
-        'giveaways': ('Giveaways', 'int'),
+        'sog': ('Sog', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'ppg': ('PowerPlayGoals', 'Голы в большинстве', 'int'),
+        'takeaways': ('Takeaways', 'Отборы', 'int'),
+        'giveaways': ('Giveaways', 'Потери', 'int'),
     }

@@ -42,14 +42,7 @@
         <div style="margin-top: 380px">
     {% endif %}
     <p>Параметры:</p>
-<ul class="chartList">
-    <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
-    <a onclick=filterChart('chartSog') id="BchartSog"><li>Sog</li></a>
-    <a onclick=filterChart('chartG') id="BchartG"><li>G</li></a>
-    <a onclick=filterChart('chartBlocks') id="BchartBlocks"><li>Blocks</li></a>
-    <a onclick=filterChart('chartHits') id="BchartHits"><li>Hits</li></a>
-    <a onclick=filterChart('chartPenalty') id="BchartPenalty"><li>Penalty</li></a>
-    <a onclick=filterChart('chartTime_a') id="BchartTime_a"><li>TimeA</li></a>
+<ul class="chartList" id="chartList">
 </ul>
     </div>
 {% endblock %}
@@ -167,13 +160,7 @@
         <h3 id="chartTitle1">Все броски</h3><h3 id="chartTitle2">Sh</h3>
     </div>
 
-    <div id="chartSh" class="charts"></div>
-    <div id="chartSog" class="charts"></div>
-    <div id="chartG" class="charts"></div>
-    <div id="chartBlocks" class="charts"></div>
-    <div id="chartHits" class="charts"></div>
-    <div id="chartPenalty" class="charts"></div>
-    <div id="chartTime_a" class="charts"></div>
+    <div id="chart" class="charts"></div>
 
     <h3>Последние матчи</h3>
     <div class="lastMatches">

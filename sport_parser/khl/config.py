@@ -97,13 +97,13 @@ class Config:
         'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
     chart_stats_names = {
-        'sh': ('Sh', 'int'),
-        'sog': ('Sog', 'int'),
-        'g': ('G', 'int'),
-        'blocks': ('Blocks', 'int'),
-        'penalty': ('Penalty', 'int'),
-        'hits': ('Hits', 'int'),
-        'time_a': ('TimeA', 'time'),
+        'sh': ('Sh', 'Все броски', 'int'),
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
     updated_team_names = {
         'Торпедо НН': 'Торпедо',
