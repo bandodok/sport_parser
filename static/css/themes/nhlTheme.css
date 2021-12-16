@@ -1,0 +1,148 @@
+/* общий цвет текста */
+* {
+    color: #847c7c;
+}
+
+/* цвет заголовков */
+h4 {
+    color: white;
+}
+
+/* цвет текста ссылок в навбаре */
+nav a {
+    color: #d9d2d2;
+}
+
+
+/* цвет фона */
+.background {
+    background: #222222 repeat;
+}
+
+/* цвет текста в сайдбарах */
+li {
+    color: #d9d2d2;
+}
+
+/* цвет фона в сайдбарах при наведении */
+li:hover {
+    background-color: #8c6634;
+}
+
+/* цвет заголовков второго уровня (номер сезона в календаре и т.д.) */
+h3 {
+    color: #FFFFFF;
+}
+
+
+/* цвет фона и текста в таблице */
+td {
+    background-color: rgba(84, 84, 84, 0.66);
+    color: #d9d2d2;
+}
+
+/* цвет фона и текста столбца команды в таблице при наведении */
+.urlToTeam:hover {
+    background-color: rgba(28, 28, 28, 0.45);
+	color: #ffffff;
+}
+
+/* цвет фона заголовков в таблице */
+th {
+  background-color: #8f6e49;
+}
+
+/* цвет строки при наведении в таблице */
+tr:hover {
+    background-color: rgb(0, 0, 0);
+    transition: none;
+}
+
+/* цвет фона заголовка в таблице, по которому выполнена сортировка */
+th.sorted[data-order="1"],
+th.sorted[data-order="-1"] {
+    background-color: #a87a18;
+}
+
+
+/* цвет границы футера */
+footer {
+    border-color: #FFFFFF33;
+}
+
+
+/* match frames */
+
+/* цвет фона и границы рамки матча */
+.lastMatches .match {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #FFFFFF33;
+}
+
+/* цвет текста команд в рамке матча */
+.match a {
+    color: #FFFFFF;
+}
+
+/* цвет фона рамки матча при наведении */
+.match:hover {
+    background-color: rgba(204, 131, 60, 0.52);
+}
+
+/* цвет текста команд в рамке матча при наведении */
+.match a:hover {
+    color: #ff9818;
+}
+
+/* цвет текста даты и счета по периодам в центре рамки матча */
+.match_info p {
+    color: #FFFFFF;
+}
+
+/* цвет текста счета и времени в рамке матча */
+p.last_score {
+    color: #FFFFFF;
+}
+
+
+/* bar stats */
+
+/* цвет текста в статистике матча */
+.match_stat_text {
+    color: #ffffff;
+}
+
+/* цвет бэкграунда правой полоски  */
+.progress_right {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* цвет бэкграунда левой полоски  */
+.progress_left {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* цвет правой полоски  */
+.progress-bar_right {
+    background: #e1e1e1;
+}
+
+/* цвет левой полоски  */
+.progress-bar_left {
+    background: #ffa21f;
+}
+
+
+/* calendar */
+
+/* цвет фона кнопок при наведении */
+button:hover {
+    background-color: rgba(176, 133, 64, 0.68);
+    transition: none;
+}
+
+/* цвет фона кнопки сортировки */
+.ordering-checkbox:hover {
+    background-color: rgba(176, 133, 64, 0.68);
+    transition: none;
+}

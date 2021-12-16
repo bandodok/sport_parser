@@ -9,7 +9,7 @@ class NHLConfig(Config):
     league_title = 'Национальная хоккейная лига'
     league_logo = 'NHL.webp'
     background_image = 'tribuna.webp'  # заменить
-    theme = 'khlTheme.css'  # заменить
+    theme = 'nhlTheme.css'  # заменить
     models = ModelList
     parser = NHLParser
     table_stats_names = {
