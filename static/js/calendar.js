@@ -61,6 +61,10 @@ window.addEventListener( "load", function () {
     a = fd.next()
     var params = "?"
     while (a['done'] === false) {
+        if (a['value'][1] === "") {
+            a = fd.next()
+            continue
+        }
         params += a['value'][0] + "=" + a['value'][1] + "&"
         a = fd.next()
     }
