@@ -9,7 +9,6 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
             protocol1, protocol2 = match.protocols.all().order_by('id')
             return {
                 'date': match.date,
-                'time': match.time,
                 'id': match.id,
                 'finished': match.finished,
                 'overtime': match.overtime,
@@ -41,7 +40,6 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
             team1, team2 = match.teams.all()
             return {
                 'date': match.date,
-                'time': match.time,
                 'id': match.id,
                 'finished': match.finished,
                 'team1_name': team1.name,

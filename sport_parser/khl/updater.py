@@ -82,8 +82,8 @@ class Updater:
 
     def _get_unfinished_matches_until_today(self):
         today = datetime.date.today()
-        return self.model_list.match_model.objects.filter(finished=False).filter(date__lte=today).order_by('date',
-                                                                                                           'time')
+        tomorrow = today + datetime.timedelta(1)
+        return self.model_list.match_model.objects.filter(finished=False).filter(date__lte=tomorrow).order_by('date')
 
     def _get_first_unfinished_match_season(self):
         return self.model_list.match_model.objects.filter(finished=False)[0].season

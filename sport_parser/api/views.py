@@ -14,4 +14,4 @@ class Calendar(generics.ListAPIView):
         self.request.app_name = config
         creator = Creator(self.request)
         season = creator.get_season_class(self.request.query_params['season'])
-        return season.models.match_model.objects.all().order_by('date', 'time')
+        return season.models.match_model.objects.all().order_by('date')
