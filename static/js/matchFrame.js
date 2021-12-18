@@ -48,7 +48,11 @@ function createMatchFrame(block, finished_matches) {
             score_p.innerHTML = match_data["team1_score"]['match'] + " - " + match_data["team2_score"]['match']; // "4 - 0"
         }
         else {
-            score_p.innerHTML = match_data["time"].substring(0, 5);
+            let time = new Date(match_data["date"]).toLocaleTimeString().substring(0, 5);
+            if (time[0] === '0') {
+                time = time.substring(1, 5)
+            }
+            score_p.innerHTML = time;
         }
 
         score.appendChild(score_p);

@@ -90,7 +90,7 @@
                         <p class="arena" id="arena">{{ match.arena }}</p>
                         <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
                         {%  else %}
-                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.time }}</p>
+                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.date|time }}</p>
                     {% endif %}
                 {% endlanguage %}
             </div>
