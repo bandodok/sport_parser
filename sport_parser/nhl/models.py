@@ -34,7 +34,6 @@ class NHLMatch(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     date = models.DateTimeField(null=True)
-    time = models.TimeField(null=True)
     season = models.ForeignKey(NHLSeason, on_delete=models.CASCADE, null=True, related_name='matches')
     arena = models.CharField(max_length=100, null=True, blank=True)
     finished = models.BooleanField(default=False)
