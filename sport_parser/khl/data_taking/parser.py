@@ -1,5 +1,8 @@
+import datetime
 import json
 import tempfile
+
+import pytz
 
 from sport_parser.khl.data_analysis.formatter import Formatter
 import os
@@ -48,7 +51,12 @@ class Parser:
         match_dict = {date: match_soup for date, match_soup in zip(dates, matches)}
         for date, matches in match_dict.items():
             match_list = matches.find_all('li', class_='b-wide_tile_item')
-            new_date = self.formatter.date_format(date)
+
+            string_date = self.formatter.date_format(date)
+            msk = pytz.timezone('Europe/Moscow')
+            date = datetime.datetime.strptime(string_date, '%Y-%m-%d')
+            date_msk = msk.localize(date)
+
             for match in match_list:
                 href = match.find('dl', class_='b-title-option').div.div.ul.li.a['href']
                 match_id = href.split('/')[3]
@@ -60,7 +68,7 @@ class Parser:
                 guest_team = match.find('dl', class_='b-details m-club m-rightward').dd.h5.a.text
                 match_info = {
                     'match_id': match_id,
-                    'date': new_date,
+                    'date': date_msk,
                     'home_team': home_team,
                     'guest_team': guest_team,
                     'season': season
@@ -77,10 +85,12 @@ class Parser:
                 else:
                     finished = False
                     time = score.dt.h3.text.split(' ')[0]
+                    hours, minutes = time.split(':')
+                    timedelta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
+                    match_info['date'] = date_msk + timedelta
                     city = score.dd.p.text
                     match_extra_info = {
                         'city': city,
-                        'time': time,
                         'penalties': False,
                         'overtime': False
                     }
@@ -130,6 +140,17 @@ class Parser:
         info = date_info.find_all('span')[1]
         info = str(info).split('<br/>')
         time = info[1][:5]
+        hours, minutes = time.split(':')
+        date = match.date
+        new_date = datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=int(hours),
+            minute=int(minutes)
+        )
+        msk = pytz.timezone('Europe/Moscow')
+        date_msk = msk.localize(new_date)
 
         info = arena_info.find_all('span')[1]
 
@@ -150,7 +171,7 @@ class Parser:
             'season': match.season,
             'arena': arena,
             'city': city,
-            'time': time,
+            'date': date_msk,
             'viewers': viewers,
             'penalties': penalties,
             'overtime': overtime,

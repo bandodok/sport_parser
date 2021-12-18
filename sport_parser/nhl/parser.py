@@ -1,5 +1,6 @@
 from sport_parser.khl.data_taking.parser import Parser
 from datetime import datetime
+import pytz
 
 
 class NHLParser(Parser):
@@ -65,26 +66,28 @@ class NHLParser(Parser):
             if game['status']['statusCode'] == '9':  # postponed code
                 continue
 
-            date = datetime.strptime(game.get('gameDate'), '%Y-%m-%dT%H:%M:%SZ')
-            time = date.time()
+            utc = pytz.utc
+            naive_date = game.get('gameDate')
+            date = datetime.strptime(naive_date, '%Y-%m-%dT%H:%M:%SZ')
+            date_utc = utc.localize(date)
 
             match_info = {
                 'match_id': game.get('gamePk'),
                 'match_type': match_type,
-                'date': date,
+                'date': date_utc,
                 'home_team': game['teams']['home']['team']['name'],
                 'guest_team': game['teams']['away']['team']['name'],
                 'season': season,
                 'finished': finished,
                 'arena': game['venue']['name'],
-                'time': time,
             }
             calendar.append(match_info)
         return calendar
 
     def parse_unfinished_match(self, match):
-        # не отличается от завершенного матча
-        return self.parse_finished_match(match)
+        match_info = self.parse_finished_match(match)
+        match_info['finished'] = False
+        return match_info
 
     def parse_finished_match(self, match):
         url = f'https://statsapi.web.nhl.com/api/v1/game/{match.id}/linescore'  # 2021010003
@@ -103,7 +106,7 @@ class NHLParser(Parser):
             'season': match.season,
             'overtime': overtime,
             'penalties': penalties,
-            'finished': match.finished,
+            'finished': True,
         }
         return match_info
 
