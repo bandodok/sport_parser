@@ -103,9 +103,18 @@ class Parser:
         return output
 
     def parse_match(self, match):
-        if match.finished:
-            return self.parse_finished_match(match)
-        return self.parse_unfinished_match(match)
+        url = f'https://text.khl.ru/text/{match.id}.html'
+        soup = self.get_request_content(url)
+
+        extra_info = soup.find_all('li', class_="b-match_add_info_item")
+        if not extra_info:
+            return self.parse_unfinished_match(match)
+
+        match_status = soup.find('dd', class_="b-period_score").text
+        if match_status != 'матч завершен':
+            return self.parse_unfinished_match(match)
+
+        return self.parse_finished_match(match, soup)
 
     def parse_unfinished_match(self, match):
         return {
@@ -114,9 +123,8 @@ class Parser:
             'finished': False
         }
 
-    def parse_finished_match(self, match):
-        url = f'https://text.khl.ru/text/{match.id}.html'
-        soup = self.get_request_content(url)
+    def parse_finished_match(self, match, match_data):
+        soup = match_data
 
         extra_info = soup.find_all('li', class_="b-match_add_info_item")
         if not extra_info:

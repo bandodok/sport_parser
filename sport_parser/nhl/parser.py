@@ -84,16 +84,28 @@ class NHLParser(Parser):
             calendar.append(match_info)
         return calendar
 
-    def parse_unfinished_match(self, match):
-        match_info = self.parse_finished_match(match)
-        match_info['finished'] = False
-        return match_info
-
-    def parse_finished_match(self, match):
-        url = f'https://statsapi.web.nhl.com/api/v1/game/{match.id}/linescore'  # 2021010003
+    def parse_match(self, match):
+        url = f'https://statsapi.web.nhl.com/api/v1/game/{match.id}/feed/live'  # 2021010003
         match_dict = self.get_api_request_content(url)
 
-        match_status = match_dict.get('currentPeriodOrdinal')
+        status_code = match_dict.get('gameData').get('status').get('statusCode')
+        linescore = match_dict.get('liveData').get('linescore')
+
+        postponed = False
+        if status_code == '9':  # postponed code
+            postponed = True
+            return 'match not updated'
+        if status_code == '7':  # finished code
+            match_data = self._parse_finished_match(match, linescore)
+            match_data['finished'] = True
+        else:
+            match_data = self._parse_finished_match(match, linescore)
+            match_data['finished'] = False
+
+        return match_data
+
+    def _parse_finished_match(self, match, linescore):
+        match_status = linescore.get('currentPeriodOrdinal')
         overtime = False
         penalties = False
         if match_status == 'OT':
@@ -106,7 +118,6 @@ class NHLParser(Parser):
             'season': match.season,
             'overtime': overtime,
             'penalties': penalties,
-            'finished': True,
         }
         return match_info
 

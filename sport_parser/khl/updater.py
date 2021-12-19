@@ -39,7 +39,7 @@ class Updater:
         matches = self._get_unfinished_matches_until_today()
         if matches:
             for match in matches:
-                self._add_finished_match_to_db(match)
+                self._add_match_to_db(match)
 
     def _add_teams_to_db(self, season):
         self.ws_send_status(f'updating teams for season {season}')
@@ -61,19 +61,13 @@ class Updater:
         self.ws_send_status('calendar updated')
         return self.model_list.match_model.objects.filter(season=season)
 
-    def _add_finished_match_to_db(self, match):
-        match = self.parser.parse_finished_match(match)
+    def _add_match_to_db(self, match):
+        match = self.parser.parse_match(match)
         if match != 'match not updated':
             self.ws_send_status(f"updating match info: {match['match_id']}")
             db_match = self.db.add_match(match)
-            self._add_protocol_to_db(db_match)
-
-    def _add_match_to_db(self, match):
-        match = self.parser.parse_match(match)
-        if match == 'match not updated':
-            return
-        self.ws_send_status(f"updating match: {match['match_id']}")
-        self.db.add_match(match)
+            if db_match.finished:
+                self._add_protocol_to_db(db_match)
 
     def _add_protocol_to_db(self, match):
         self.ws_send_status(f"updating protocols for match: {match.id}")
