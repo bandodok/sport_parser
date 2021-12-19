@@ -3,6 +3,16 @@ from abc import ABC
 from rest_framework import serializers
 
 
+def get_sorted_teams_by_m2m_table(match):
+    meta = match._meta
+    app_label = meta.app_label
+    match_model = meta.model_name
+    team_model = meta.many_to_many[0].column
+    m2m_table = f'{app_label}_{match_model}_{team_model}'
+    team1, team2 = match.teams.all().extra(select={'add_id': f'{m2m_table}.id'}).order_by('add_id')
+    return team1, team2
+
+
 class CalendarSerializer(serializers.BaseSerializer, ABC):
     def to_representation(self, match):
         if match.finished:
@@ -37,7 +47,7 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
                 'team2_id': protocol2.team.id,
             }
         else:
-            team1, team2 = match.teams.all()
+            team1, team2 = get_sorted_teams_by_m2m_table(match)
             return {
                 'date': match.date,
                 'id': match.id,
