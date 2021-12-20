@@ -73,7 +73,7 @@ class Config:
         'blocks__e': 'blocks / (blocks + blocks__a) * 100',
         'dev__e': '(1 - (sog__a / sh__a)) * 100',
         'time_a__e': 'time_a / (time_a + time_a__a) * 100',
-        'pdo__e': '((sh / (sh + sh__a)) + (sog / sh)) * 100',
+        'pdo__e': 'sog__e + dev__e',
     }
     match_stats_names = {
         'sh': ('Sh', 'int'),
