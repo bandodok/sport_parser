@@ -36,7 +36,11 @@ class NHLMatch(models.Model):
     date = models.DateTimeField(null=True)
     season = models.ForeignKey(NHLSeason, on_delete=models.CASCADE, null=True, related_name='matches')
     arena = models.CharField(max_length=100, null=True, blank=True)
-    finished = models.BooleanField(default=False)
+    status = models.CharField(choices=[
+        ('scheduled', 'scheduled'),
+        ('finished', 'finished'),
+        ('postponed', 'postponed'),
+    ], max_length=9, default='scheduled')
     teams = models.ManyToManyField(NHLTeam, related_name='matches')
     penalties = models.BooleanField(default=False)
     overtime = models.BooleanField(default=False)
