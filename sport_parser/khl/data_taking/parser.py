@@ -73,17 +73,18 @@ class Parser:
                     'guest_team': guest_team,
                     'season': season
                 }
+
+                match_extra_info = {
+                    'penalties': False,
+                    'overtime': False
+                }
                 score = match.find('dl', class_='b-score')
                 if '+' in score.dt.h3.text:
-                    continue
-                if '—' in score.dt.h3.text:
-                    finished = True
-                    match_extra_info = {
-                        'penalties': False,
-                        'overtime': False
-                    }
+                    status = 'postponed'
+                elif '—' in score.dt.h3.text:
+                    status = 'finished'
                 else:
-                    finished = False
+                    status = 'scheduled'
                     time = score.dt.h3.text.split(' ')[0]
                     hours, minutes = time.split(':')
                     timedelta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
@@ -91,13 +92,11 @@ class Parser:
                     city = score.dd.p.text
                     match_extra_info = {
                         'city': city,
-                        'penalties': False,
-                        'overtime': False
                     }
 
                 match_info.update(match_extra_info)
                 match_info.update({
-                    'finished': finished,
+                    'status': status,
                 })
                 output.append(match_info)
         return output
@@ -120,7 +119,6 @@ class Parser:
         return {
             'match_id': match.id,
             'season': match.season,
-            'finished': False
         }
 
     def parse_finished_match(self, match, match_data):
@@ -183,7 +181,7 @@ class Parser:
             'viewers': viewers,
             'penalties': penalties,
             'overtime': overtime,
-            'finished': True
+            'status': 'finished'
         }
 
     def parse_protocol(self, match):
