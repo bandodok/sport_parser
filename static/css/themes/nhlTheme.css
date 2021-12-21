@@ -104,6 +104,11 @@ p.last_score {
     color: #FFFFFF;
 }
 
+/* цвет текста надписи "Отменен" */
+#postponed {
+    color: #ff0000;
+}
+
 
 /* bar stats */
 
