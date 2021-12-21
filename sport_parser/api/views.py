@@ -7,7 +7,7 @@ from ..khl.creator import Creator
 class Calendar(generics.ListAPIView):
     serializer_class = CalendarSerializer
     ordering_fields = ['date']
-    filterset_fields = ['teams', 'finished', 'season']
+    filterset_fields = ['teams', 'status', 'season']
 
     def get_queryset(self):
         config = self.request.query_params['config']

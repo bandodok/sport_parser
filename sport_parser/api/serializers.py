@@ -15,12 +15,12 @@ def get_sorted_teams_by_m2m_table(match):
 
 class CalendarSerializer(serializers.BaseSerializer, ABC):
     def to_representation(self, match):
-        if match.finished:
+        if match.status == 'finished':
             protocol1, protocol2 = match.protocols.all().order_by('id')
             return {
                 'date': match.date,
                 'id': match.id,
-                'finished': match.finished,
+                'status': match.status,
                 'overtime': match.overtime,
                 'penalties': match.penalties,
                 'team1_name': protocol1.team.name,
@@ -51,7 +51,7 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
             return {
                 'date': match.date,
                 'id': match.id,
-                'finished': match.finished,
+                'status': match.status,
                 'team1_name': team1.name,
                 'team1_image': team1.img,
                 'team1_id': team1.id,

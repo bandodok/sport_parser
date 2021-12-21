@@ -36,7 +36,7 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {% if match.finished == True %}
+    {% if match.status == 'finished' %}
         <div style="margin-top: 810px">
     {% else %}
         <div style="margin-top: 380px">
@@ -62,7 +62,7 @@
             <div class="score">
                 {% language 'ru' %}
                 <p class="header_city">{{ match.date|date:'j E Y' }}</p>
-                    {% if match.finished == True %}
+                    {% if match.status == 'finished' %}
                         <p id="score_time">{{ team1.score.match }} - {{ team2.score.match }}</p>
 
                         {% if overtime == True %}
@@ -92,6 +92,7 @@
                         {%  else %}
                         <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.date|time }}</p>
                     {% endif %}
+
                 {% endlanguage %}
             </div>
 
@@ -107,7 +108,7 @@
     </div>
 
 
-{% if match.finished == True %}
+{% if match.status == 'finished' %}
     <h3></h3>
     {% language 'ru' %}
 <div class="match_stats">

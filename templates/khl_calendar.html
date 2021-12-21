@@ -53,11 +53,12 @@
                         <option value="{{ team.id }}">{{ team.name }}</option>
                     {% endfor %}
                 </select></p>
-            <p><label for="id_finished">Завершенные матчи:</label>
-                <select name="finished" id="id_finished">
+            <p><label for="id_status">Статус матча:</label>
+                <select name="status" id="id_status">
                   <option value="" selected="">---------</option>
-                  <option value="true">Да</option>
-                  <option value="false">Нет</option>
+                  <option value="scheduled">Запланирован</option>
+                  <option value="finished">Завершен</option>
+                  <option value="postponed">Отменен</option>
                 </select></p>
 
                 <label for="id_ordering">Сортировка:</label>

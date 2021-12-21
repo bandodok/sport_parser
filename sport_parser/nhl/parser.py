@@ -60,11 +60,11 @@ class NHLParser(Parser):
             if game_type == 'P':
                 match_type = 'Playoffs'
 
-            finished = False
-            if game['status']['statusCode'] == '7':  # finished code
-                finished = True
+            status = 'scheduled'
             if game['status']['statusCode'] == '9':  # postponed code
-                continue
+                status = 'postponed'
+            elif game['status']['statusCode'] == '7':  # finished code
+                status = 'finished'
 
             utc = pytz.utc
             naive_date = game.get('gameDate')
@@ -78,7 +78,7 @@ class NHLParser(Parser):
                 'home_team': game['teams']['home']['team']['name'],
                 'guest_team': game['teams']['away']['team']['name'],
                 'season': season,
-                'finished': finished,
+                'status': status,
                 'arena': game['venue']['name'],
             }
             calendar.append(match_info)
@@ -91,16 +91,13 @@ class NHLParser(Parser):
         status_code = match_dict.get('gameData').get('status').get('statusCode')
         linescore = match_dict.get('liveData').get('linescore')
 
-        postponed = False
+        match_data = self._parse_finished_match(match, linescore)
         if status_code == '9':  # postponed code
-            postponed = True
-            return 'match not updated'
-        if status_code == '7':  # finished code
-            match_data = self._parse_finished_match(match, linescore)
-            match_data['finished'] = True
+            match_data['status'] = 'postponed'
+        elif status_code == '7':  # finished code
+            match_data['status'] = 'finished'
         else:
-            match_data = self._parse_finished_match(match, linescore)
-            match_data['finished'] = False
+            match_data['status'] = 'scheduled'
 
         return match_data
 

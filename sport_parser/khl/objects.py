@@ -24,14 +24,14 @@ class Season:
         return self.models.protocol_model.objects.filter(match__season_id=self.data)
 
     def get_last_matches(self, num):
-        return self.data.matches.filter(finished=True).order_by('-date')[:num]
+        return self.data.matches.filter(status='finished').order_by('-date')[:num]
 
     def get_json_last_matches(self, num):
         lats_matches = self.get_last_matches(num)
         return self.formatter.get_json_last_matches_info(lats_matches)
 
     def get_future_matches(self, num):
-        return self.data.matches.filter(finished=False).order_by('date')[:num]
+        return self.data.matches.filter(status='scheduled').order_by('date')[:num]
 
     def get_json_future_matches(self, num):
         future_matches = self.get_future_matches(num)
@@ -90,14 +90,14 @@ class Team:
         return protocol_list.order_by('match__date')
 
     def get_last_matches(self, num, *, exclude=0):
-        return self.data.matches.filter(finished=True).exclude(id=exclude).order_by('-date')[:num]
+        return self.data.matches.filter(status='finished').exclude(id=exclude).order_by('-date')[:num]
 
     def get_json_last_matches(self, num, *, exclude=0):
         lats_matches = self.get_last_matches(num, exclude=exclude)
         return self.formatter.get_json_last_matches_info(lats_matches)
 
     def get_future_matches(self, num, *, exclude=0):
-        return self.data.matches.filter(finished=False).exclude(id=exclude).order_by('date')[:num]
+        return self.data.matches.filter(status='scheduled').exclude(id=exclude).order_by('date')[:num]
 
     def get_json_future_matches(self, num, *, exclude=0):
         future_matches = self.get_future_matches(num, exclude=exclude)
@@ -135,7 +135,7 @@ class Match:
         self._set_exclude()
 
     def get_team1_score_by_period(self):
-        if not self.data.finished:
+        if self.data.status != 'finished':
             return 'The match is not over yet'
         protocol = self.team1.data.protocols.get(match=self.data)
         return {
@@ -148,14 +148,14 @@ class Match:
         }
 
     def get_team1_score(self):
-        if not self.data.finished:
+        if self.data.status != 'finished':
             return 'The match is not over yet'
         goals = self.team1.data.protocols.get(match=self.data).g
         penalties = self.team1.data.protocols.get(match=self.data).g_b
         return goals + penalties
 
     def get_team2_score_by_period(self):
-        if not self.data.finished:
+        if self.data.status != 'finished':
             return 'The match is not over yet'
         protocol = self.team2.data.protocols.get(match=self.data)
         return {
@@ -168,7 +168,7 @@ class Match:
         }
 
     def get_team2_score(self):
-        if not self.data.finished:
+        if self.data.status != 'finished':
             return 'The match is not over yet'
         goals = self.team2.data.protocols.get(match=self.data).g
         penalties = self.team2.data.protocols.get(match=self.data).g_b
@@ -187,7 +187,7 @@ class Match:
         return self.team2.get_json_future_matches(num, exclude=self._exclude)
 
     def get_match_stats(self):
-        if not self.data.finished:
+        if self.data.status != 'finished':
             return 'The match is not over yet'
         return self.TableStats.match_stats_calculate(self.data)
 
@@ -196,7 +196,7 @@ class Match:
         return season.get_table_stats(team_list=[self.team1.data, self.team2.data])
 
     def get_bar_stats(self):
-        if not self.data.finished:
+        if self.data.status != 'finished':
             return 'The match is not over yet'
         return self.BarStats.calculate(self)
 
@@ -219,5 +219,5 @@ class Match:
 
     def _set_exclude(self):
         self._exclude = 0
-        if self.data.finished:
+        if self.data.status == 'finished':
             self._exclude = self.data.id

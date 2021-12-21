@@ -25,7 +25,7 @@ class Updater:
         calendar = self._add_calendar_to_db(season)
         for match in calendar:
             self._add_match_to_db(match)
-            if match.finished:
+            if match.status == 'finished':
                 self._add_protocol_to_db(match)
         self.ws_send_status('complete')
 
@@ -54,7 +54,7 @@ class Updater:
         self.ws_send_status('updating calendar dates')
         calendar = self.parser.parse_calendar(season)
         for match in calendar:
-            if skip_finished or match['match_id'] in self.ignore:
+            if skip_finished and match['status'] == 'finished' or match['match_id'] in self.ignore:
                 continue
             self.ws_send_status(f"updating match: {match['match_id']}")
             self.db.add_match(match)
@@ -66,7 +66,7 @@ class Updater:
         if match != 'match not updated':
             self.ws_send_status(f"updating match info: {match['match_id']}")
             db_match = self.db.add_match(match)
-            if db_match.finished:
+            if db_match.status == 'finished':
                 self._add_protocol_to_db(db_match)
 
     def _add_protocol_to_db(self, match):
@@ -77,7 +77,7 @@ class Updater:
     def _get_unfinished_matches_until_today(self):
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(1)
-        return self.model_list.match_model.objects.filter(finished=False).filter(date__lte=tomorrow).order_by('date')
+        return self.model_list.match_model.objects.filter(status='scheduled').filter(date__lte=tomorrow).order_by('date')
 
     def _get_first_unfinished_match_season(self):
-        return self.model_list.match_model.objects.filter(finished=False)[0].season
+        return self.model_list.match_model.objects.filter(status='scheduled')[0].season
