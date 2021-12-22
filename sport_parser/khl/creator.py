@@ -50,3 +50,6 @@ class Creator:
 
     def get_theme(self):
         return self.config.theme
+
+    def get_glossary(self):
+        return self.config.glossary

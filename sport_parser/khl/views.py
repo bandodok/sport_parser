@@ -37,6 +37,7 @@ class HockeyView(View):
             'league_title': self.get_league_title(),
             'league_logo': self.get_league_logo(),
             'config': self.config,
+            'glossary': self.get_glossary(),
 
             'url_stats': reverse_lazy(f'{self.config}:index_stats'),
             'url_team': reverse_lazy(f'{self.config}:index_team'),
@@ -59,6 +60,9 @@ class HockeyView(View):
 
     def get_league_logo(self):
         return f'/static/img/{self.creator.get_league_logo()}'
+
+    def get_glossary(self):
+        return self.creator.get_glossary()
 
 
 class StatsView(HockeyView):
