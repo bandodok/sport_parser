@@ -34,6 +34,11 @@ h3 {
     color: #FFFFFF;
 }
 
+/* цвет названия команды при наведении */
+.teams h4:hover {
+    color: #ff9818;
+    transition: color 0.2s;
+}
 
 /* цвет фона и текста в таблице */
 td {
@@ -150,4 +155,23 @@ button:hover {
 .ordering-checkbox:hover {
     background-color: rgba(176, 133, 64, 0.68);
     transition: none;
+}
+
+/* глоссарий и тултипы */
+
+/* цвет текста заголовков в глоссарии */
+.gloss_title {
+    color: white;
+}
+
+/* цвет текста описаний в глоссарии */
+.gloss_value {
+    color: white;
+}
+
+/* цвет текста, фона, границы тултипа */
+.tooltip {
+    color: rgb(255, 255, 255);
+    background-color: rgb(152, 120, 61);
+    border-color: #FFFFFF33;
 }

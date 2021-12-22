@@ -34,6 +34,11 @@ h3 {
     color: #FFFFFF;
 }
 
+/* цвет названия команды при наведении */
+.teams h4:hover {
+    color: #6393ff;
+    transition: color 0.2s;
+}
 
 /* цвет фона и текста в таблице */
 td {
@@ -105,7 +110,7 @@ p.last_score {
 }
 
 /* цвет текста надписи "Отменен" */
-.match_info p .postponed {
+#postponed {
     color: #ff0000;
 }
 
@@ -134,4 +139,24 @@ p.last_score {
 /* цвет левой полоски  */
 .progress-bar_left {
     background: #4c8cd5;
+}
+
+
+/* глоссарий и тултипы */
+
+/* цвет текста заголовков в глоссарии */
+.gloss_title {
+    color: white;
+}
+
+/* цвет текста описаний в глоссарии */
+.gloss_value {
+    color: white;
+}
+
+/* цвет текста, фона, границы тултипа */
+.tooltip {
+    color: rgb(255, 255, 255);
+    background-color: rgb(79, 118, 196);
+    border-color: #FFFFFF33;
 }
