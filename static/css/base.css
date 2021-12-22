@@ -238,7 +238,6 @@ table {
     table-layout: auto;
     width: 100%;
     border-collapse: collapse;
-    overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -413,4 +412,74 @@ p.last_score {
     font-size: 13px;
     word-spacing: 0.5em;
     white-space: nowrap;
+}
+
+#postponed {
+    color: #ff0000;
+    font-size: 15px;
+    word-spacing: 0.5em;
+    white-space: nowrap;
+}
+
+#glossButton {
+    text-align: right;
+    cursor: pointer;
+    margin-top: 0;
+}
+
+#glossary {
+    display: grid;
+    grid-template-columns: repeat(8, 150px);
+    grid-column-gap: 1em;
+    overflow: hidden;
+    padding: 0 40px;
+}
+
+#glossary.on {
+    height: 270px;
+    transition: 1s height;
+}
+
+#glossary.off {
+    height: 0;
+    transition: 1s height;
+}
+
+.gloss_title {
+    font-family: Montserrat, sans-serif;
+    color: white;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.gloss_value {
+    font-family: Montserrat, sans-serif;
+    color: white;
+    font-size: 12px;
+}
+
+
+.tooltip {
+    display: block;
+    opacity: 0;
+    position: absolute;
+    color: rgb(255, 255, 255);
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    font-weight: lighter;
+    background-color: rgb(96, 136, 168);
+    border-color: #FFFFFF33;
+    border-style: solid;
+    border-width: 1px;
+    max-height: 0;
+    width: 0;
+    top: 30px;
+    overflow: hidden;
+
+    transition-timing-function: linear;
+    transition-duration: 0s;
+    transition-property: opacity, min-height;
+    transition-delay: 0s;
+
+    padding: 0;
 }
