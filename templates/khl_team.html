@@ -55,6 +55,8 @@
 {% endblock %}
 
 {% block main_content %}
+    <span id="chart-stat_left"></span>
+    <span id="chart-stat_right"></span>
 <h3><a href="{{ url_stats }}{{ team.season_id }}">СЕЗОН {{ team.season_id }}</a></h3>
 <p class="update">{{ league_title }}</p>
     <div id="chart" class="charts"></div>

@@ -29,10 +29,11 @@ stat_values.forEach(function (item, i) {
     }
 });
 
-    var options = {
+let options = {
         curveType: 'function',
         'min-width': 1200,
         height: 400,
+        colors: [],
         legend: {
             position: 'bottom',
             alignment: 'center',
@@ -78,6 +79,9 @@ stat_values.forEach(function (item, i) {
 
 
 function drawChart(i) {
+    let left_color = getComputedStyle(document.getElementById('chart-stat_left')).color
+    let right_color =  getComputedStyle(document.getElementById('chart-stat_right')).color
+    options['colors'] = [left_color, right_color]
     let data = google.visualization.arrayToDataTable(stats_data[i]);
     let chart = new google.visualization.LineChart(document.getElementById('chart'));
     chart.draw(data, options);

@@ -141,6 +141,15 @@ p.last_score {
     background: #4c8cd5;
 }
 
+/* цвет гостевой команды  */
+#chart-stat_right {
+    color: #d93131;
+}
+
+/* цвет домашней команды  */
+#chart-stat_left {
+    color: #4c8cd5;
+}
 
 /* глоссарий и тултипы */
 
