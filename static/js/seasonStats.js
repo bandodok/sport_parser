@@ -54,9 +54,7 @@ let expandTimer = []
 
 function tooltip(id) {
     let element = document.getElementById(id)
-    if (id === "Team") {
-        return
-    }
+    if (!(id in GLOSSARY)) return
     element.style.transitionDelay = "0.5s, 0.7s, 0.5s, 0.5s, 0.5s, 0.7s, 0.7s"
     element.style.transitionProperty = "opacity, max-height, width, padding-left, padding-right, padding-top, padding-bottom"
     element.style.transitionDuration = "0s, 0.2s, 0.2s, 0.2s, 0.2s, 0.2s, 0.2s"
@@ -82,6 +80,7 @@ function tooltipExpand(id) {
     let element = document.getElementById(id)
 
     let extra = GLOSSARY[id]['long']
+    if (extra === "" || extra === undefined) return
     element.innerHTML = element.innerHTML + "<br><br>" + extra
 
     element.style.transitionTimingFunction = 'ease-in-out'
