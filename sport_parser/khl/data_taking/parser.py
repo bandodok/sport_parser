@@ -124,14 +124,6 @@ class Parser:
     def parse_finished_match(self, match, match_data):
         soup = match_data
 
-        extra_info = soup.find_all('li', class_="b-match_add_info_item")
-        if not extra_info:
-            return 'match not updated'
-
-        match_status = soup.find('dd', class_="b-period_score").text
-        if match_status != 'матч завершен':
-            return 'match not updated'
-
         penalties = False
         overtime = False
         score_status = soup.find('dt', class_="b-total_score").h3
@@ -140,6 +132,7 @@ class Parser:
         if 'ОТ' in score_status.text:
             overtime = True
 
+        extra_info = soup.find_all('li', class_="b-match_add_info_item")
         date_info = extra_info[0]
         arena_info = extra_info[1]
 
