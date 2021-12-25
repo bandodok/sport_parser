@@ -1,7 +1,5 @@
 from django.db import transaction
 
-from sport_parser.khl.models import ModelList
-
 
 class DB:
     def __init__(self, config):
