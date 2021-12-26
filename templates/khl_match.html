@@ -90,7 +90,9 @@
                             </p>
                         {% endif %}
                         <p class="arena" id="arena">{{ match.arena }}</p>
-                        <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
+                        {% if match.viewers %}
+                            <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
+                        {%  endif %}
                     {% elif match.status == 'postponed' %}
                         <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.date|time }}</p>
                         <p class="arena" id="postponed">Отменен<br>
