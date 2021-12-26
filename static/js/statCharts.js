@@ -4,6 +4,7 @@ google.charts.load('current', {'packages':['corechart']});
 function hideChart() {
     drawChart(0);
     addButtons();
+    setSidebarTopValue();
     }
 
 
@@ -103,4 +104,26 @@ function addButtons() {
         ul.innerHTML = ul.innerHTML + `<a onclick=drawChart(${i}) id="BchartSh"><li>${item}</li></a>`
     })
 
+}
+
+function setSidebarTopValue() {
+    let chart = document.getElementById('chart')
+    let sidebar = document.getElementById('rightSideBar')
+    let coords = getCoords(chart)
+
+    let top = coords['top'] - 236
+    sidebar.style.marginTop = `${top}px`
+}
+
+
+// координаты элемента в контексте документа
+function getCoords(elem) {
+  let box = elem.getBoundingClientRect();
+
+  return {
+    top: box.top + window.pageYOffset,
+    right: box.right + window.pageXOffset,
+    bottom: box.bottom + window.pageYOffset,
+    left: box.left + window.pageXOffset
+  };
 }

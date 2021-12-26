@@ -36,15 +36,11 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {% if match.status == 'finished' %}
-        <div style="margin-top: 810px">
-    {% else %}
-        <div style="margin-top: 380px">
-    {% endif %}
+<div id='rightSideBar'>
     <p>Параметры:</p>
-<ul class="chartList" id="chartList">
-</ul>
-    </div>
+    <ul class="chartList" id="chartList">
+    </ul>
+</div>
 {% endblock %}
 
 {% block main_content %}
