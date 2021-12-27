@@ -48,8 +48,16 @@ class Parser:
         dates = [date.b.text for date in dates]
 
         matches = match_soup.find_all('div', class_='m-future')
-        match_dict = {date: match_soup for date, match_soup in zip(dates, matches)}
+        match_dict = {}
+        for date, match_soup in zip(dates, matches):
+            if date in match_dict:
+                date = f'{date}_1'
+            match_dict[date] = match_soup
+
         for date, matches in match_dict.items():
+            if date.endswith('_1'):
+                date = date[:-2]
+
             match_list = matches.find_all('li', class_='b-wide_tile_item')
 
             string_date = self.formatter.date_format(date)
