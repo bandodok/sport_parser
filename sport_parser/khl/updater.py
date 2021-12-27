@@ -25,8 +25,6 @@ class Updater:
         calendar = self._add_calendar_to_db(season)
         for match in calendar:
             self._add_match_to_db(match)
-            if match.status == 'finished':
-                self._add_protocol_to_db(match)
         self.ws_send_status('complete')
 
     def ws_send_status(self, message):
