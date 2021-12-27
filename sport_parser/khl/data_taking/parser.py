@@ -148,7 +148,8 @@ class Parser:
         info = str(info).split('<br/>')
         time = info[1][:5]
         hours, minutes = time.split(':')
-        date = match.date
+        msk_delta = datetime.timedelta(hours=3)
+        date = match.date + msk_delta
         new_date = datetime.datetime(
             year=date.year,
             month=date.month,
