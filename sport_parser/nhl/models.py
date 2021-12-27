@@ -18,7 +18,7 @@ class NHLTeam(models.Model):
     name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=100)
     abbreviation = models.CharField(max_length=4)
-    img = models.CharField(max_length=100)
+    img = models.CharField(max_length=200)
     city = models.CharField(max_length=100)
     arena = models.CharField(max_length=100)
     division = models.CharField(max_length=100)
