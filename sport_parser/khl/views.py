@@ -2,9 +2,10 @@ from abc import abstractmethod
 
 from django.http import Http404
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.views import View
 
-from sport_parser.khl.config import Creator
+from sport_parser.khl.creator import Creator
 from sport_parser.khl.tasks import update, parse_season
 
 
@@ -35,6 +36,14 @@ class HockeyView(View):
             'title': self.get_title(),
             'league_title': self.get_league_title(),
             'league_logo': self.get_league_logo(),
+            'config': self.config,
+            'glossary': self.get_glossary(),
+
+            'url_stats': reverse_lazy(f'{self.config}:index_stats'),
+            'url_team': reverse_lazy(f'{self.config}:index_team'),
+            'url_match': reverse_lazy(f'{self.config}:index_match'),
+            'url_calendar': reverse_lazy(f'{self.config}:index_calendar'),
+            'url_calendar_api': reverse_lazy(f'{self.config}_calendar_api'),
         }
 
     def get_theme(self):
@@ -52,12 +61,15 @@ class HockeyView(View):
     def get_league_logo(self):
         return f'/static/img/{self.creator.get_league_logo()}'
 
+    def get_glossary(self):
+        return self.creator.get_glossary()
+
 
 class StatsView(HockeyView):
     config = 'khl'
     template = 'khl_stats.html'
 
-    def get_object(self, season_id):
+    def get_object(self, season_id=0):
         s = self.creator.get_season_class(season_id)
         if s.season_does_not_exist:
             raise Http404("Season does not exist")
@@ -77,7 +89,7 @@ class TeamView(HockeyView):
     config = 'khl'
     template = 'khl_team.html'
 
-    def get_object(self, team_id):
+    def get_object(self, team_id=0):
         return self.creator.get_team_class(team_id)
 
     def get_context(self, t):
@@ -94,7 +106,7 @@ class MatchView(HockeyView):
     config = 'khl'
     template = 'khl_match.html'
 
-    def get_object(self, match_id):
+    def get_object(self, match_id=0):
         return self.creator.get_match_class(match_id)
 
     def get_context(self, m):
@@ -122,7 +134,7 @@ class CalendarView(HockeyView):
     config = 'khl'
     template = 'khl_calendar.html'
 
-    def get_object(self, season_id):
+    def get_object(self, season_id=0):
         return self.creator.get_season_class(season_id)
 
     def get_context(self, s):

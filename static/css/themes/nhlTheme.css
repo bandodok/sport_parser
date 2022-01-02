@@ -16,7 +16,7 @@ nav a {
 
 /* цвет фона */
 .background {
-    background: #162447 repeat;
+    background: #222222 repeat;
 }
 
 /* цвет текста в сайдбарах */
@@ -26,7 +26,7 @@ li {
 
 /* цвет фона в сайдбарах при наведении */
 li:hover {
-    background-color: #47639f;
+    background-color: #8c6634;
 }
 
 /* цвет заголовков второго уровня (номер сезона в календаре и т.д.) */
@@ -36,37 +36,37 @@ h3 {
 
 /* цвет названия команды при наведении */
 .teams h4:hover {
-    color: #6393ff;
+    color: #ff9818;
     transition: color 0.2s;
 }
 
 /* цвет фона и текста в таблице */
 td {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(84, 84, 84, 0.66);
     color: #d9d2d2;
 }
 
 /* цвет фона и текста столбца команды в таблице при наведении */
 .urlToTeam:hover {
-    background-color: rgba(213, 37, 37, 0.3);
+    background-color: rgba(28, 28, 28, 0.45);
 	color: #ffffff;
 }
 
 /* цвет фона заголовков в таблице */
 th {
-  background-color: #47639f;
+  background-color: #8f6e49;
 }
 
 /* цвет строки при наведении в таблице */
 tr:hover {
-    background-color: rgba(218, 5, 5, 0.3);
+    background-color: rgb(0, 0, 0);
     transition: none;
 }
 
 /* цвет фона заголовка в таблице, по которому выполнена сортировка */
 th.sorted[data-order="1"],
 th.sorted[data-order="-1"] {
-    background-color: #2651a2;
+    background-color: #a87a18;
 }
 
 
@@ -91,12 +91,12 @@ footer {
 
 /* цвет фона рамки матча при наведении */
 .match:hover {
-    background-color: rgba(132, 169, 255, 0.42);
+    background-color: rgba(204, 131, 60, 0.52);
 }
 
 /* цвет текста команд в рамке матча при наведении */
 .match a:hover {
-    color: #6393ff;
+    color: #ff9818;
 }
 
 /* цвет текста даты и счета по периодам в центре рамки матча */
@@ -113,6 +113,7 @@ p.last_score {
 #postponed {
     color: #ff0000;
 }
+
 
 /* bar stats */
 
@@ -133,22 +134,36 @@ p.last_score {
 
 /* цвет правой полоски  */
 .progress-bar_right {
-    background: #d93131;
+    background: #e1e1e1;
 }
 
 /* цвет левой полоски  */
 .progress-bar_left {
-    background: #4c8cd5;
+    background: #ffa21f;
 }
 
 /* цвет гостевой команды  */
 #chart-stat_right {
-    color: #d93131;
+    color: #e1e1e1;
 }
 
 /* цвет домашней команды  */
 #chart-stat_left {
-    color: #4c8cd5;
+    color: #ffa21f;
+}
+
+/* calendar */
+
+/* цвет фона кнопок при наведении */
+button:hover {
+    background-color: rgba(176, 133, 64, 0.68);
+    transition: none;
+}
+
+/* цвет фона кнопки сортировки */
+.ordering-checkbox:hover {
+    background-color: rgba(176, 133, 64, 0.68);
+    transition: none;
 }
 
 /* глоссарий и тултипы */
@@ -166,6 +181,6 @@ p.last_score {
 /* цвет текста, фона, границы тултипа */
 .tooltip {
     color: rgb(255, 255, 255);
-    background-color: rgb(79, 118, 196);
+    background-color: rgb(152, 120, 61);
     border-color: #FFFFFF33;
 }

@@ -41,12 +41,19 @@ class BarStats:
     def get_comparison_stats(self, team1_stats, team2_stats):
         comparison_stats = {}
         for stat, team1_value, team2_value in zip(team1_stats.keys(), team1_stats.values(), team2_stats.values()):
+            sum_value = team1_value + team2_value
+            if not sum_value:
+                left_perc = 0
+                right_perc = 0
+            else:
+                left_perc = int(team1_value / sum_value * 100)
+                right_perc = int(team2_value / sum_value * 100)
             comparison_stats[stat] = {
                 'short_title': self.bar_stats_names[stat][0],
                 'long_title': self.bar_stats_names[stat][1],
                 'left_value': team1_value,
-                'left_perc': int(team1_value / (team1_value + team2_value) * 100),
+                'left_perc': left_perc,
                 'right_value': team2_value,
-                'right_perc': int(team2_value / (team1_value + team2_value) * 100)
+                'right_perc': right_perc
             }
         return comparison_stats
