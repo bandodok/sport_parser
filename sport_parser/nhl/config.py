@@ -8,8 +8,8 @@ class NHLConfig(Config):
     title = 'НХЛ'
     league_title = 'Национальная хоккейная лига'
     league_logo = 'NHL.webp'
-    background_image = 'tribuna.webp'  # заменить
-    theme = 'nhlTheme.css'  # заменить
+    background_image = 'tribuna.webp'
+    theme = 'nhlTheme.css'
     models = ModelList
     parser = NHLParser
     table_stats_names = {
@@ -29,7 +29,6 @@ class NHLConfig(Config):
         'blocks__a': ('Blocks(A)', 'int'),
         'blocks__e': ('Blocks%', 'percent'),
         'penalty': ('Penalty', 'int'),
-        'ppg': ('PPG', 'int'),
         'takeaways': ('TA', 'int'),
         'giveaways': ('GA', 'int'),
     }
@@ -55,7 +54,7 @@ class NHLConfig(Config):
         'sog__e': 'sog / sh * 100',
         'blocks__e': 'blocks / (blocks + blocks__a) * 100',
         'dev__e': '(1 - (sog__a / sh__a)) * 100',
-        'pdo__e': '((sh / (sh + sh__a)) + (sog / sh)) * 100',
+        'pdo__e': 'sog__e + dev__e',
     }
     bar_stats_names = {
         'sh': ('Sh', 'Все броски', 'int'),
@@ -65,7 +64,6 @@ class NHLConfig(Config):
         'hits': ('Hits', 'Силовые приемы', 'int'),
         'blocks': ('Blocks', 'Блокированные броски', 'int'),
         'penalty': ('Penalty', 'Штрафное время', 'int'),
-        'ppg': ('PPG', 'Голы в большинстве', 'int'),
         'takeaways': ('TA', 'Отборы', 'int'),
         'giveaways': ('GA', 'Потери', 'int'),
     }
@@ -80,4 +78,35 @@ class NHLConfig(Config):
         'ppg': ('PPG', 'Голы в большинстве', 'int'),
         'takeaways': ('TA', 'Отборы', 'int'),
         'giveaways': ('GA', 'Потери', 'int'),
+    }
+    glossary = {
+        'Sh': {'short': 'Все броски',
+               'long': 'Все броски команды в сторону ворот соперника, включая броски в створ, промахи,'
+                       ' блокированные броски и голы'},
+        'Sh(A)': {'short': 'Все броски соперника',
+                  'long': 'Все броски команды соперника в сторону ворот, включая броски в створ, промахи,'
+                          ' блокированные броски и голы'},
+        'Sh%': {'short': 'Процент бросков',
+                'long': 'Процент всех бросков команды от общего количества <br>'
+                        'Sh% = (Sh / (Sh + Sh(A))) * 100'},
+        'SoG': {'short': 'Броски в створ', 'long': ''},
+        'SoG(A)': {'short': 'Броски в створ соперника', 'long': ''},
+        'AQ': {'short': 'Качество атаки',
+               'long': 'Показывает, какая часть бросков доходит до створа ворот соперника <br>'
+                       'AQ = (SoG / (Sh + Sh(A))) * 100'},
+        'G': {'short': 'Голы', 'long': ''},
+        'G(A)': {'short': 'Голы соперника', 'long': ''},
+        'FaceOff%': {'short': 'Выигранные вбрасывания', 'long': ''},
+        'DEV%': {'short': 'Разрушение атак соперника',
+                 'long': 'Показывает, какая часть бросков соперника блокируется или идет мимо <br>'
+                         'DEV% = (1 - (SoG(A) / Sh(A))) * 100'},
+        'PDO%': {'short': 'Оборона + атака', 'long': 'Сумма показателей качества атаки и разрушения атак соперника'},
+        'Hits': {'short': 'Силовые приемы', 'long': ''},
+        'Blocks': {'short': 'Блокированные броски', 'long': ''},
+        'Blocks(A)': {'short': 'Блокированные броски соперника', 'long': ''},
+        'Blocks%': {'short': 'Процент блокированных бросков', 'long': ''},
+        'Penalty': {'short': 'Удаления', 'long': ''},
+        'PPG': {'short': 'Голы в большинстве', 'long': ''},
+        'TA': {'short': 'Отборы', 'long': ''},
+        'GA': {'short': 'Потери', 'long': ''},
     }
