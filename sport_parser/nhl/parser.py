@@ -11,7 +11,9 @@ class NHLParser(Parser):
         dates_list = dates_dict.get('dates')
         games_list = []
         for dates in [date.get('games') for date in dates_list]:
-            games_list.extend([game for game in dates])
+            for game in dates:
+                if game.get('gameType') not in ('PR', 'A', 'WA', 'O', 'WCOH_EXH', 'WCOH_PRELIM', 'WCOH_FINAL'):
+                    games_list.append(game)
 
         teams_list = [game.get('teams') for game in games_list]
         team_ids_list = []
