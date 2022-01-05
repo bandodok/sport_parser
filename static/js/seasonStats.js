@@ -67,7 +67,7 @@ function tooltip(id) {
     element.style.paddingTop = '10px'
     element.style.paddingBottom = '10px'
 
-    setTimeout(computeStyle, 900, element)
+    expandTimer[`${id}_style`] = setTimeout(computeStyle, 900, element)
     expandTimer[id] = setTimeout(tooltipExpand, 2500, id);
 }
 
@@ -92,6 +92,12 @@ function tooltipExpand(id) {
 
 function tooltipHide(id) {
     let element = document.getElementById(id)
+
+    clearTimeout(expandTimer[id])
+    clearTimeout(expandTimer[`${id}_style`])
+
+    element.innerHTML = GLOSSARY[id]['short']
+
     element.style.transitionDelay = "0s"
     element.style.transitionProperty = "opacity, max-height, width, padding-left, padding-right, padding-top, padding-bottom"
     element.style.transitionDuration = "0s"
@@ -102,6 +108,4 @@ function tooltipHide(id) {
     element.style.paddingRight = '0'
     element.style.paddingTop = '0'
     element.style.paddingBottom = '0'
-    element.innerHTML = GLOSSARY[id]['short']
-    clearTimeout(expandTimer[id])
 }
