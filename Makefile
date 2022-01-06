@@ -11,4 +11,7 @@ shell:
 	python manage.py shell_plus
 
 celery:
-	celery -A sport_parser worker -l info -P eventlet
+	celery -A sport_parser worker -l info -P eventlet --concurrency=1
+
+celery_beat:
+	celery -A sport_parser beat -l info

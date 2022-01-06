@@ -1,7 +1,5 @@
 import datetime
 
-from .formatter import Formatter
-
 
 class ChartStats:
     def __init__(self, *, config):
@@ -10,6 +8,8 @@ class ChartStats:
 
     def calculate(self, team_list):
         stat_list = [*self.stat_names.keys()]
+        short_name_list = [value[0] for value in self.stat_names.values()]
+        full_name_list = [value[1] for value in self.stat_names.values()]
         if len(team_list) > 1:
             team_stats = self.get_team_stats_per_day(team_list[0], stat_list)
             opponent_stats = self.get_team_stats_per_day(team_list[1], stat_list)
@@ -18,8 +18,8 @@ class ChartStats:
         else:
             team_stats = self.get_team_stats_per_day(team_list, stat_list)
             opponent_stats = self.get_opp_stats_per_day(team_list, stat_list)
-            self_headers = [value[0] for value in self.stat_names.values()]
-            opponent_headers = [f'{value[0]}(A)' for value in self.stat_names.values()]
+            self_headers = short_name_list
+            opponent_headers = [f'{value}(A)' for value in short_name_list]
 
         while len(team_stats) != len(opponent_stats):
             if len(team_stats) < len(opponent_stats):
@@ -33,7 +33,7 @@ class ChartStats:
             value.extend(opponent_stats[index])
             output_stats.append(value)
 
-        return output_stats
+        return [output_stats, short_name_list, full_name_list]
 
     def get_team_stats_per_day(self, team, stat_list):
         protocol_list = team.get_self_protocol_list()

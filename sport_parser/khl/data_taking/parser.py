@@ -1,4 +1,8 @@
+import datetime
+import json
 import tempfile
+
+import pytz
 
 from sport_parser.khl.data_analysis.formatter import Formatter
 import os
@@ -44,10 +48,23 @@ class Parser:
         dates = [date.b.text for date in dates]
 
         matches = match_soup.find_all('div', class_='m-future')
-        match_dict = {date: match_soup for date, match_soup in zip(dates, matches)}
+        match_dict = {}
+        for date, match_soup in zip(dates, matches):
+            if date in match_dict:
+                date = f'{date}_1'
+            match_dict[date] = match_soup
+
         for date, matches in match_dict.items():
+            if date.endswith('_1'):
+                date = date[:-2]
+
             match_list = matches.find_all('li', class_='b-wide_tile_item')
-            new_date = self.formatter.date_format(date)
+
+            string_date = self.formatter.date_format(date)
+            msk = pytz.timezone('Europe/Moscow')
+            date = datetime.datetime.strptime(string_date, '%Y-%m-%d')
+            date_msk = msk.localize(date)
+
             for match in match_list:
                 href = match.find('dl', class_='b-title-option').div.div.ul.li.a['href']
                 match_id = href.split('/')[3]
@@ -59,61 +76,61 @@ class Parser:
                 guest_team = match.find('dl', class_='b-details m-club m-rightward').dd.h5.a.text
                 match_info = {
                     'match_id': match_id,
-                    'date': new_date,
+                    'date': date_msk,
                     'home_team': home_team,
                     'guest_team': guest_team,
                     'season': season
                 }
+
+                match_extra_info = {
+                    'penalties': False,
+                    'overtime': False
+                }
                 score = match.find('dl', class_='b-score')
                 if '+' in score.dt.h3.text:
-                    continue
-                if '—' in score.dt.h3.text:
-                    finished = True
-                    match_extra_info = {
-                        'penalties': False,
-                        'overtime': False
-                    }
+                    status = 'postponed'
+                elif '—' in score.dt.h3.text:
+                    status = 'finished'
                 else:
-                    finished = False
+                    status = 'scheduled'
                     time = score.dt.h3.text.split(' ')[0]
+                    hours, minutes = time.split(':')
+                    timedelta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
+                    match_info['date'] = date_msk + timedelta
                     city = score.dd.p.text
                     match_extra_info = {
                         'city': city,
-                        'time': time,
-                        'penalties': False,
-                        'overtime': False
                     }
 
                 match_info.update(match_extra_info)
                 match_info.update({
-                    'finished': finished,
+                    'status': status,
                 })
                 output.append(match_info)
         return output
 
     def parse_match(self, match):
-        if match.finished:
-            return self.parse_finished_match(match)
-        return self.parse_unfinished_match(match)
-
-    def parse_unfinished_match(self, match):
-        return {
-            'match_id': match.id,
-            'season': match.season,
-            'finished': False
-        }
-
-    def parse_finished_match(self, match):
         url = f'https://text.khl.ru/text/{match.id}.html'
         soup = self.get_request_content(url)
 
         extra_info = soup.find_all('li', class_="b-match_add_info_item")
         if not extra_info:
-            return 'match not updated'
+            return self.parse_unfinished_match(match)
 
         match_status = soup.find('dd', class_="b-period_score").text
         if match_status != 'матч завершен':
-            return 'match not updated'
+            return self.parse_unfinished_match(match)
+
+        return self.parse_finished_match(match, soup)
+
+    def parse_unfinished_match(self, match):
+        return {
+            'match_id': match.id,
+            'season': match.season,
+        }
+
+    def parse_finished_match(self, match, match_data):
+        soup = match_data
 
         penalties = False
         overtime = False
@@ -123,12 +140,25 @@ class Parser:
         if 'ОТ' in score_status.text:
             overtime = True
 
+        extra_info = soup.find_all('li', class_="b-match_add_info_item")
         date_info = extra_info[0]
         arena_info = extra_info[1]
 
         info = date_info.find_all('span')[1]
         info = str(info).split('<br/>')
         time = info[1][:5]
+        hours, minutes = time.split(':')
+        msk_delta = datetime.timedelta(hours=3)
+        date = match.date + msk_delta
+        new_date = datetime.datetime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=int(hours),
+            minute=int(minutes)
+        )
+        msk = pytz.timezone('Europe/Moscow')
+        date_msk = msk.localize(new_date)
 
         info = arena_info.find_all('span')[1]
 
@@ -149,11 +179,11 @@ class Parser:
             'season': match.season,
             'arena': arena,
             'city': city,
-            'time': time,
+            'date': date_msk,
             'viewers': viewers,
             'penalties': penalties,
             'overtime': overtime,
-            'finished': True
+            'status': 'finished'
         }
 
     def parse_protocol(self, match):
@@ -305,6 +335,11 @@ class Parser:
     def get_request_content(url):
         r = requests.get(url)
         return BeautifulSoup(r.content, 'html.parser')
+
+    @staticmethod
+    def get_api_request_content(url):
+        r = requests.get(url).content
+        return json.loads(r)
 
     @staticmethod
     def get_selenium_content(url):

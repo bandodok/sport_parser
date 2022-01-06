@@ -3,7 +3,7 @@ var NEXT_PAGE_URL = 2
 
 
 initCalendar = () => {
-    let url = '/api/khl/calendar/?season=' + SEASON;
+    let url = `/api/calendar/?config=${CONFIG}&season=${SEASON}`;
     let f = new XMLHttpRequest();
     f.open('GET', url);
     f.responseType = 'json';
@@ -61,10 +61,14 @@ window.addEventListener( "load", function () {
     a = fd.next()
     var params = "?"
     while (a['done'] === false) {
+        if (a['value'][1] === "") {
+            a = fd.next()
+            continue
+        }
         params += a['value'][0] + "=" + a['value'][1] + "&"
         a = fd.next()
     }
-    url = "/api/khl/calendar/" + params + "season=" + SEASON
+    url = `/api/calendar/${params}config=${CONFIG}&season=${SEASON}`
     XHR.open( "GET", url );
     XHR.responseType = 'json';
 

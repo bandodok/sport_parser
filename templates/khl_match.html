@@ -19,8 +19,8 @@
 
 {% block nav %}
     {{ block.super }}
-    <a href="{% url 'stats' match.season %}">Сезоны</a>
-    <a href="{% url 'calendar' match.season %}">Календарь</a>
+    <a href="{{ url_stats }}{{ match.season }}">Сезоны</a>
+    <a href="{{ url_calendar }}{{ match.season }}">Календарь</a>
 
 {% endblock %}
 
@@ -36,30 +36,21 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {% if match.finished == True %}
-        <div style="margin-top: 810px">
-    {% else %}
-        <div style="margin-top: 380px">
-    {% endif %}
+<div id='rightSideBar'>
     <p>Параметры:</p>
-<ul class="chartList">
-    <a onclick=filterChart('chartSh') id="BchartSh"><li>Sh</li></a>
-    <a onclick=filterChart('chartSog') id="BchartSog"><li>Sog</li></a>
-    <a onclick=filterChart('chartG') id="BchartG"><li>G</li></a>
-    <a onclick=filterChart('chartBlocks') id="BchartBlocks"><li>Blocks</li></a>
-    <a onclick=filterChart('chartHits') id="BchartHits"><li>Hits</li></a>
-    <a onclick=filterChart('chartPenalty') id="BchartPenalty"><li>Penalty</li></a>
-    <a onclick=filterChart('chartTime_a') id="BchartTime_a"><li>TimeA</li></a>
-</ul>
-    </div>
+    <ul class="chartList" id="chartList">
+    </ul>
+</div>
 {% endblock %}
 
 {% block main_content %}
+    <span id="chart-stat_left"></span>
+    <span id="chart-stat_right"></span>
     <div class="teams">
         <div class="team1_info">
             <p class="header_city">Конференция «{{ team1.data.conference }}»</p>
             <p class="header_city">Дивизион {{ team1.data.division }}</p>
-            <a href="{% url 'team' team1.data.id %}"><h4 class="header_title">{{ team1.data.name }}</h4></a>
+            <a href="{{ url_team }}{{ team1.data.id }}"><h4 class="header_title">{{ team1.data.name }}</h4></a>
             <p class="header_city">{{ team1.data.city }}</p>
             <p class="header_city">{{ team1.data.arena }}</p>
         </div>
@@ -69,7 +60,7 @@
             <div class="score">
                 {% language 'ru' %}
                 <p class="header_city">{{ match.date|date:'j E Y' }}</p>
-                    {% if match.finished == True %}
+                    {% if match.status == 'finished' %}
                         <p id="score_time">{{ team1.score.match }} - {{ team2.score.match }}</p>
 
                         {% if overtime == True %}
@@ -95,10 +86,16 @@
                             </p>
                         {% endif %}
                         <p class="arena" id="arena">{{ match.arena }}</p>
-                        <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
-                        {%  else %}
-                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.time }}</p>
+                        {% if match.viewers %}
+                            <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
+                        {%  endif %}
+                    {% elif match.status == 'postponed' %}
+                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.date|time }}</p>
+                        <p class="arena" id="postponed">Отменен<br>
+                    {% else %}
+                        <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.date|time }}</p>
                     {% endif %}
+
                 {% endlanguage %}
             </div>
 
@@ -107,14 +104,14 @@
         <div class="team2_info">
             <p class="header_city">Конференция «{{ team2.data.conference }}»</p>
             <p class="header_city">Дивизион {{ team2.data.division }}</p>
-            <a href="{% url 'team' team2.data.id %}"><h4 class="header_title">{{ team2.data.name }}</h4></a>
+            <a href="{{ url_team }}{{ team2.data.id }}"><h4 class="header_title">{{ team2.data.name }}</h4></a>
             <p class="header_city">{{ team2.data.city }}</p>
             <p class="header_city">{{ team2.data.arena }}</p>
         </div>
     </div>
 
 
-{% if match.finished == True %}
+{% if match.status == 'finished' %}
     <h3></h3>
     {% language 'ru' %}
 <div class="match_stats">
@@ -167,13 +164,7 @@
         <h3 id="chartTitle1">Все броски</h3><h3 id="chartTitle2">Sh</h3>
     </div>
 
-    <div id="chartSh" class="charts"></div>
-    <div id="chartSog" class="charts"></div>
-    <div id="chartG" class="charts"></div>
-    <div id="chartBlocks" class="charts"></div>
-    <div id="chartHits" class="charts"></div>
-    <div id="chartPenalty" class="charts"></div>
-    <div id="chartTime_a" class="charts"></div>
+    <div id="chart" class="charts"></div>
 
     <h3>Последние матчи</h3>
     <div class="lastMatches">
