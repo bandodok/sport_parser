@@ -106,7 +106,6 @@ class NHLConfig(Config):
         'Blocks(A)': {'short': 'Блокированные броски соперника', 'long': ''},
         'Blocks%': {'short': 'Процент блокированных бросков', 'long': ''},
         'Penalty': {'short': 'Удаления', 'long': ''},
-        'PPG': {'short': 'Голы в большинстве', 'long': ''},
         'TA': {'short': 'Отборы', 'long': ''},
         'GA': {'short': 'Потери', 'long': ''},
     }
