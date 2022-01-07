@@ -13,7 +13,7 @@ class Updater:
 
     def update(self):
         season = self._get_first_unfinished_match_season()
-        self._add_calendar_to_db(season, skip_finished=True)
+        self._add_calendar_to_db(season, skip_finished=True, add_postponed=True)
 
         self.ws_send_status('updating matches')
         self._update_finished_matches()
@@ -48,9 +48,11 @@ class Updater:
         self.ws_send_status('teams updated')
         return self.model_list.team_model.objects.filter(season=season)
 
-    def _add_calendar_to_db(self, season, *, skip_finished=False):
+    def _add_calendar_to_db(self, season, *, skip_finished=False, add_postponed=False):
         self.ws_send_status('updating calendar dates')
         calendar = self.parser.parse_calendar(season)
+        if add_postponed:
+            self._postpone_missed_matches(calendar)
         for match in calendar:
             if skip_finished and match['status'] == 'finished' or match['match_id'] in self.ignore:
                 continue
@@ -72,6 +74,9 @@ class Updater:
         protocol = self.parser.parse_protocol(match)
         self.db.add_protocol(protocol)
 
+    def _get_unfinished_matches_id(self):
+        return self.model_list.match_model.objects.filter(status='scheduled').values_list('id', flat=True)
+
     def _get_unfinished_matches_until_today(self):
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(1)
@@ -79,3 +84,16 @@ class Updater:
 
     def _get_first_unfinished_match_season(self):
         return self.model_list.match_model.objects.filter(status='scheduled')[0].season
+
+    def _postpone_missed_matches(self, calendar) -> None:
+        """Задает статус 'postponed' для матчей, которые убрали из календаря"""
+        calendar_ids = [match['match_id'] for match in calendar]
+        db_ids = self._get_unfinished_matches_id()
+        season = calendar[0]['season']
+        for match_id in db_ids:
+            if str(match_id) not in calendar_ids:
+                self.db.add_match({
+                    'match_id': match_id,
+                    'status': 'postponed',
+                    'season': season
+                })
