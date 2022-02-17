@@ -59,6 +59,11 @@ class Updater:
             self.ws_send_status(f"updating match: {match['match_id']}")
             self.db.add_match(match)
         self.ws_send_status('calendar updated')
+
+        self.ws_send_status('updating postponed matches')
+        self._update_postponed(calendar)
+        self.ws_send_status('complete')
+
         return self.model_list.match_model.objects.filter(season=season)
 
     def _add_match_to_db(self, match):
@@ -85,6 +90,9 @@ class Updater:
     def _get_first_unfinished_match_season(self):
         return self.model_list.match_model.objects.filter(status='scheduled')[0].season
 
+    def _get_postponed_matches(self, season):
+        return self.model_list.match_model.objects.filter(status='postponed').filter(season=season)
+
     def _postpone_missed_matches(self, calendar) -> None:
         """Задает статус 'postponed' для матчей, которые убрали из календаря"""
         calendar_ids = [match['match_id'] for match in calendar]
@@ -97,3 +105,13 @@ class Updater:
                     'status': 'postponed',
                     'season': season
                 })
+
+    def _update_postponed(self, calendar) -> None:
+        """Обновляет информацию по отмененным матчам"""
+        calendar_dict = {match['match_id']: match for match in calendar}
+        season = calendar[0]['season']
+        postponed_matches = self._get_postponed_matches(season)
+        for match in postponed_matches:
+            if match.id in calendar_dict:
+                if calendar_dict[match.id]['status'] != 'postponed':
+                    self._add_match_to_db(match)
