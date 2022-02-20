@@ -38,16 +38,18 @@ class Parser:
 
         output = []
 
-        url = f'https://www.khl.ru/calendar/{season.external_id}/00/'
-        soup = webdriver(url)
-        match_soup = soup.find('div', id='tab-calendar-all')
-        if not match_soup:
-            match_soup = soup.find('div', id='tab-calendar-last')
+        regular_url = f'https://www.khl.ru/calendar/{season.external_id}/00/'
+        playoff_url = f'https://www.khl.ru/calendar/{season.external_id + 1}/00/'
+        regular_soup = webdriver(regular_url)
+        playoff_soup = webdriver(playoff_url)
 
-        dates = match_soup.find_all('div', class_='b-final_cup_date')
-        dates = [date.b.text for date in dates]
+        dates, matches = self._get_dates_and_matches(regular_soup)
 
-        matches = match_soup.find_all('div', class_='m-future')
+        if playoff_soup != 'redirected':
+            playoff_dates, playoff_matches = self._get_dates_and_matches(playoff_soup)
+            dates = [*dates, *playoff_dates]
+            matches = [*matches, *playoff_matches]
+
         match_dict = {}
         for date, match_soup in zip(dates, matches):
             if date in match_dict:
@@ -293,7 +295,8 @@ class Parser:
 
         return self._row_update_type(row_home), self._row_update_type(row_guest)
 
-    def _row_update_type(self, row):
+    @staticmethod
+    def _row_update_type(row):
         """Приводит некорректные типы данных в протоколах к корректному
         для восприятия базой данных"""
         for stat, value in row.items():
@@ -357,7 +360,9 @@ class Parser:
 
     @staticmethod
     def _calendar_request_content(url):
-        r = requests.get(url)
+        r = requests.get(url, allow_redirects=False)
+        if r.status_code == 301:
+            return 'redirected'
         with tempfile.TemporaryDirectory() as tmpdirname:
             with open(f'{tmpdirname}/file1.txt', 'w', encoding='utf-8') as f:
                 a = r.text.replace('<!--div align="center" style="margin-top: 1em;">', ' ')
@@ -365,3 +370,17 @@ class Parser:
             with open(f'{tmpdirname}/file1.txt', 'rb') as f:
                 soup = BeautifulSoup(f, 'html.parser')
             return soup
+
+    @staticmethod
+    def _get_dates_and_matches(soup):
+        match_soup = soup.find('div', id='tab-calendar-all')
+        if not match_soup:
+            match_soup = soup.find('div', id='tab-calendar-last')
+        if not match_soup:
+            match_soup = soup.find('div', id='tab-calendar-future')
+
+        dates = match_soup.find_all('div', class_='b-final_cup_date')
+        dates = [date.b.text for date in dates]
+
+        matches = match_soup.find_all('div', class_='m-future')
+        return dates, matches
