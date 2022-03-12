@@ -4,4 +4,6 @@
 db.sqlite3
 __pycache__/
 secret_key.txt
-sport_parser/.env
+.env*
+postgresql/
+collected_static
