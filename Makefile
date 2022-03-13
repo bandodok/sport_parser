@@ -1,3 +1,5 @@
+include deployment/test/.env
+
 makemigrations:
 	python manage.py makemigrations
 
@@ -15,3 +17,11 @@ celery:
 
 celery_beat:
 	celery -A sport_parser beat -l info
+
+
+
+# dev app
+
+run:
+	python deployment/dev/sql_render.py > deployment/dev/_init.sql
+	docker-compose -f deployment/dev/docker-compose.yml -p sport_parser up --abort-on-container-exit
