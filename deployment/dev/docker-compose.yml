@@ -18,7 +18,7 @@ services:
     build:
       context: ../..
       dockerfile: deployment/dev/Dockerfile
-    command: bash -c "sleep 10 && python manage.py migrate && python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker"
+    command: bash -c "sleep 10 && python manage.py migrate && python init_db.py && python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker"
     env_file:
       - .env
     volumes:
