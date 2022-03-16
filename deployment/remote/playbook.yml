@@ -1,0 +1,94 @@
+- hosts: all
+
+  tasks:
+    - name: Install required system packages
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools' ]
+      become: yes
+      tags: init
+
+    - name: Install docker
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      loop: ['docker', 'docker-compose']
+      become: yes
+      tags: init
+
+    - name: Get services list
+      ansible.builtin.service_facts:
+      tags: init
+
+    - name: Stopping nginx service
+      ansible.builtin.systemd:
+        name: nginx
+        state: stopped
+      become: yes
+      when: "'nginx' in ansible_facts.services"
+      tags: init
+
+    - name: remove all files if exist
+      ansible.builtin.shell:
+        removes: /home/sport_parser
+        cmd: "rm -rf /home/sport_parser"
+      become: yes
+      tags: remove_all
+
+    - name: remove db files if exist
+      ansible.builtin.shell:
+        removes: /home/sport_parser/postgresql
+        cmd: "rm -rf /home/sport_parser/postgresql"
+      become: yes
+      tags: remove_db
+
+    - name: remove app files if exist
+      ansible.builtin.shell:
+        removes: /home/sport_parser/app
+        cmd: "rm -rf /home/sport_parser/app"
+      become: yes
+      tags: remove_app
+
+    - name: create project folder
+      ansible.builtin.shell:
+        creates: /home/sport_parser
+        cmd: "mkdir /home/sport_parser -m 777"
+      become: yes
+      tags: create_folders
+
+    - name: create app folder
+      ansible.builtin.shell:
+        creates: /home/sport_parser/app
+        cmd: "mkdir /home/sport_parser/app -m 777"
+      become: yes
+      tags: create_folders
+
+    - name: create test env file
+      ansible.builtin.copy:
+        src: .env
+        dest: /home/sport_parser/app/.env
+      tags: create_test_env
+
+    - name: create prod env file
+      ansible.builtin.copy:
+        src: .env.prod
+        dest: /home/sport_parser/app/.env
+      tags: create_prod_env
+
+    - name: copy files
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      vars:
+        - server_ip: "{{ lookup('env','SERVER_IP') }}"
+        - DB_USER: "{{ lookup('env','DB_USER') }}"
+        - DB_PASSWORD: "{{ lookup('env','DB_PASSWORD') }}"
+        - DB_NAME: "{{ lookup('env','DB_NAME') }}"
+      loop:
+        - { src: nginx.conf.j2, dest: /home/sport_parser/app/nginx_test.conf }
+        - { src: ../init.sql.j2, dest: /home/sport_parser/_init.sql }
+        - { src: docker-compose.yml, dest: /home/sport_parser/app/docker-compose.yml }
+      tags: copy_files

@@ -1,0 +1,71 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx_test.conf:/etc/nginx/nginx.conf
+      - static_files:/home/bandodok/static/
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+
+  app:
+    image: bandodok/sport_parser_app:${TAG}
+    command: bash -c "sleep 10 && python manage.py migrate && python manage.py collectstatic -c --no-input && python init_db.py && python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker"
+    env_file:
+      - .env
+    volumes:
+      - static_files:/home/bandodok/sport_parser/collected_static/static/
+    depends_on:
+      - db
+      - redis
+
+  ws:
+    image: bandodok/sport_parser_app
+    command: bash -c "python -m daphne sport_parser.asgi:application -b 0.0.0.0 -p 8080"
+    env_file:
+      - .env
+    depends_on:
+      - app
+      - db
+      - redis
+
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: $${DB_USER}
+      POSTGRES_PASSWORD: $${DB_PASSWORD}
+      POSTGRES_DB: $${DB_NAME}
+    volumes:
+      - ../postgresql/data:/var/lib/postgresql/data
+      - ../_init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:alpine
+
+  celery:
+    image: bandodok/sport_parser_app
+    command: python -m celery -A sport_parser worker -l info --concurrency=1
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - app
+      - db
+
+  celery-beat:
+    image: bandodok/sport_parser_app
+    command: python -m celery -A sport_parser worker --beat -l info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - app
+      - db
+
+volumes:
+  database_data:
+  static_files:
