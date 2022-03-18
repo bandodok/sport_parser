@@ -46,6 +46,7 @@ init_server:
 deploy_app:
 	TAG=${TAG} \
 	SERVER_IP=${SERVER_IP} \
+	HOST_NAME=${HOST_NAME} \
 	SERVER_USERNAME=${SERVER_USERNAME} \
 	DB_NAME=${DB_NAME} \
 	DB_USER=${DB_USER} \
