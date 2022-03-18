@@ -1,6 +1,7 @@
 import datetime
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.db.models import Max
 
 
 class Updater:
@@ -12,12 +13,14 @@ class Updater:
         self.channel_layer = get_channel_layer()
 
     def update(self):
-        season = self._get_first_unfinished_match_season()
-        self._add_calendar_to_db(season, skip_finished=True, add_postponed=True)
-
-        self.ws_send_status('updating matches')
-        self._update_finished_matches()
-        self.ws_send_status('matches updated')
+        season, new_season = self._get_first_unfinished_match_season()
+        if new_season:
+            self.parse_season(season)
+        else:
+            self._add_calendar_to_db(season, skip_finished=True, add_postponed=True)
+            self.ws_send_status('updating matches')
+            self._update_finished_matches()
+            self.ws_send_status('matches updated')
 
     def parse_season(self, season_id):
         season = self.model_list.season_model.objects.get(id=season_id)
@@ -88,7 +91,14 @@ class Updater:
         return self.model_list.match_model.objects.filter(status='scheduled').filter(date__lte=tomorrow).order_by('date')
 
     def _get_first_unfinished_match_season(self):
-        return self.model_list.match_model.objects.filter(status='scheduled')[0].season
+        season = self.model_list.match_model.objects.filter(status='scheduled')
+        if not season:
+            season = self.model_list.season_model.objects.aggregate(Max('id'))['id__max']
+            new_season = True
+        else:
+            season = season[0].season
+            new_season = False
+        return season, new_season
 
     def _get_postponed_matches(self, season):
         return self.model_list.match_model.objects.filter(status='postponed').filter(season=season)
