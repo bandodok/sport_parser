@@ -27,6 +27,7 @@
       ansible.builtin.systemd:
         name: nginx
         state: stopped
+        enabled: no
       become: yes
       when: "'nginx' in ansible_facts.services"
       tags: init
@@ -88,7 +89,24 @@
         - DB_PASSWORD: "{{ lookup('env','DB_PASSWORD') }}"
         - DB_NAME: "{{ lookup('env','DB_NAME') }}"
       loop:
-        - { src: nginx.conf.j2, dest: /home/sport_parser/app/nginx_test.conf }
+        - { src: nginx.conf.j2, dest: /home/sport_parser/app/_nginx.conf }
         - { src: ../init.sql.j2, dest: /home/sport_parser/_init.sql }
         - { src: docker-compose.yml, dest: /home/sport_parser/app/docker-compose.yml }
+      tags: copy_files
+
+    - name: Get certificate
+      ansible.builtin.shell:
+        removes: "/etc/letsencrypt/live/{{ lookup('env','HOST_NAME') }}"
+        cmd: "ls /etc/letsencrypt/live/{{ lookup('env','HOST_NAME') }}"
+      become: yes
+      register: cert
+      tags: copy_files
+
+    - name: copy nginx ssl file
+      ansible.builtin.template:
+        src: nginx_ssl.conf.j2
+        dest: /home/sport_parser/app/_nginx.conf
+      vars:
+        - host_name: "{{ lookup('env','HOST_NAME') }}"
+      when: "'fullchain.pem' in cert.stdout"
       tags: copy_files
