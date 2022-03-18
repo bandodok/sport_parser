@@ -4,7 +4,8 @@ services:
   nginx:
     image: nginx
     volumes:
-      - ./nginx_test.conf:/etc/nginx/nginx.conf
+      - ./_nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt:/etc/letsencrypt
       - static_files:/home/bandodok/static/
     ports:
       - "80:80"
