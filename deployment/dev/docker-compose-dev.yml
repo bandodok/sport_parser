@@ -17,8 +17,18 @@ services:
   app:
     build:
       context: ../..
-      dockerfile: Dockerfile_dev
-    command: bash -c "sleep 10 && python manage.py migrate && python init_db.py && python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker"
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python manage.py migrate;
+        python init_db.py;
+        python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker;
+      "
     env_file:
       - .env
     volumes:
@@ -30,8 +40,16 @@ services:
   ws:
     build:
       context: ../..
-      dockerfile: Dockerfile_dev
-    command: bash -c "python -m daphne sport_parser.asgi:application -b 0.0.0.0 -p 8080"
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m daphne sport_parser.asgi:application -b 0.0.0.0 -p 8080;
+      "
     env_file:
       - .env
     volumes:
@@ -57,8 +75,16 @@ services:
   celery:
     build:
       context: ../..
-      dockerfile: Dockerfile_dev
-    command: python -m celery -A sport_parser worker -l info --concurrency=1
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m celery -A sport_parser worker -l info --concurrency=1;
+      "
     env_file:
       - .env
     volumes:
@@ -71,8 +97,16 @@ services:
   celery-beat:
     build:
       context: ../..
-      dockerfile: Dockerfile_dev
-    command: python -m celery -A sport_parser worker --beat -l info
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z app 8000;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m celery -A sport_parser beat -l info;
+      "
     env_file:
       - .env
     volumes:

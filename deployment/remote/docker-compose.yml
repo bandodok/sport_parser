@@ -14,7 +14,6 @@ services:
 
   app:
     image: bandodok/sport_parser_app:${TAG}
-    command: bash -c "sleep 10 && python manage.py migrate && python manage.py collectstatic -c --no-input && python init_db.py && python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker"
     env_file:
       - .env
     volumes:
@@ -22,16 +21,36 @@ services:
     depends_on:
       - db
       - redis
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python manage.py migrate;
+        python manage.py collectstatic -c --no-input;
+        python init_db.py;
+        python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker;
+      "
 
   ws:
     image: bandodok/sport_parser_app
-    command: bash -c "python -m daphne sport_parser.asgi:application -b 0.0.0.0 -p 8080"
     env_file:
       - .env
     depends_on:
       - app
       - db
       - redis
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m daphne sport_parser.asgi:application -b 0.0.0.0 -p 8080;
+      "
 
   db:
     image: postgres:alpine
@@ -48,23 +67,39 @@ services:
 
   celery:
     image: bandodok/sport_parser_app
-    command: python -m celery -A sport_parser worker -l info --concurrency=1
     env_file:
       - .env
     depends_on:
       - redis
       - app
       - db
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m celery -A sport_parser worker -l info --concurrency=1;
+      "
 
   celery-beat:
     image: bandodok/sport_parser_app
-    command: python -m celery -A sport_parser worker --beat -l info
     env_file:
       - .env
     depends_on:
       - redis
       - app
       - db
+    command: >
+      bash -c "
+        while ! nc -z app 8000;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m celery -A sport_parser beat -l info;
+      "
 
 volumes:
   database_data:
