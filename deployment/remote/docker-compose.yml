@@ -36,7 +36,7 @@ services:
       "
 
   ws:
-    image: bandodok/sport_parser_app
+    image: bandodok/sport_parser_app:${TAG}
     env_file:
       - .env
     depends_on:
@@ -67,7 +67,7 @@ services:
     image: redis:alpine
 
   celery:
-    image: bandodok/sport_parser_app
+    image: bandodok/sport_parser_app:${TAG}
     env_file:
       - .env
     depends_on:
@@ -85,7 +85,7 @@ services:
       "
 
   celery-beat:
-    image: bandodok/sport_parser_app
+    image: bandodok/sport_parser_app:${TAG}
     env_file:
       - .env
     depends_on:
