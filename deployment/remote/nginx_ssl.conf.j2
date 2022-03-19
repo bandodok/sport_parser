@@ -31,11 +31,11 @@ http {
         # настройки сервера
         server {
             listen 443 ssl;
-            ssl_certificate /etc/letsencrypt/live/{{ host_name }}/fullchain.pem;
-            ssl_certificate_key /etc/letsencrypt/live/{{ host_name }}/privkey.pem;
+            ssl_certificate /etc/letsencrypt/live/{{ env.HOST_NAME }}/fullchain.pem;
+            ssl_certificate_key /etc/letsencrypt/live/{{ env.HOST_NAME }}/privkey.pem;
             include /etc/letsencrypt/options-ssl-nginx.conf;
             ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-            server_name {{ host_name }};
+            server_name {{ env.HOST_NAME }};
             location /static/ {
                 root /home/bandodok/;
             }
@@ -58,11 +58,11 @@ http {
                 }
         }
         server {
-            if ($host = {{ host_name }}) {
+            if ($host = {{ env.HOST_NAME }}) {
                 return 301 https://$host$request_uri;
             }
             listen 80;
-            server_name {{ host_name }};
+            server_name {{ env.HOST_NAME }};
             return 404;
         }
 }

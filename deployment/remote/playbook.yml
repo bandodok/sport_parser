@@ -1,4 +1,23 @@
 - hosts: all
+  vars:
+    env:
+      SECRET_KEY: "{{ lookup('env','SECRET_KEY') }}"
+      TAG: "{{ lookup('env','TAG') }}"
+      DEBUG: "{{ lookup('env','DEBUG') }}"
+      ALLOWED_HOSTS: "{{ lookup('env','ALLOWED_HOSTS') }}"
+      SERVER_IP: "{{ lookup('env','SERVER_IP') }}"
+      HOST_NAME: "{{ lookup('env','HOST_NAME') }}"
+      SERVER_USERNAME: "{{ lookup('env','SERVER_USERNAME') }}"
+      ADMIN_USERNAME: "{{ lookup('env','ADMIN_USERNAME') }}"
+      ADMIN_PASSWORD: "{{ lookup('env','ADMIN_PASSWORD') }}"
+      DB_NAME: "{{ lookup('env','DB_NAME') }}"
+      DB_USER: "{{ lookup('env','DB_USER') }}"
+      DB_PASSWORD: "{{ lookup('env','DB_PASSWORD') }}"
+      DB_HOST: "{{ lookup('env','DB_HOST') }}"
+      DB_PORT: "{{ lookup('env','DB_PORT') }}"
+      CHROMEDRIVER: "{{ lookup('env','CHROMEDRIVER') }}"
+      ROLLBAR_TOKEN: "{{ lookup('env','ROLLBAR_TOKEN') }}"
+      REDIS_HOST: "{{ lookup('env','REDIS_HOST') }}"
 
   tasks:
     - name: Install required system packages
@@ -74,20 +93,16 @@
       tags: create_test_env
 
     - name: create prod env file
-      ansible.builtin.copy:
-        src: .env.prod
-        dest: /home/sport_parser/app/.env
+      ansible.builtin.shell:
+        chdir: /home/sport_parser/app
+        cmd: 'echo "{{ item.key }}={{ item.value }}" >> .env'
+      loop: "{{ env | dict2items }}"
       tags: create_prod_env
 
     - name: copy files
       ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-      vars:
-        - server_ip: "{{ lookup('env','SERVER_IP') }}"
-        - DB_USER: "{{ lookup('env','DB_USER') }}"
-        - DB_PASSWORD: "{{ lookup('env','DB_PASSWORD') }}"
-        - DB_NAME: "{{ lookup('env','DB_NAME') }}"
       loop:
         - { src: nginx.conf.j2, dest: /home/sport_parser/app/_nginx.conf }
         - { src: ../init.sql.j2, dest: /home/sport_parser/_init.sql }
@@ -106,7 +121,14 @@
       ansible.builtin.template:
         src: nginx_ssl.conf.j2
         dest: /home/sport_parser/app/_nginx.conf
-      vars:
-        - host_name: "{{ lookup('env','HOST_NAME') }}"
       when: "'fullchain.pem' in cert.stdout"
       tags: copy_files
+
+    - name: run app
+      ansible.builtin.shell:
+        chdir: /home/sport_parser/app
+        cmd: |
+          docker-compose -f docker-compose.yml pull
+          docker-compose -f docker-compose.yml up --build --remove-orphans -d
+      become: yes
+      tags: run_app

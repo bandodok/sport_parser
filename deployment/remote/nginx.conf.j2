@@ -31,7 +31,7 @@ http {
         # настройки сервера
         server {
             listen 80;
-            server_name {{ server_ip }};
+            server_name {{ env.SERVER_IP }};
             location /static/ {
                 root /home/bandodok/;
             }

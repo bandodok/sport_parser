@@ -44,13 +44,23 @@ init_server:
 	ansible-playbook deployment/remote/playbook.yml -i "${SERVER_IP}, " -u ${SERVER_USERNAME} -t init
 
 deploy_app:
-	TAG=${TAG} \
-	SERVER_IP=${SERVER_IP} \
-	HOST_NAME=${HOST_NAME} \
-	SERVER_USERNAME=${SERVER_USERNAME} \
-	DB_NAME=${DB_NAME} \
-	DB_USER=${DB_USER} \
-	DB_PASSWORD=${DB_PASSWORD} \
+	SECRET_KEY="${SECRET_KEY}" \
+    TAG=${TAG} \
+    DEBUG=${DEBUG} \
+    ALLOWED_HOSTS=${ALLOWED_HOSTS} \
+    SERVER_IP=${SERVER_IP} \
+    HOST_NAME=${HOST_NAME} \
+    SERVER_USERNAME=${SERVER_USERNAME} \
+    ADMIN_USERNAME=${ADMIN_USERNAME} \
+    ADMIN_PASSWORD=${ADMIN_PASSWORD} \
+    DB_NAME=${DB_NAME} \
+    DB_USER=${DB_USER} \
+    DB_PASSWORD=${DB_PASSWORD} \
+    DB_HOST=${DB_HOST} \
+    DB_PORT=${DB_PORT} \
+    CHROMEDRIVER=${CHROMEDRIVER} \
+    ROLLBAR_TOKEN=${ROLLBAR_TOKEN} \
+    REDIS_HOST=${REDIS_HOST} \
 	ansible-playbook deployment/remote/playbook.yml -i "${SERVER_IP}, " -u ${SERVER_USERNAME} --tags create_folders,create_test_env,copy_files
 
 remove_db:
