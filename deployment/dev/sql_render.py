@@ -10,7 +10,10 @@ if __name__ == '__main__':
     with open('deployment/init.sql.j2', 'r') as file:
         template = jinja2.Template(file.read())
         print(template.render(
-            DB_USER=os.getenv('DB_USER'),
-            DB_PASSWORD=os.getenv('DB_PASSWORD'),
-            DB_NAME=os.getenv('DB_NAME')
+            env={
+                'DB_USER': os.getenv('DB_USER'),
+                'DB_PASSWORD': os.getenv('DB_PASSWORD'),
+                'DB_NAME': os.getenv('DB_NAME')
+            }
+
         ))
