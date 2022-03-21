@@ -55,6 +55,8 @@ class Season:
         return [key for key, value in fields.items()]
 
     def get_table_stats(self, *, match_list=None, team_list=None, protocol_list=None):
+        if not match_list and not team_list and not protocol_list:
+            return self.data.table_data
         if not match_list:
             match_list = self.get_match_list()
         if not team_list:
@@ -62,6 +64,11 @@ class Season:
         if not protocol_list:
             protocol_list = self.get_protocol_list()
         return self.TableStats.season_stats_calculate(match_list, team_list, protocol_list)
+
+    def update_season_table_stats(self):
+        data = self.get_table_stats(match_list=self.get_match_list())
+        self.data.table_data = data
+        self.data.save()
 
 
 class Team:

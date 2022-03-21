@@ -11,6 +11,8 @@ class Updater:
         self.db = config.db(config)
         self.ignore = config.updater_ignore
         self.channel_layer = get_channel_layer()
+        self.season_class = config.season_class
+        self.config = config
 
     def update(self):
         season, new_season = self._get_first_unfinished_match_season()
@@ -21,6 +23,8 @@ class Updater:
             self.ws_send_status('updating matches')
             self._update_finished_matches()
             self.ws_send_status('matches updated')
+        season_class = self.season_class(season.id, config=self.config)
+        season_class.update_season_table_stats()
 
     def parse_season(self, season_id):
         season = self.model_list.season_model.objects.get(id=season_id)
