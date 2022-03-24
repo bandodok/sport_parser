@@ -1,0 +1,56 @@
+# This is a basic workflow to help you get started with Actions
+
+name: deploy
+
+# Controls when the workflow will run
+on:
+# Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+    environment: deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: build container
+        run: docker build -f deployment/remote/Dockerfile -t bandodok/sport_parser_app:${{ secrets.TAG }} .
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: push container
+        run: docker push bandodok/sport_parser_app:${{ secrets.TAG }}
+        
+      - name: deploy and run app
+        env:
+          SECRET_KEY: "${{secrets.SECRET_KEY}}"
+          TAG: ${{secrets.TAG}}
+          DEBUG: ${{secrets.DEBUG}}
+          ALLOWED_HOSTS: ${{secrets.ALLOWED_HOSTS}}
+          SERVER_IP: ${{secrets.SERVER_IP}}
+          HOST_NAME: ${{secrets.HOST_NAME}}
+          SERVER_USERNAME: ${{secrets.SERVER_USERNAME}}
+          ADMIN_USERNAME: ${{secrets.ADMIN_USERNAME}}
+          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
+          DB_NAME: ${{secrets.DB_NAME}}
+          DB_USER: ${{secrets.DB_USER}}
+          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          DB_HOST: ${{secrets.DB_HOST}}
+          DB_PORT: ${{secrets.DB_PORT}}
+          CHROMEDRIVER: ${{secrets.CHROMEDRIVER}}
+          ROLLBAR_TOKEN: ${{secrets.ROLLBAR_TOKEN}}
+          REDIS_HOST: ${{secrets.REDIS_HOST}}
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: deployment/remote/playbook.yml
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          options: |
+            -i "${{ secrets.SERVER_IP }}, "
+            -u ${{ secrets.SERVER_USERNAME }}
+            --tags init,create_folders,create_prod_env,copy_files,run_app

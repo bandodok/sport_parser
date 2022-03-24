@@ -1,0 +1,120 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx_dev.conf:/etc/nginx/nginx.conf:ro
+      - ../..:/home/bandodok/sport_parser/
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - .env
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: ../..
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python manage.py migrate;
+        python init_db.py;
+        python -m gunicorn --workers 3 --timeout 2000 --bind 0.0.0.0:8000 sport_parser.asgi -k uvicorn.workers.UvicornWorker;
+      "
+    env_file:
+      - .env
+    volumes:
+      - ../..:/home/bandodok/sport_parser/
+    depends_on:
+      - db
+      - redis
+
+  ws:
+    build:
+      context: ../..
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m daphne sport_parser.asgi:application -b 0.0.0.0 -p 8080;
+      "
+    env_file:
+      - .env
+    volumes:
+      - ../..:/home/bandodok/sport_parser/
+    depends_on:
+      - app
+      - db
+      - redis
+
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: $${DB_USER}
+      POSTGRES_PASSWORD: $${DB_PASSWORD}
+      POSTGRES_DB: $${DB_NAME}
+    volumes:
+      - ../../postgresql/data:/var/lib/postgresql/data
+      - ./_init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:alpine
+
+  celery:
+    build:
+      context: ../..
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m celery -A sport_parser worker -l info --concurrency=1;
+      "
+    env_file:
+      - .env
+    volumes:
+      - ../..:/home/bandodok/sport_parser/
+    depends_on:
+      - redis
+      - app
+      - db
+
+  celery-beat:
+    build:
+      context: ../..
+      dockerfile: deployment/dev/Dockerfile_dev
+    command: >
+      bash -c "
+        while ! nc -z app 8000;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m celery -A sport_parser beat -l info;
+      "
+    env_file:
+      - .env
+    volumes:
+      - ../..:/home/bandodok/sport_parser/
+    depends_on:
+      - redis
+      - app
+      - db
+
+volumes:
+  database_data:

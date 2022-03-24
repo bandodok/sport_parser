@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 
 class KHLProtocolManager(models.Manager):
@@ -14,6 +15,7 @@ class KHLSeason(models.Model):
     updated = models.DateTimeField(auto_now=True)
     id = models.IntegerField(primary_key=True)
     external_id = models.IntegerField(null=True)
+    table_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
 
     def __str__(self):
         return str(self.id)

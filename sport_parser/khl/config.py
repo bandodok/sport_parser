@@ -142,5 +142,5 @@ class Config:
         'Blocks%': {'short': 'Процент блокированных бросков', 'long': ''},
         'Penalty': {'short': 'Удаления', 'long': ''},
     }
-    updater_ignore = ['872325', '872404', '872667']
+    updater_ignore = ['872325', '872404', '872667', '880834']
     calendar_serializer = CalendarSerializer()
