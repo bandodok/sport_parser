@@ -5,8 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 
-from sport_parser.khl.creator import Creator
-from sport_parser.khl.tasks import update, parse_season
+from sport_parser.core.creator import Creator
+from sport_parser.core.tasks import update, parse_season
 
 
 class HockeyView(View):

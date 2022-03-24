@@ -1,8 +1,7 @@
 import pytest
 
-from sport_parser.khl.objects import Team
-from sport_parser.khl.config import Config
-from fixtures.db_fixture import update_db
+from sport_parser.core.objects import Team
+from sport_parser.core.config import Config
 
 from sport_parser.khl.models import KHLTeams
 

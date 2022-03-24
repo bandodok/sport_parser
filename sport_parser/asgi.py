@@ -11,11 +11,11 @@ import os
 
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-import sport_parser.khl.routing
+import sport_parser.core.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sport_parser.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
-    'websocket': URLRouter(sport_parser.khl.routing.websocket_urlpatterns)
+    'websocket': URLRouter(sport_parser.core.routing.websocket_urlpatterns)
 })

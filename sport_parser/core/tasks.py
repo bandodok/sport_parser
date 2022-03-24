@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from sport_parser.khl.creator import Creator
+from sport_parser.core.creator import Creator
 
 
 @shared_task(name='update')

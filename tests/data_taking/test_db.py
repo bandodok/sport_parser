@@ -1,9 +1,8 @@
 import pytest
 
-from fixtures.db_fixture import get_protocol, get_teams, get_matches
-from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch, KHLSeason
-from sport_parser.khl.data_taking.db import DB
-from sport_parser.khl.config import Config
+from sport_parser.khl.models import KHLProtocol, KHLTeams, KHLMatch
+from sport_parser.core.data_taking.db import DB
+from sport_parser.core.config import Config
 
 
 @pytest.mark.django_db(transaction=True)

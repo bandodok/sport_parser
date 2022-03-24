@@ -1,9 +1,8 @@
 import pytest
 
-from sport_parser.khl.data_analysis.bar_stats import BarStats
-from sport_parser.khl.objects import Team, Match
-from sport_parser.khl.config import Config
-from fixtures.db_fixture import update_db
+from sport_parser.core.data_analysis.bar_stats import BarStats
+from sport_parser.core.objects import Match
+from sport_parser.core.config import Config
 
 from sport_parser.khl.models import KHLTeams, KHLMatch
 

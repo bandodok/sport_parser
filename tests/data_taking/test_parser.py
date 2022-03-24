@@ -1,9 +1,8 @@
 import pook
 import pytest
 from sport_parser.khl.models import KHLSeason, KHLMatch
-from sport_parser.khl.data_taking.parser import Parser
-from sport_parser.khl.config import Config
-from fixtures.db_fixture import update_db
+from sport_parser.core.data_taking.parser import Parser
+from sport_parser.core.config import Config
 
 
 @pytest.fixture

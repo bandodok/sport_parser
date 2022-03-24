@@ -1,4 +1,4 @@
-from sport_parser.khl.data_taking.parser import Parser
+from sport_parser.core.data_taking.parser import Parser
 from datetime import datetime
 import pytz
 
