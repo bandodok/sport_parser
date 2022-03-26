@@ -100,14 +100,14 @@ class KHLProtocol(models.Model):
     sog = models.IntegerField(null=True, default=0)
     penalty = models.IntegerField(null=True, default=0)
     faceoff = models.IntegerField(null=True, default=0)
-    faceoff_p = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True, default=0)
+    faceoff_p = models.DecimalField(max_length=100, decimal_places=2, max_digits=5, null=True, blank=True, default=0)
     blocks = models.IntegerField(null=True, default=0)
     hits = models.IntegerField(null=True, default=0)
     fop = models.IntegerField(null=True, default=0)
     time_a = models.TimeField(max_length=100, null=True, blank=True, default='00:00:00')
     vvsh = models.TimeField(max_length=100, null=True, blank=True, default='00:00:00')
     nshv = models.TimeField(max_length=100, null=True, blank=True, default='00:00:00')
-    pd = models.DecimalField(max_length=100, decimal_places=2, max_digits=4, null=True, blank=True, default=0)
+    pd = models.DecimalField(max_length=100, decimal_places=2, max_digits=5, null=True, blank=True, default=0)
 
     objects = KHLProtocolManager()
 
