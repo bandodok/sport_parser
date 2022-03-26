@@ -235,6 +235,37 @@ class KHLParser(Parser):
         })
         return row_home, row_guest
 
+    def parse_live_protocol(self, match):
+        url = f"https://text.khl.ru/text/{match.id}.html"
+        soup = self.get_request_content(url)
+        match_status = self._get_match_status(soup)
+
+        row_home = {}
+        row_guest = {}
+
+        if match_status != 'подготовка' and match_status != 'status not found':
+            stat_dict = {
+                'Команда': 'team',
+                'Ш': 'g',
+                'БВ': 'sog',
+                'Штр': 'penalty',
+                'ВВбр': 'faceoff',
+                '%ВВбр': 'faceoff_p',
+                'БлБ': 'blocks',
+                'СПр': 'hits',
+                'ФоП': 'fop',
+                'ВВА': 'time_a',
+            }
+            main_data = self._get_main_stats(soup, stat_dict)
+            row_home = main_data['row_home']
+            row_guest = main_data['row_guest']
+
+        return {
+            'match_status': match_status,
+            'row_home': row_home,
+            'row_guest': row_guest
+        }
+
     @staticmethod
     def _get_match_status(soup):
         match_status = soup.find('dd', class_="b-period_score")
