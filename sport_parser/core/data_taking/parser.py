@@ -30,6 +30,11 @@ class Parser:
         """Возвращает протокол по id матча в виде двух списков - для домашней и для гостевой команды"""
         pass
 
+    @abstractmethod
+    def parse_live_protocol(self, match):
+        """Возвращает статус и протокол текущего матча для параметров, обновляемых в течение матча"""
+        pass
+
     @staticmethod
     def get_request_content(url):
         r = requests.get(url)
