@@ -1,20 +1,13 @@
 import datetime
-import json
 import tempfile
-
 import pytz
-
-from sport_parser.khl.data_analysis.formatter import Formatter
-import os
-
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
+
+from sport_parser.core.data_taking.parser import Parser
 
 
-class Parser:
-    def __init__(self, config):
-        self.formatter = Formatter(config)
+class KHLParser(Parser):
 
     def parse_teams(self, season):
         url = f'https://www.khl.ru/standings/{season.external_id}/division/'
@@ -333,30 +326,6 @@ class Parser:
             })
 
         return teams
-
-    @staticmethod
-    def get_request_content(url):
-        r = requests.get(url)
-        return BeautifulSoup(r.content, 'html.parser')
-
-    @staticmethod
-    def get_api_request_content(url):
-        r = requests.get(url).content
-        return json.loads(r)
-
-    @staticmethod
-    def get_selenium_content(url):
-        loc = os.getenv('CHROMEDRIVER')
-        op = webdriver.ChromeOptions()
-        op.add_argument('headless')
-        op.add_argument('ignore-certificate-errors')
-        capabilities = webdriver.DesiredCapabilities().CHROME
-        capabilities['acceptSslCerts'] = True
-        driver = webdriver.Chrome(loc, options=op)
-        driver.get(url)
-        r = driver.page_source
-        driver.close()
-        return BeautifulSoup(r, 'html.parser')
 
     @staticmethod
     def _calendar_request_content(url):

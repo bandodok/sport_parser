@@ -1,6 +1,6 @@
 from django.db.models import Max
 
-from sport_parser.khl.config import Config
+from sport_parser.khl.config import KHLConfig
 from sport_parser.nhl.config import NHLConfig
 
 
@@ -11,7 +11,7 @@ class Creator:
         else:
             app_name = request.app_name
         if app_name == 'khl':
-            self.config = Config
+            self.config = KHLConfig
         elif app_name == 'nhl':
             self.config = NHLConfig
         else:

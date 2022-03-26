@@ -2,10 +2,9 @@ import pytest
 from datetime import datetime, timezone
 from freezegun import freeze_time
 
-from sport_parser.khl.data_taking.db import DB
-from sport_parser.khl.objects import Season
-from sport_parser.khl.config import Config
-from fixtures.db_fixture import update_db, get_teams, get_matches
+from sport_parser.core.data_taking.db import DB
+from sport_parser.core.objects import Season
+from sport_parser.core.config import Config
 
 from sport_parser.khl.models import KHLTeams
 

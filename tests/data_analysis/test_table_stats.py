@@ -1,10 +1,9 @@
 import pytest
 from datetime import time
 
-from sport_parser.khl.data_analysis.table_stats import TableStats
-from sport_parser.khl.objects import Season
-from sport_parser.khl.config import Config
-from fixtures.db_fixture import update_db
+from sport_parser.core.data_analysis import TableStats
+from sport_parser.core.objects import Season
+from sport_parser.core.config import Config
 
 from sport_parser.khl.models import KHLTeams, KHLMatch
 

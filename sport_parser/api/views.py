@@ -1,7 +1,7 @@
 from rest_framework import generics
 
 from .serializers import CalendarSerializer
-from ..khl.creator import Creator
+from sport_parser.core.creator import Creator
 
 
 class Calendar(generics.ListAPIView):

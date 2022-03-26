@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'dbview',
     'django_celery_beat',
+    'sport_parser.core',
     'sport_parser.khl',
     'sport_parser.nhl',
     'sport_parser.api',
