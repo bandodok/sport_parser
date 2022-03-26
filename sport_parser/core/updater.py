@@ -23,8 +23,7 @@ class Updater:
             self.ws_send_status('updating matches')
             self._update_finished_matches()
             self.ws_send_status('matches updated')
-        season_class = self.season_class(season.id, config=self.config)
-        season_class.update_season_table_stats()
+        self._update_season_stats_data(season.id)
 
     def parse_season(self, season_id):
         season = self.model_list.season_model.objects.get(id=season_id)
@@ -33,12 +32,19 @@ class Updater:
         for match in calendar:
             self._add_match_to_db(match)
         self.ws_send_status('complete')
+        self._update_season_stats_data(season.id)
 
     def ws_send_status(self, message):
         """Отправляет сообщение в вебсокет"""
         async_to_sync(self.channel_layer.group_send)(
             'update', {'type': 'update.update', 'text': message}
         )
+
+    def _update_season_stats_data(self, season_id):
+        self.ws_send_status('updating season stats data')
+        season_class = self.season_class(season_id, config=self.config)
+        season_class.update_season_table_stats()
+        self.ws_send_status('season stats data updated')
 
     def _update_finished_matches(self):
         matches = self._get_unfinished_matches_until_today()
