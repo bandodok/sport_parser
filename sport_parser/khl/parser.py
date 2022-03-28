@@ -235,8 +235,8 @@ class KHLParser(Parser):
         })
         return row_home, row_guest
 
-    def parse_live_protocol(self, match):
-        url = f"https://text.khl.ru/text/{match.id}.html"
+    def parse_live_protocol(self, match_id):
+        url = f"https://text.khl.ru/text/{match_id}.html"
         soup = self.get_request_content(url)
         match_status = self._get_match_status(soup)
 
@@ -262,8 +262,12 @@ class KHLParser(Parser):
 
         return {
             'match_status': match_status,
-            'row_home': row_home,
-            'row_guest': row_guest
+            'team_1_score': row_home.get('g', 0),
+            'team_2_score': row_guest.get('g', 0),
+            'data': {
+                'row_home': row_home,
+                'row_guest': row_guest
+            }
         }
 
     @staticmethod
