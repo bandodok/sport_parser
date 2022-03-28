@@ -31,3 +31,11 @@ def schedule_live_match(league, match_id):
     match.data.status = 'live'
     match.data.save()
 
+
+@shared_task(name='update_live_matches', queue='update_live_matches')
+def update_live_matches():
+    matches = LiveMatches.objects.all()
+    for match in matches:
+        creator = Creator(match.league)
+        updater = creator.get_updater()
+        updater.update_live_match(match.match_id)
