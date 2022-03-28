@@ -26,4 +26,8 @@ def schedule_live_match(league, match_id):
         match_id=match_id
     )
     PeriodicTask.objects.get(name=f'{league}_{match_id}_live_match').delete()
+    creator = Creator(league)
+    match = creator.get_match_class(match_id)
+    match.data.status = 'live'
+    match.data.save()
 
