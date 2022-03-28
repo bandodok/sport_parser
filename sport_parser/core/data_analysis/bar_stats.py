@@ -2,6 +2,7 @@ class BarStats:
     def __init__(self, config):
         self.formatter = config.formatter
         self.bar_stats_names = config.bar_stats_names
+        self.live_bar_stats_names = config.live_bar_stats_names
 
     def calculate(self, match):
         """
@@ -57,3 +58,18 @@ class BarStats:
                 'right_perc': right_perc
             }
         return comparison_stats
+
+
+class LiveBarStats(BarStats):
+    def calculate(self, match_data):
+        comparison_stats = self.get_comparison_stats(
+            self.get_team_live_stats(match_data['row_home']),
+            self.get_team_live_stats(match_data['row_guest'])
+        )
+        return self.formatter.bar_stat_format(comparison_stats, self.live_bar_stats_names)
+
+    def get_team_live_stats(self, data):
+        stats = {}
+        for stat in self.live_bar_stats_names.keys():
+            stats[stat] = self.formatter.live_bar_stat_format(data[stat])
+        return stats

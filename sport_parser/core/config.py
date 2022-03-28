@@ -3,7 +3,7 @@ from sport_parser.khl.models import ModelList
 from sport_parser.core.objects import Season, Team, Match
 from sport_parser.core.data_analysis.chart_stats import ChartStats
 from sport_parser.core.data_analysis.table_stats import TableStats
-from sport_parser.core.data_analysis.bar_stats import BarStats
+from sport_parser.core.data_analysis.bar_stats import BarStats, LiveBarStats
 from sport_parser.core.data_analysis.formatter import Formatter
 from sport_parser.core.data_taking.parser import Parser
 from sport_parser.core.data_taking.db import DB
@@ -24,6 +24,7 @@ class Config:
     TableStats = TableStats
     ChartStats = ChartStats
     BarStats = BarStats
+    LiveBarStats = LiveBarStats
     formatter = Formatter
     parser = Parser
     db = DB

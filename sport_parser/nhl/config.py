@@ -68,6 +68,17 @@ class NHLConfig(Config):
         'takeaways': ('TA', 'Отборы', 'int'),
         'giveaways': ('GA', 'Потери', 'int'),
     }
+    live_bar_stats_names = {
+        'sh': ('Sh', 'Все броски', 'int'),
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'takeaways': ('TA', 'Отборы', 'int'),
+        'giveaways': ('GA', 'Потери', 'int'),
+    }
     chart_stats_names = {
         'sh': ('Sh', 'Все броски', 'int'),
         'sog': ('Sog', 'Броски в створ', 'int'),

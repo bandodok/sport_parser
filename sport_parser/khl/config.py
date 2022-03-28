@@ -80,6 +80,25 @@ class KHLConfig(Config):
         'hits': ('Hits', 'Силовые приемы', 'int'),
         'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
+    bar_stats_names = {
+        'sh': ('Sh', 'Все броски', 'int'),
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'time_a': ('TimeA', 'Время в атаке', 'time'),
+    }
+    live_bar_stats_names = {
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'time_a': ('TimeA', 'Время в атаке', 'time'),
+    }
     updated_team_names = {
         'Торпедо НН': 'Торпедо',
         'Динамо Мск': 'Динамо М',
