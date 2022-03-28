@@ -68,6 +68,8 @@ services:
     volumes:
       - ../../postgresql/data:/var/lib/postgresql/data
       - ./_init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:alpine
