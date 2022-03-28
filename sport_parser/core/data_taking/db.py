@@ -1,8 +1,10 @@
 from django.db import transaction
+from sport_parser.core.models import LiveMatches
 
 
 class DB:
     def __init__(self, config):
+        self.config = config
         self.model_list = config.models
         self.updated_team_names = config.updated_team_names
 
@@ -18,12 +20,14 @@ class DB:
 
         t.save()
 
-    def add_match(self, match):
+    def add_match(self, match, *, skip_live=False):
         """Добавляет информацию о матче в базу данных"""
         with transaction.atomic():
             a, _ = self.model_list.match_model.objects.get_or_create(
                 id=match['match_id'],
             )
+            if skip_live and a.status == 'live':
+                return
             a.season = match['season']
 
             for arg, value in match.items():
@@ -59,6 +63,21 @@ class DB:
                     continue
                 p.__dict__[arg] = value
             p.save()
+
+    def update_live_match(self, match_data):
+        match = LiveMatches.objects.get(
+            league=self.config.name,
+            match_id=match_data['match_id']
+        )
+        match.match_data = match_data
+        match.save()
+
+    def remove_live_match(self, match_id):
+        match = LiveMatches.objects.get(
+            league=self.config.name,
+            match_id=match_id
+        )
+        match.delete()
 
     def _team_name_update(self, team):
         if self.updated_team_names.get(team):
