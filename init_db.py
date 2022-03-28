@@ -24,6 +24,7 @@ def main():
     # Default celery beat schedule tasks
     interval, _ = IntervalSchedule.objects.get_or_create(every=10, period='minutes')
     sec_interval, _ = IntervalSchedule.objects.get_or_create(every=1, period='seconds')
+    min_interval, _ = IntervalSchedule.objects.get_or_create(every=1, period='minutes')
     update_list = [
         "khl",
         "nhl"
@@ -39,8 +40,18 @@ def main():
                 args=f'["{item}"]',
                 start_time=timezone.now(),
                 one_off=False,
-                enabled=True
+                enabled=True,
+                queue='regular_update'
             )
+    PeriodicTask.objects.get_or_create(
+        name='update_live_matches',
+        interval_id=min_interval.id,
+        task='update_live_matches',
+        start_time=timezone.now(),
+        one_off=False,
+        enabled=True,
+        queue='update_live_matches'
+    )
 
     # KHL season settings
     KHLSeason.objects.get_or_create(id=21, external_id=1097)
