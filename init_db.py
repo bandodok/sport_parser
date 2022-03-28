@@ -23,6 +23,7 @@ def main():
 
     # Default celery beat schedule tasks
     interval, _ = IntervalSchedule.objects.get_or_create(every=10, period='minutes')
+    sec_interval, _ = IntervalSchedule.objects.get_or_create(every=1, period='seconds')
     update_list = [
         "khl",
         "nhl"
