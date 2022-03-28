@@ -53,6 +53,14 @@ class Formatter:
                 stats[stat]['right_value'] = cls._set_format(value['right_value'], format)
         return stats
 
+    @classmethod
+    def live_bar_stat_format(cls, stat):
+        if cls._isfloat(stat):
+            return int(stat)
+        if ':' in str(stat):
+            hours, mins, secs = stat.split(':')
+            return int(secs) + int(mins) * 60 + int(hours) * 3600
+
     def date_format(self, date):
         splitted_date = date.split(' ')[:-1]
         if not splitted_date[0]:
@@ -103,3 +111,11 @@ class Formatter:
             return f'{"{:.2f}".format(round(stat, 2))}%'
         elif format == 'time':
             return cls.sec_to_time(stat)
+
+    @staticmethod
+    def _isfloat(num):
+        try:
+            float(num)
+            return True
+        except ValueError:
+            return False
