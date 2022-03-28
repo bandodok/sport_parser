@@ -14,6 +14,7 @@ class Updater:
         self.ignore = config.updater_ignore
         self.channel_layer = get_channel_layer()
         self.season_class = config.season_class
+        self.match_class = config.match_class
         self.config = config
 
     def update(self):
@@ -21,7 +22,7 @@ class Updater:
         if new_season:
             self.parse_season(season)
         else:
-            self._add_calendar_to_db(season, skip_finished=True, add_postponed=True)
+            self._add_calendar_to_db(season, skip_finished=True, skip_live=True, add_postponed=True)
             self.ws_send_status('updating matches')
             self._update_finished_matches()
             self.ws_send_status('matches updated')
@@ -36,6 +37,20 @@ class Updater:
             self._add_match_to_db(match)
         self.ws_send_status('complete')
         self._update_season_stats_data(season.id)
+
+    def update_live_match(self, match_id):
+        live_match_data = self.parser.parse_live_protocol(match_id)
+        match_class = self.match_class(match_id, config=self.config)
+
+        if live_match_data['match_status'] == 'матч завершен':
+            self.db.remove_live_match(match_id)
+            self._add_match_to_db(match_class)
+            return
+
+        live_match_data['match_id'] = match_id
+        live_match_data['data'] = match_class.get_live_bar_stats(live_match_data['data'])
+
+        self.db.update_live_match(live_match_data)
 
     def ws_send_status(self, message):
         """Отправляет сообщение в вебсокет"""
@@ -64,7 +79,7 @@ class Updater:
         self.ws_send_status('teams updated')
         return self.model_list.team_model.objects.filter(season=season)
 
-    def _add_calendar_to_db(self, season, *, skip_finished=False, add_postponed=False):
+    def _add_calendar_to_db(self, season, *, skip_finished=False, skip_live=True, add_postponed=False):
         self.ws_send_status('updating calendar dates')
         calendar = self.parser.parse_calendar(season)
         if add_postponed:
@@ -73,7 +88,10 @@ class Updater:
             if skip_finished and match['status'] == 'finished' or match['match_id'] in self.ignore:
                 continue
             self.ws_send_status(f"updating match: {match['match_id']}")
-            self.db.add_match(match)
+            if skip_live:
+                self.db.add_match(match, skip_live=True)
+            else:
+                self.db.add_match(match)
         self.ws_send_status('calendar updated')
 
         self.ws_send_status('updating postponed matches')
@@ -158,5 +176,6 @@ class Updater:
                 args=f'["{config}", "{match_id}"]',
                 start_time=update_start_date,
                 one_off=True,
-                enabled=True
+                enabled=True,
+                queue='regular_update'
             )
