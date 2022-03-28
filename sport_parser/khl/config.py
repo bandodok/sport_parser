@@ -5,6 +5,7 @@ from sport_parser.khl.parser import KHLParser
 
 
 class KHLConfig(Config):
+    name = 'khl'
     title = 'КХЛ'
     league_title = 'Континентальная хоккейная лига'
     league_logo = 'KHL.webp'

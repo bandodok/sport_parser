@@ -5,6 +5,7 @@ from sport_parser.nhl.parser import NHLParser
 
 
 class NHLConfig(Config):
+    name = 'nhl'
     title = 'НХЛ'
     league_title = 'Национальная хоккейная лига'
     league_logo = 'NHL.webp'
