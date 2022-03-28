@@ -2,6 +2,8 @@ import datetime
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db.models import Max
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from django.utils import timezone
 
 
 class Updater:
@@ -24,6 +26,7 @@ class Updater:
             self._update_finished_matches()
             self.ws_send_status('matches updated')
         self._update_season_stats_data(season.id)
+        self._add_matches_to_live_updater()
 
     def parse_season(self, season_id):
         season = self.model_list.season_model.objects.get(id=season_id)
@@ -135,3 +138,25 @@ class Updater:
             if match.id in calendar_dict:
                 if calendar_dict[match.id]['status'] != 'postponed':
                     self._add_match_to_db(match)
+
+    def _add_matches_to_live_updater(self):
+        interval = IntervalSchedule.objects.get(every=1, period='seconds')
+        today = timezone.now()
+        tomorrow = timezone.now() + datetime.timedelta(days=1)
+        matches = self.model_list.match_model.objects. \
+            filter(status='scheduled'). \
+            filter(date__gte=today). \
+            filter(date__lte=tomorrow)
+        for match in matches:
+            config = self.config.name
+            match_id = match.id
+            update_start_date = match.date - datetime.timedelta(minutes=10)
+            PeriodicTask.objects.get_or_create(
+                name=f'{config}_{match_id}_live_match',
+                interval_id=interval.id,
+                task='schedule_live_match',
+                args=f'["{config}", "{match_id}"]',
+                start_time=update_start_date,
+                one_off=True,
+                enabled=True
+            )
