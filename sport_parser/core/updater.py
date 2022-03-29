@@ -44,7 +44,7 @@ class Updater:
 
         if live_match_data['match_status'] == 'матч завершен':
             self.db.remove_live_match(match_id)
-            self._add_match_to_db(match_class)
+            self._add_match_to_db(match_class.data)
             return
 
         live_match_data['match_id'] = match_id
