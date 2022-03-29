@@ -59,3 +59,16 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
                 'team2_image': team2.img,
                 'team2_id': team2.id,
             }
+
+
+class LiveMatchSerializer(serializers.BaseSerializer, ABC):
+    def to_representation(self, match):
+        match_data = match.match_data
+        return {
+            'id': match.id,
+            'league': match.league,
+            'status': match_data.get('match_status', ''),
+            'team_1_score': match_data.get('team_1_score', ''),
+            'team_2_score': match_data.get('team_2_score', ''),
+            'data': match_data.get('data', '')
+        }

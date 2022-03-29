@@ -38,6 +38,7 @@ class HockeyView(View):
             'league_logo': self.get_league_logo(),
             'config': self.config,
             'glossary': self.get_glossary(),
+            'league': self.config,
 
             'url_stats': reverse_lazy(f'{self.config}:index_stats'),
             'url_team': reverse_lazy(f'{self.config}:index_team'),
