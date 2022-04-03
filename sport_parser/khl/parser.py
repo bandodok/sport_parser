@@ -238,7 +238,18 @@ class KHLParser(Parser):
     def parse_live_protocol(self, match_id):
         url = f"https://text.khl.ru/text/{match_id}.html"
         soup = self.get_request_content(url)
+
         match_status = self._get_match_status(soup)
+        if match_status in ('матч скоро начнется', 'status not found', 'подготовка'):
+            return {
+                'match_status': 'матч скоро начнется',
+                'team_1_score': '-',
+                'team_2_score': '-',
+                'data': {
+                    'row_home': '',
+                    'row_guest': ''
+                }
+            }
 
         row_home = {}
         row_guest = {}
