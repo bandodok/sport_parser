@@ -48,7 +48,7 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
             }
         else:
             team1, team2 = get_sorted_teams_by_m2m_table(match)
-            return {
+            output = {
                 'date': match.date,
                 'id': match.id,
                 'status': match.status,
@@ -59,6 +59,9 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
                 'team2_image': team2.img,
                 'team2_id': team2.id,
             }
+            if match.status != 'scheduled':
+                output['match_data'] = match.match_data
+            return output
 
 
 class LiveMatchSerializer(serializers.BaseSerializer, ABC):
