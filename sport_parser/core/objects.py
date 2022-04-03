@@ -6,9 +6,11 @@ class Season:
     season_does_not_exist = False
 
     def __init__(self, season_id, *, config):
+        self.config = config
         self.TableStats = config.TableStats(config=config)
         self.formatter = config.formatter(config=config)
         self.models = config.models
+        self.live_match_model = config.live_match_model
         try:
             self.data = self.models.season_model.objects.get(id=season_id)
         except self.models.season_model.DoesNotExist:
@@ -36,6 +38,21 @@ class Season:
     def get_json_future_matches(self, num):
         future_matches = self.get_future_matches(num)
         return self.formatter.get_json_matches_info(future_matches)
+
+    def get_live_matches(self):
+        live_matches = []
+        matches = self.data.matches.filter(status='live').order_by('date')
+        for match in matches:
+            live_match = self.live_match_model.objects.get(match_id=match.id, league=self.config.name)
+            match_data = live_match.match_data
+            match.status = match_data['match_status']
+            match.match_data = match_data
+            live_matches.append(match)
+        return live_matches
+
+    def get_json_live_matches(self):
+        live_matches = self.get_live_matches()
+        return self.formatter.get_json_matches_info(live_matches)
 
     def last_updated(self, *, update=False):
         """Возвращает дату последнего обновления таблицы матчей
