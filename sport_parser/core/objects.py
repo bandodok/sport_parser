@@ -28,14 +28,14 @@ class Season:
 
     def get_json_last_matches(self, num):
         lats_matches = self.get_last_matches(num)
-        return self.formatter.get_json_last_matches_info(lats_matches)
+        return self.formatter.get_json_matches_info(lats_matches)
 
     def get_future_matches(self, num):
         return self.data.matches.filter(status='scheduled').order_by('date')[:num]
 
     def get_json_future_matches(self, num):
         future_matches = self.get_future_matches(num)
-        return self.formatter.get_json_future_matches_info(future_matches)
+        return self.formatter.get_json_matches_info(future_matches)
 
     def last_updated(self, *, update=False):
         """Возвращает дату последнего обновления таблицы матчей
@@ -101,14 +101,14 @@ class Team:
 
     def get_json_last_matches(self, num, *, exclude=0):
         lats_matches = self.get_last_matches(num, exclude=exclude)
-        return self.formatter.get_json_last_matches_info(lats_matches)
+        return self.formatter.get_json_matches_info(lats_matches)
 
     def get_future_matches(self, num, *, exclude=0):
         return self.data.matches.filter(status='scheduled').exclude(id=exclude).order_by('date')[:num]
 
     def get_json_future_matches(self, num, *, exclude=0):
         future_matches = self.get_future_matches(num, exclude=exclude)
-        return self.formatter.get_json_future_matches_info(future_matches)
+        return self.formatter.get_json_matches_info(future_matches)
 
     def get_table_stats(self):
         season = self.season_class(self.data.season_id, config=self.config)

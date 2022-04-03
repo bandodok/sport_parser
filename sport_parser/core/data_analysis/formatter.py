@@ -91,17 +91,11 @@ class Formatter:
         }
         return months.get(month)
 
-    def get_json_last_matches_info(self, matches):
-        last_matches = {}
+    def get_json_matches_info(self, matches):
+        json_matches = {}
         for match in matches:
-            last_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
-        return json.dumps(last_matches, cls=DjangoJSONEncoder)
-
-    def get_json_future_matches_info(self, matches):
-        future_matches = {}
-        for match in matches:
-            future_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
-        return json.dumps(future_matches, cls=DjangoJSONEncoder)
+            json_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
+        return json.dumps(json_matches, cls=DjangoJSONEncoder)
 
     @classmethod
     def _set_format(cls, stat, format):
