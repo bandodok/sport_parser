@@ -40,8 +40,10 @@ class Updater:
 
     def update_live_match(self, match_id):
         live_match_data = self.parser.parse_live_protocol(match_id)
-        match_class = self.match_class(match_id, config=self.config)
+        if live_match_data['match_status'] == 'матч скоро начнется':
+            return
 
+        match_class = self.match_class(match_id, config=self.config)
         if live_match_data['match_status'] == 'матч завершен':
             self.db.remove_live_match(match_id)
             self._add_match_to_db(match_class.data)
