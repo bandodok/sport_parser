@@ -1,6 +1,5 @@
 import datetime
 import json
-from sport_parser.api.serializers import CalendarSerializer
 from django.core.serializers.json import DjangoJSONEncoder
 
 
@@ -55,6 +54,8 @@ class Formatter:
 
     @classmethod
     def live_bar_stat_format(cls, stat):
+        if not stat:
+            return 0
         if cls._isfloat(stat):
             return int(stat)
         if ':' in str(stat):
