@@ -9,9 +9,13 @@
     var stats = {{ chart_stats|safe }};
     var left_matches = {{ team1.last_matches|safe }};
     var right_matches = {{ team2.last_matches|safe }};
+    var league = "{{ league|safe }}";
+    var match_id = {{ match.id|safe }};
+    var status = "{{ match.status|safe }}";
     </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="{% static 'js/statCharts.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/liveMatch.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/matchStats.css'%}" type="text/css">
     <link rel="stylesheet" href="{% static theme %}" type="text/css">
@@ -59,8 +63,13 @@
 
             <div class="score">
                 {% language 'ru' %}
-                <p class="header_city">{{ match.date|date:'j E Y' }}</p>
-                    {% if match.status == 'finished' %}
+
+
+                    {% if match.status == 'live' %}
+                        <p id="score_time"></p>
+                        <p class="arena" id="arena"></p>
+                    {% elif match.status == 'finished' %}
+                        <p class="header_city">{{ match.date|date:'j E Y' }}</p>
                         <p id="score_time">{{ team1.score.match }} - {{ team2.score.match }}</p>
 
                         {% if overtime == True %}
@@ -90,9 +99,11 @@
                             <p class="arena" id="viewers">Зрителей: {{ match.viewers }}</p>
                         {%  endif %}
                     {% elif match.status == 'postponed' %}
+                        <p class="header_city">{{ match.date|date:'j E Y' }}</p>
                         <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.date|time }}</p>
                         <p class="arena" id="postponed">Отменен<br>
                     {% else %}
+                        <p class="header_city">{{ match.date|date:'j E Y' }}</p>
                         <p id="score_time" style="font-family: Montserrat, sans-serif; font-size: 80px; padding-top: 0">{{ match.date|time }}</p>
                     {% endif %}
 
@@ -109,6 +120,14 @@
             <p class="header_city">{{ team2.data.arena }}</p>
         </div>
     </div>
+
+
+    {% if match.status == 'live' %}
+    {% language 'ru' %}
+    <div class="match_stats" id="match_stats"></div>
+    {% endlanguage %}
+    {% endif %}
+
 
 
 {% if match.status == 'finished' %}

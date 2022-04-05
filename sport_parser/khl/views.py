@@ -84,6 +84,7 @@ class StatsView(HockeyView):
             'season': s.data.id,
             'last_matches': s.get_json_last_matches(5),
             'future_matches': s.get_json_future_matches(5),
+            'live_matches': s.get_json_live_matches()
         }
 
 

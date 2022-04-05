@@ -28,12 +28,12 @@
 }
 
 .team1_info {
-    width: 340px;
+    width: 100%;
     text-align: right;
 }
 
 .team2_info {
-    width: 340px;
+    width: 100%;
     text-align: left;
 }
 

@@ -10,7 +10,8 @@
     <script>
     var left_matches = {{ last_matches|safe }};
     var right_matches = {{ future_matches|safe }};
-    var GLOSSARY = {{ glossary|safe }}
+    var live_matches = {{ live_matches|safe }};
+    var GLOSSARY = {{ glossary|safe }};
     </script>
     <script type="text/javascript" src="{% static 'js/matchFrame.js' %}"></script>
     <link rel="stylesheet" href="{% static theme %}" type="text/css">
@@ -83,6 +84,14 @@
     {% endfor %}
     </tbody>
 </table>
+
+{% if live_matches != '{}' %}
+    <div style="display: flex; justify-content: space-between">
+        <h3>Текущие матчи</h3>
+    </div>
+    <div class="LiveMatches" id="LiveMatches">
+    </div>
+{% endif %}
 
 <div style="display: flex; justify-content: space-between">
         <h3>Последние матчи</h3><h3>Ближайшие матчи</h3>
