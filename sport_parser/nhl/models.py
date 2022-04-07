@@ -47,6 +47,7 @@ class NHLMatch(models.Model):
     teams = models.ManyToManyField(NHLTeam, related_name='matches')
     penalties = models.BooleanField(default=False)
     overtime = models.BooleanField(default=False)
+    live_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
 
     def __str__(self):
         return str(self.id)
