@@ -56,6 +56,7 @@ function createMatchFrame(block, finished_matches) {
         }
         else {
             score_p.innerHTML = match_data['match_data']["team_1_score"] + " - " + match_data['match_data']["team_2_score"];
+            date.innerHTML = 'live'
         }
 
         score.appendChild(score_p);
@@ -93,7 +94,7 @@ function createMatchFrame(block, finished_matches) {
             match_data["status"] !== 'scheduled' &&
             match_data["status"] !== 'finished') {
             score_p_extra.id = "live";
-            score_p_extra.innerHTML = match_data["status"]
+            score_p_extra.innerHTML = match_data["match_data"]["match_status"]
             score.appendChild(score_p_extra);
         }
 

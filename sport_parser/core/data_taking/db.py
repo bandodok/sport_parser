@@ -64,20 +64,24 @@ class DB:
                 p.__dict__[arg] = value
             p.save()
 
-    def update_live_match(self, match_data):
-        match = LiveMatches.objects.get(
-            league=self.config.name,
-            match_id=match_data['match_id']
+    def update_live_match(self, live_data):
+        match = self.model_list.match_model.objects.get(
+            id=live_data['match_id']
         )
-        match.match_data = match_data
+        match.live_data = live_data
         match.save()
 
     def remove_live_match(self, match_id):
-        match = LiveMatches.objects.get(
+        live_match = LiveMatches.objects.get(
             league=self.config.name,
             match_id=match_id
         )
-        match.delete()
+        live_match.delete()
+        match = self.model_list.match_model.objects.get(
+            id=match_id
+        )
+        match.live_data = ""
+        match.save()
 
     def _team_name_update(self, team):
         if self.updated_team_names.get(team):

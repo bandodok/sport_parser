@@ -58,20 +58,18 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
                 'team2_name': team2.name,
                 'team2_image': team2.img,
                 'team2_id': team2.id,
+                'match_data': match.live_data
             }
-            if match.status != 'scheduled':
-                output['match_data'] = match.match_data
             return output
 
 
 class LiveMatchSerializer(serializers.BaseSerializer, ABC):
     def to_representation(self, match):
-        match_data = match.match_data
+        live_data = match.live_data
         return {
             'id': match.id,
-            'league': match.league,
-            'status': match_data.get('match_status', ''),
-            'team_1_score': match_data.get('team_1_score', ''),
-            'team_2_score': match_data.get('team_2_score', ''),
-            'data': match_data.get('data', '')
+            'status': live_data.get('match_status', ''),
+            'team_1_score': live_data.get('team_1_score', ''),
+            'team_2_score': live_data.get('team_2_score', ''),
+            'data': live_data.get('data', '')
         }

@@ -225,7 +225,7 @@ class NHLParser(Parser):
     @staticmethod
     def _get_match_status(match_data):
         status = match_data['gameData']['status']
-        if status['detailedState'] == 'Pre-Game':
+        if status['detailedState'] in ('Pre-Game', 'Scheduled'):
             return 'матч скоро начнется'
         if status['detailedState'] in ('In Progress', 'In Progress - Critical'):
             status = match_data['liveData']['linescore']

@@ -43,10 +43,8 @@ class Season:
         live_matches = []
         matches = self.data.matches.filter(status='live').order_by('date')
         for match in matches:
-            live_match = self.live_match_model.objects.get(match_id=match.id, league=self.config.name)
-            match_data = live_match.match_data
-            match.status = match_data['match_status']
-            match.match_data = match_data
+            live_data = match.live_data
+            match.status = live_data['match_status']
             live_matches.append(match)
         return live_matches
 
