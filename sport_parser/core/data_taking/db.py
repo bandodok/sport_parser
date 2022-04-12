@@ -63,6 +63,12 @@ class DB:
                     continue
                 p.__dict__[arg] = value
             p.save()
+        # очистка данных прямого эфира
+        match = self.model_list.match_model.objects.get(
+            id=protocol[0]['match_id']
+        )
+        match.live_data = ""
+        match.save()
 
     def update_live_match(self, live_data):
         match = self.model_list.match_model.objects.get(
