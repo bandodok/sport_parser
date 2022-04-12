@@ -125,12 +125,18 @@ class Updater:
 
     def _get_first_unfinished_match_season(self):
         season = self.model_list.match_model.objects.filter(status='scheduled')
-        if not season:
-            season = self.model_list.season_model.objects.aggregate(Max('id'))['id__max']
-            new_season = True
-        else:
+        if season:
             season = season[0].season
             new_season = False
+        else:
+            last_season = self.model_list.match_model.objects.filter(status='finished')
+            max_season = self.model_list.season_model.objects.aggregate(Max('id'))['id__max']
+            if last_season and last_season[0].season.id == max_season:
+                season = last_season[0].season
+                new_season = False
+            else:
+                season = max_season
+                new_season = True
         return season, new_season
 
     def _get_postponed_matches(self, season):
