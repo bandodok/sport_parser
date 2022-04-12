@@ -77,10 +77,16 @@ class DB:
             match_id=match_id
         )
         live_match.delete()
-        match = self.model_list.match_model.objects.get(
-            id=match_id
-        )
-        match.live_data = ""
+
+    def set_match_status(self, match, status: str) -> None:
+        """
+        Устанавливает статус матча
+
+        :param match строка базы данных матча
+        :param status статус в формате строки
+        """
+        match = self.model_list.match_model.objects.get(id=match.id)
+        match.status = status
         match.save()
 
     def _team_name_update(self, team):
