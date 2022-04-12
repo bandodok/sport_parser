@@ -43,6 +43,7 @@ class NHLMatch(models.Model):
         ('finished', 'finished'),
         ('postponed', 'postponed'),
         ('live', 'live'),
+        ('game over', 'game over'),
     ], max_length=9, default='scheduled')
     teams = models.ManyToManyField(NHLTeam, related_name='matches')
     penalties = models.BooleanField(default=False)
