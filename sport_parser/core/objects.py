@@ -41,7 +41,11 @@ class Season:
 
     def get_live_matches(self):
         live_matches = []
-        matches = self.data.matches.filter(status='live').order_by('date')
+        matches = self.data.matches\
+            .exclude(status='finished')\
+            .exclude(status='scheduled')\
+            .exclude(status='postponed')\
+            .order_by('date')
         for match in matches:
             live_data = match.live_data
             match.status = live_data['match_status']

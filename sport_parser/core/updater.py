@@ -46,7 +46,7 @@ class Updater:
         match_class = self.match_class(match_id, config=self.config)
         if live_match_data['match_status'] == 'матч завершен':
             self.db.remove_live_match(match_id)
-            self._add_match_to_db(match_class.data)
+            self._set_game_over_status(match_class.data)
             return
 
         live_match_data['match_id'] = match_id
@@ -121,7 +121,12 @@ class Updater:
     def _get_unfinished_matches_until_today(self):
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(1)
-        return self.model_list.match_model.objects.filter(status='scheduled').filter(date__lte=tomorrow).order_by('date')
+        return self.model_list.match_model.objects\
+            .exclude(status='finished')\
+            .exclude(status='postponed')\
+            .exclude(status='live')\
+            .filter(date__lte=tomorrow)\
+            .order_by('date')
 
     def _get_first_unfinished_match_season(self):
         season = self.model_list.match_model.objects.filter(status='scheduled')
@@ -187,3 +192,12 @@ class Updater:
                 enabled=True,
                 queue='regular_update'
             )
+
+    def _set_game_over_status(self, match):
+        """
+        Устанавливает статус 'game over' для матча
+        Такой матч не будет проигнорирован при регулярном обновлении
+
+        :param match трока базы данных матча
+        """
+        self.db.set_match_status(match, 'game over')
