@@ -26,4 +26,4 @@ class LiveMatch(generics.ListAPIView):
         config = self.request.query_params['league']
         creator = Creator(config)
         match = creator.get_match_class(self.request.query_params['match_id'])
-        return match.models.match_model.objects.filter(id=self.request.query_params['match_id'])
+        return match.models.match_model.objects.filter(id=self.request.query_params['match_id']).filter(status='live')
