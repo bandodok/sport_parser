@@ -45,6 +45,7 @@ class Updater:
 
         match_class = self.match_class(match_id, config=self.config)
         if live_match_data['match_status'] == 'матч завершен':
+            self.db.update_live_match(live_match_data)
             self.db.remove_live_match(match_id)
             self._set_game_over_status(match_class.data)
             return
