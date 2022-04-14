@@ -116,3 +116,7 @@ if (STATUS === 'live') {
     getLiveMatchData()
     setInterval(getLiveMatchData, 60000)
 }
+
+if (STATUS === 'game over') {
+    getLiveMatchData()
+}
