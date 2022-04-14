@@ -233,6 +233,8 @@ class NHLParser(Parser):
                 return f"{status['currentPeriod']}-й перерыв"
             if status['currentPeriod'] == 4:
                 return 'овертайм'
+            if status['currentPeriod'] == 5:
+                return 'послематчевые буллиты'
             return f"{status['currentPeriod']}-й период"
         if status['detailedState'] == 'Game Over':
             return 'завершение'
