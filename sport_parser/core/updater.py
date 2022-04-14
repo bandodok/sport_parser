@@ -44,16 +44,14 @@ class Updater:
             return
 
         match_class = self.match_class(match_id, config=self.config)
+        live_match_data['match_id'] = match_id
+        live_match_data['data'] = match_class.get_live_bar_stats(live_match_data['data'])
+        self.db.update_live_match(live_match_data)
+
         if live_match_data['match_status'] == 'матч завершен':
-            self.db.update_live_match(live_match_data)
             self.db.remove_live_match(match_id)
             self._set_game_over_status(match_class.data)
             return
-
-        live_match_data['match_id'] = match_id
-        live_match_data['data'] = match_class.get_live_bar_stats(live_match_data['data'])
-
-        self.db.update_live_match(live_match_data)
 
     def ws_send_status(self, message):
         """Отправляет сообщение в вебсокет"""
