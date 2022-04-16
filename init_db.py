@@ -30,28 +30,30 @@ def main():
         "nhl"
     ]
     for item in update_list:
-        try:
-            PeriodicTask.objects.get_or_create(name=f'{item}_update')
-        except django.core.exceptions.ValidationError:
-            PeriodicTask.objects.get_or_create(
-                name=f'{item}_update',
-                interval_id=interval.id,
-                task='update',
-                args=f'["{item}"]',
-                start_time=timezone.now(),
-                one_off=False,
-                enabled=True,
-                queue='regular_update'
-            )
-    PeriodicTask.objects.get_or_create(
+        task, created = PeriodicTask.objects.get_or_create(
+            name=f'{item}_update',
+            interval_id=interval.id,
+            task='update',
+            args=f'["{item}"]',
+            one_off=False,
+            enabled=True,
+            queue='regular_update'
+        )
+        if created:
+            task.start_time = timezone.now()
+        task.save()
+
+    task, created = PeriodicTask.objects.get_or_create(
         name='update_live_matches',
         interval_id=min_interval.id,
         task='update_live_matches',
-        start_time=timezone.now(),
         one_off=False,
         enabled=True,
         queue='update_live_matches'
     )
+    if created:
+        task.start_time = timezone.now()
+    task.save()
 
     # KHL season settings
     KHLSeason.objects.get_or_create(id=21, external_id=1097)
