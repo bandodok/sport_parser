@@ -1,5 +1,6 @@
 from django.db.models import Max
 import datetime
+from django.db.models import Q
 
 
 class Season:
@@ -42,9 +43,7 @@ class Season:
     def get_live_matches(self):
         live_matches = []
         matches = self.data.matches\
-            .exclude(status='finished')\
-            .exclude(status='scheduled')\
-            .exclude(status='postponed')\
+            .filter(Q(status='live') | Q(status='game over'))\
             .order_by('date')
         for match in matches:
             live_data = match.live_data

@@ -4,6 +4,7 @@ from channels.layers import get_channel_layer
 from django.db.models import Max
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from django.utils import timezone
+from django.db.models import Q
 
 
 class Updater:
@@ -121,9 +122,7 @@ class Updater:
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(1)
         return self.model_list.match_model.objects\
-            .exclude(status='finished')\
-            .exclude(status='postponed')\
-            .exclude(status='live')\
+            .filter(Q(status='scheduled') | Q(status='game over'))\
             .filter(date__lte=tomorrow)\
             .order_by('date')
 
