@@ -51,6 +51,15 @@
       when: "'nginx' in ansible_facts.services"
       tags: init
 
+    - name: Stopping postgresql service
+      ansible.builtin.systemd:
+        name: postgresql
+        state: stopped
+        enabled: no
+      become: yes
+      when: "'postgresql' in ansible_facts.services"
+      tags: init
+
     - name: remove all files if exist
       ansible.builtin.shell:
         removes: /home/sport_parser
