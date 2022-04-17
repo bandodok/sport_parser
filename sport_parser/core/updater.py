@@ -21,16 +21,16 @@ class Updater:
     def update(self):
         season, new_season = self._get_first_unfinished_match_season()
         if new_season:
-            self.parse_season(season)
+            self.parse_season(season.id)
         else:
             self._add_calendar_to_db(season, skip_finished=True, skip_live=True, add_postponed=True)
             self.ws_send_status('updating matches')
             self._update_finished_matches()
             self.ws_send_status('matches updated')
-        self._update_season_stats_data(season.id)
+            self._update_season_stats_data(season.id)
         self._add_matches_to_live_updater()
 
-    def parse_season(self, season_id):
+    def parse_season(self, season_id: int):
         season = self.model_list.season_model.objects.get(id=season_id)
         self._add_teams_to_db(season)
         calendar = self._add_calendar_to_db(season)
@@ -60,7 +60,7 @@ class Updater:
             'update', {'type': 'update.update', 'text': message}
         )
 
-    def _update_season_stats_data(self, season_id):
+    def _update_season_stats_data(self, season_id: int):
         self.ws_send_status('updating season stats data')
         season_class = self.season_class(season_id, config=self.config)
         season_class.update_season_table_stats()
@@ -127,9 +127,9 @@ class Updater:
             .order_by('date')
 
     def _get_first_unfinished_match_season(self):
-        season = self.model_list.match_model.objects.filter(status='scheduled')
-        if season:
-            season = season[0].season
+        scheduled_matches = self.model_list.match_model.objects.filter(status='scheduled')
+        if scheduled_matches:
+            season = scheduled_matches[0].season
             new_season = False
         else:
             last_season = self.model_list.match_model.objects.filter(status='finished')
@@ -138,7 +138,7 @@ class Updater:
                 season = last_season[0].season
                 new_season = False
             else:
-                season = max_season
+                season = self.model_list.season_model.objects.get(id=max_season)
                 new_season = True
         return season, new_season
 
