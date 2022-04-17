@@ -65,7 +65,7 @@ class NHLParser(Parser):
             status = 'scheduled'
             if game['status']['statusCode'] == '9':  # postponed code
                 status = 'postponed'
-            elif game['status']['statusCode'] == '7':  # finished code
+            elif game['status']['statusCode'] in ('6', '7'):  # finished codes
                 status = 'finished'
 
             utc = pytz.utc
