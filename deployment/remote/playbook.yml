@@ -133,6 +133,21 @@
       when: "'fullchain.pem' in cert.stdout"
       tags: copy_files
 
+    - name: create autorun service
+      ansible.builtin.copy:
+        src: sport_parser.service
+        dest: /etc/systemd/system/sport_parser.service
+      become: yes
+      tags: run_app
+
+    - name: enable and reload systemd
+      ansible.builtin.shell:
+        cmd: |
+          systemctl daemon-reload
+          systemctl enable sport_parser.service
+      become: yes
+      tags: run_app
+
     - name: run app
       ansible.builtin.shell:
         chdir: /home/sport_parser/app
