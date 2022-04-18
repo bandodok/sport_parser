@@ -65,7 +65,7 @@
                 {% language 'ru' %}
 
 
-                    {% if match.status == 'live' %}
+                    {% if match.status == 'live' or match.status == 'game over' %}
                         <p id="score_time"></p>
                         <p class="arena" id="arena"></p>
                     {% elif match.status == 'finished' %}
@@ -122,7 +122,7 @@
     </div>
 
 
-    {% if match.status == 'live' %}
+    {% if match.status == 'live' or match.status == 'game over' %}
     {% language 'ru' %}
     <div class="match_stats" id="match_stats"></div>
     {% endlanguage %}
