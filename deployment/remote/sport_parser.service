@@ -1,0 +1,14 @@
+[Unit]
+Description=Sport_parser docker service
+After=docker.service network.target
+[Service]
+RemainAfterExit=yes
+User=bandodok
+Group=bandodok
+WorkingDirectory=/home/sport_parser/app
+ExecStartPre=sudo docker-compose -f /home/sport_parser/app/docker-compose.yml pull
+ExecStart=sudo docker-compose -f /home/sport_parser/app/docker-compose.yml up --build --remove-orphans -d
+ExecStop=sudo docker-compose -f /home/sport_parser/app/docker-compose.yml down --volume
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target

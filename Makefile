@@ -1,6 +1,23 @@
 include deployment/remote/.env
 
 makemigrations:
+	SECRET_KEY="${SECRET_KEY}" \
+    TAG=${TAG} \
+    DEBUG=${DEBUG} \
+    ALLOWED_HOSTS=${ALLOWED_HOSTS} \
+    SERVER_IP=${SERVER_IP} \
+    HOST_NAME=${HOST_NAME} \
+    SERVER_USERNAME=${SERVER_USERNAME} \
+    ADMIN_USERNAME=${ADMIN_USERNAME} \
+    ADMIN_PASSWORD=${ADMIN_PASSWORD} \
+    DB_NAME=${DB_NAME} \
+    DB_USER=${DB_USER} \
+    DB_PASSWORD=${DB_PASSWORD} \
+    DB_HOST=${DB_HOST} \
+    DB_PORT=${DB_PORT} \
+    CHROMEDRIVER=${CHROMEDRIVER} \
+    ROLLBAR_TOKEN=${ROLLBAR_TOKEN} \
+    REDIS_HOST=${REDIS_HOST} \
 	python manage.py makemigrations
 
 migrate:

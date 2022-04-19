@@ -48,7 +48,7 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
             }
         else:
             team1, team2 = get_sorted_teams_by_m2m_table(match)
-            return {
+            output = {
                 'date': match.date,
                 'id': match.id,
                 'status': match.status,
@@ -58,4 +58,18 @@ class CalendarSerializer(serializers.BaseSerializer, ABC):
                 'team2_name': team2.name,
                 'team2_image': team2.img,
                 'team2_id': team2.id,
+                'match_data': match.live_data
             }
+            return output
+
+
+class LiveMatchSerializer(serializers.BaseSerializer, ABC):
+    def to_representation(self, match):
+        live_data = match.live_data
+        return {
+            'id': match.id,
+            'status': live_data.get('match_status', ''),
+            'team_1_score': live_data.get('team_1_score', ''),
+            'team_2_score': live_data.get('team_2_score', ''),
+            'data': live_data.get('data', '')
+        }

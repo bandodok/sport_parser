@@ -81,7 +81,25 @@ services:
           sleep 1;
         done;
         echo Connected!;
-        python -m celery -A sport_parser worker -l info --concurrency=1;
+        python -m celery -A sport_parser worker -l info --concurrency=1 -Q regular_update;
+      "
+
+  celery_live_matches:
+    image: bandodok/sport_parser_app:${TAG}
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - app
+      - db
+    command: >
+      bash -c "
+        while ! nc -z db 5432;
+        do
+          sleep 1;
+        done;
+        echo Connected!;
+        python -m celery -A sport_parser worker -l info --concurrency=1 -Q update_live_matches;
       "
 
   celery-beat:

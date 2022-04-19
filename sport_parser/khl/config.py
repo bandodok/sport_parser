@@ -5,6 +5,7 @@ from sport_parser.khl.parser import KHLParser
 
 
 class KHLConfig(Config):
+    name = 'khl'
     title = 'КХЛ'
     league_title = 'Континентальная хоккейная лига'
     league_logo = 'KHL.webp'
@@ -77,6 +78,25 @@ class KHLConfig(Config):
         'blocks': ('Blocks', 'Блокированные броски', 'int'),
         'penalty': ('Penalty', 'Штрафное время', 'int'),
         'hits': ('Hits', 'Силовые приемы', 'int'),
+        'time_a': ('TimeA', 'Время в атаке', 'time'),
+    }
+    bar_stats_names = {
+        'sh': ('Sh', 'Все броски', 'int'),
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'time_a': ('TimeA', 'Время в атаке', 'time'),
+    }
+    live_bar_stats_names = {
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
         'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
     updated_team_names = {

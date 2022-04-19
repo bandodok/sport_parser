@@ -1,6 +1,5 @@
 import datetime
 import json
-from sport_parser.api.serializers import CalendarSerializer
 from django.core.serializers.json import DjangoJSONEncoder
 
 
@@ -53,6 +52,16 @@ class Formatter:
                 stats[stat]['right_value'] = cls._set_format(value['right_value'], format)
         return stats
 
+    @classmethod
+    def live_bar_stat_format(cls, stat):
+        if not stat:
+            return 0
+        if cls._isfloat(stat):
+            return int(stat)
+        if ':' in str(stat):
+            hours, mins, secs = stat.split(':')
+            return int(secs) + int(mins) * 60 + int(hours) * 3600
+
     def date_format(self, date):
         splitted_date = date.split(' ')[:-1]
         if not splitted_date[0]:
@@ -83,17 +92,11 @@ class Formatter:
         }
         return months.get(month)
 
-    def get_json_last_matches_info(self, matches):
-        last_matches = {}
+    def get_json_matches_info(self, matches):
+        json_matches = {}
         for match in matches:
-            last_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
-        return json.dumps(last_matches, cls=DjangoJSONEncoder)
-
-    def get_json_future_matches_info(self, matches):
-        future_matches = {}
-        for match in matches:
-            future_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
-        return json.dumps(future_matches, cls=DjangoJSONEncoder)
+            json_matches[f'{match.id}/{match.date}'] = self.calendar_serializer.to_representation(match)
+        return json.dumps(json_matches, cls=DjangoJSONEncoder)
 
     @classmethod
     def _set_format(cls, stat, format):
@@ -103,3 +106,11 @@ class Formatter:
             return f'{"{:.2f}".format(round(stat, 2))}%'
         elif format == 'time':
             return cls.sec_to_time(stat)
+
+    @staticmethod
+    def _isfloat(num):
+        try:
+            float(num)
+            return True
+        except ValueError:
+            return False

@@ -185,11 +185,112 @@ class KHLParser(Parser):
         """Возвращает протокол по id матча в виде двух списков - для домашней и для гостевой команды"""
         url = f"https://text.khl.ru/text/{match.id}.html"
         soup = self.get_request_content(url)
-        match_status = soup.find('dd', class_="b-period_score")
-        if not match_status or match_status.text != 'матч завершен':
+        match_status = self._get_match_status(soup)
+        if match_status != 'матч завершен':
             return f'match not found {match.id}'
 
         # Общего количества бросков нет в протоколе, берется отдельно из текстовой трансляции
+        text_broadcast_data = self._get_text_broadcast_stats(soup)
+        sh_home = text_broadcast_data['sh_home']
+        sh_guest = text_broadcast_data['sh_guest']
+        g_home = text_broadcast_data['g_home']
+        g_guest = text_broadcast_data['g_guest']
+
+        stat_dict = {
+            'Команда': 'team',
+            'Ш': 'g',
+            'БВ': 'sog',
+            'Штр': 'penalty',
+            'ВВбр': 'faceoff',
+            '%ВВбр': 'faceoff_p',
+            'БлБ': 'blocks',
+            'СПр': 'hits',
+            'ФоП': 'fop',
+            'ВВА': 'time_a',
+            'ВВШ': 'vvsh',
+            'НВШ': 'nshv',
+            'ПД': 'pd'
+        }
+        main_data = self._get_main_stats(soup, stat_dict)
+        row_home = main_data['row_home']
+        row_guest = main_data['row_guest']
+
+        row_home.update({
+            'match_id': match.id,
+            'sh': sh_home,
+            'g_1': g_home.get('p1'),
+            'g_2': g_home.get('p2'),
+            'g_3': g_home.get('p3'),
+            'g_ot': g_home.get('ot'),
+            'g_b': g_home.get('b'),
+        })
+        row_guest.update({
+            'match_id': match.id,
+            'sh': sh_guest,
+            'g_1': g_guest.get('p1'),
+            'g_2': g_guest.get('p2'),
+            'g_3': g_guest.get('p3'),
+            'g_ot': g_guest.get('ot'),
+            'g_b': g_guest.get('b'),
+        })
+        return row_home, row_guest
+
+    def parse_live_protocol(self, match_id):
+        url = f"https://text.khl.ru/text/{match_id}.html"
+        soup = self.get_request_content(url)
+
+        match_status = self._get_match_status(soup)
+        if match_status in ('матч скоро начнется', 'status not found', 'подготовка'):
+            return {
+                'match_status': 'матч скоро начнется',
+                'team_1_score': '-',
+                'team_2_score': '-',
+                'data': {
+                    'row_home': '',
+                    'row_guest': ''
+                }
+            }
+
+        row_home = {}
+        row_guest = {}
+
+        if match_status != 'подготовка' and match_status != 'status not found':
+            stat_dict = {
+                'Команда': 'team',
+                'Ш': 'g',
+                'БВ': 'sog',
+                'Штр': 'penalty',
+                'ВВбр': 'faceoff',
+                '%ВВбр': 'faceoff_p',
+                'БлБ': 'blocks',
+                'СПр': 'hits',
+                'ФоП': 'fop',
+                'ВВА': 'time_a',
+            }
+            main_data = self._get_main_stats(soup, stat_dict)
+            row_home = main_data['row_home']
+            row_guest = main_data['row_guest']
+
+        return {
+            'match_status': match_status,
+            'team_1_score': row_home.get('g', 0),
+            'team_2_score': row_guest.get('g', 0),
+            'data': {
+                'row_home': row_home,
+                'row_guest': row_guest
+            }
+        }
+
+    @staticmethod
+    def _get_match_status(soup):
+        match_status = soup.find('dd', class_="b-period_score")
+        if not match_status:
+            return 'status not found'
+        return match_status.text
+
+    @staticmethod
+    def _get_text_broadcast_stats(soup):
+        """Возвращает количество голов и всего бросков по периодам из текстовой трансляции"""
         text_stats = soup.find_all('p', class_='e-action_txt')
 
         match_stats = {}
@@ -209,8 +310,8 @@ class KHLParser(Parser):
 
         sh_home = 0
         sh_guest = 0
-        g_home = {}
-        g_guest = {}
+        g_home = {'b': 0}
+        g_guest = {'b': 0}
 
         score_status = soup.find('dt', class_="b-total_score").h3
         if 'Б' in score_status.text:
@@ -236,6 +337,15 @@ class KHLParser(Parser):
                 g_home[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[0])
                 g_guest[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[1])
 
+        return {
+            'sh_home': sh_home,
+            'sh_guest': sh_guest,
+            'g_home': g_home,
+            'g_guest': g_guest,
+        }
+
+    def _get_main_stats(self, soup, stat_dict):
+        """Возвращает статистику из основной таблицы"""
         team_stats = soup.find_all('div', class_="table-responsive")
         head = [x.find_all('th') for x in team_stats][0]
         body = [x.find_all('td') for x in team_stats][0]
@@ -248,45 +358,13 @@ class KHLParser(Parser):
             len_ = int((len(rows) + 1) / 2)
             rows.insert((k + len_), v)
 
-        stat_dict = {
-            'Команда': 'team',
-            'Ш': 'g',
-            'БВ': 'sog',
-            'Штр': 'penalty',
-            'ВВбр': 'faceoff',
-            '%ВВбр': 'faceoff_p',
-            'БлБ': 'blocks',
-            'СПр': 'hits',
-            'ФоП': 'fop',
-            'ВВА': 'time_a',
-            'ВВШ': 'vvsh',
-            'НВШ': 'nshv',
-            'ПД': 'pd'
+        row_home = {stat_dict[stat]: value for stat, value in zip(columns, rows) if stat in stat_dict}
+        row_guest = {stat_dict[stat]: value for stat, value in zip(columns, rows[len(columns):]) if stat in stat_dict}
+
+        return {
+            'row_home': self._row_update_type(row_home),
+            'row_guest': self._row_update_type(row_guest)
         }
-
-        row_home = {stat_dict[stat]: value for stat, value in zip(columns, rows)}
-        row_guest = {stat_dict[stat]: value for stat, value in zip(columns, rows[len(columns):])}
-
-        row_home.update({
-            'match_id': match.id,
-            'sh': sh_home,
-            'g_1': g_home.get('p1'),
-            'g_2': g_home.get('p2'),
-            'g_3': g_home.get('p3'),
-            'g_ot': g_home.get('ot'),
-            'g_b': g_home.get('b'),
-        })
-        row_guest.update({
-            'match_id': match.id,
-            'sh': sh_guest,
-            'g_1': g_guest.get('p1'),
-            'g_2': g_guest.get('p2'),
-            'g_3': g_guest.get('p3'),
-            'g_ot': g_guest.get('ot'),
-            'g_b': g_guest.get('b'),
-        })
-
-        return self._row_update_type(row_home), self._row_update_type(row_guest)
 
     @staticmethod
     def _row_update_type(row):

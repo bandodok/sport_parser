@@ -303,6 +303,14 @@ footer div a {
 
 /* match frames */
 
+.LiveMatches {
+    width: 1400px;
+    min-width: 1364px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
 .lastMatches {
     width: 1400px;
     min-width: 1364px;
@@ -311,7 +319,7 @@ footer div a {
 }
 
 
-.lastMatches .match {
+.match {
     font-size: 16px;
     font-family: Montserrat, sans-serif;
     background-color: rgba(255, 255, 255, 0.1);

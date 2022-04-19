@@ -51,6 +51,15 @@
       when: "'nginx' in ansible_facts.services"
       tags: init
 
+    - name: Stopping postgresql service
+      ansible.builtin.systemd:
+        name: postgresql
+        state: stopped
+        enabled: no
+      become: yes
+      when: "'postgresql' in ansible_facts.services"
+      tags: init
+
     - name: remove all files if exist
       ansible.builtin.shell:
         removes: /home/sport_parser
@@ -123,6 +132,21 @@
         dest: /home/sport_parser/app/_nginx.conf
       when: "'fullchain.pem' in cert.stdout"
       tags: copy_files
+
+    - name: create autorun service
+      ansible.builtin.copy:
+        src: sport_parser.service
+        dest: /etc/systemd/system/sport_parser.service
+      become: yes
+      tags: run_app
+
+    - name: enable and reload systemd
+      ansible.builtin.shell:
+        cmd: |
+          systemctl daemon-reload
+          systemctl enable sport_parser.service
+      become: yes
+      tags: run_app
 
     - name: run app
       ansible.builtin.shell:

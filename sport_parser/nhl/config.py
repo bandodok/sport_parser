@@ -5,6 +5,7 @@ from sport_parser.nhl.parser import NHLParser
 
 
 class NHLConfig(Config):
+    name = 'nhl'
     title = 'НХЛ'
     league_title = 'Национальная хоккейная лига'
     league_logo = 'NHL.webp'
@@ -57,6 +58,17 @@ class NHLConfig(Config):
         'pdo__e': 'sog__e + dev__e',
     }
     bar_stats_names = {
+        'sh': ('Sh', 'Все броски', 'int'),
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'takeaways': ('TA', 'Отборы', 'int'),
+        'giveaways': ('GA', 'Потери', 'int'),
+    }
+    live_bar_stats_names = {
         'sh': ('Sh', 'Все броски', 'int'),
         'sog': ('SoG', 'Броски в створ', 'int'),
         'g': ('G', 'Голы', 'int'),
