@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 
 class NHLSeason(models.Model):
@@ -6,6 +7,7 @@ class NHLSeason(models.Model):
     updated = models.DateTimeField(auto_now=True)
     id = models.IntegerField(primary_key=True)
     external_id = models.IntegerField(null=True)
+    table_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
 
     def __str__(self):
         return str(self.id)
@@ -40,10 +42,13 @@ class NHLMatch(models.Model):
         ('scheduled', 'scheduled'),
         ('finished', 'finished'),
         ('postponed', 'postponed'),
+        ('live', 'live'),
+        ('game over', 'game over'),
     ], max_length=9, default='scheduled')
     teams = models.ManyToManyField(NHLTeam, related_name='matches')
     penalties = models.BooleanField(default=False)
     overtime = models.BooleanField(default=False)
+    live_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
 
     def __str__(self):
         return str(self.id)

@@ -1,14 +1,17 @@
 from django.db.models import Max
 import datetime
+from django.db.models import Q
 
 
 class Season:
     season_does_not_exist = False
 
     def __init__(self, season_id, *, config):
+        self.config = config
         self.TableStats = config.TableStats(config=config)
         self.formatter = config.formatter(config=config)
         self.models = config.models
+        self.live_match_model = config.live_match_model
         try:
             self.data = self.models.season_model.objects.get(id=season_id)
         except self.models.season_model.DoesNotExist:
@@ -28,14 +31,29 @@ class Season:
 
     def get_json_last_matches(self, num):
         lats_matches = self.get_last_matches(num)
-        return self.formatter.get_json_last_matches_info(lats_matches)
+        return self.formatter.get_json_matches_info(lats_matches)
 
     def get_future_matches(self, num):
         return self.data.matches.filter(status='scheduled').order_by('date')[:num]
 
     def get_json_future_matches(self, num):
         future_matches = self.get_future_matches(num)
-        return self.formatter.get_json_future_matches_info(future_matches)
+        return self.formatter.get_json_matches_info(future_matches)
+
+    def get_live_matches(self):
+        live_matches = []
+        matches = self.data.matches\
+            .filter(Q(status='live') | Q(status='game over'))\
+            .order_by('date')
+        for match in matches:
+            live_data = match.live_data
+            match.status = live_data['match_status']
+            live_matches.append(match)
+        return live_matches
+
+    def get_json_live_matches(self):
+        live_matches = self.get_live_matches()
+        return self.formatter.get_json_matches_info(live_matches)
 
     def last_updated(self, *, update=False):
         """Возвращает дату последнего обновления таблицы матчей
@@ -55,6 +73,8 @@ class Season:
         return [key for key, value in fields.items()]
 
     def get_table_stats(self, *, match_list=None, team_list=None, protocol_list=None):
+        if not match_list and not team_list and not protocol_list:
+            return self.data.table_data
         if not match_list:
             match_list = self.get_match_list()
         if not team_list:
@@ -62,6 +82,11 @@ class Season:
         if not protocol_list:
             protocol_list = self.get_protocol_list()
         return self.TableStats.season_stats_calculate(match_list, team_list, protocol_list)
+
+    def update_season_table_stats(self):
+        data = self.get_table_stats(match_list=self.get_match_list())
+        self.data.table_data = data
+        self.data.save()
 
 
 class Team:
@@ -94,14 +119,14 @@ class Team:
 
     def get_json_last_matches(self, num, *, exclude=0):
         lats_matches = self.get_last_matches(num, exclude=exclude)
-        return self.formatter.get_json_last_matches_info(lats_matches)
+        return self.formatter.get_json_matches_info(lats_matches)
 
     def get_future_matches(self, num, *, exclude=0):
         return self.data.matches.filter(status='scheduled').exclude(id=exclude).order_by('date')[:num]
 
     def get_json_future_matches(self, num, *, exclude=0):
         future_matches = self.get_future_matches(num, exclude=exclude)
-        return self.formatter.get_json_future_matches_info(future_matches)
+        return self.formatter.get_json_matches_info(future_matches)
 
     def get_table_stats(self):
         season = self.season_class(self.data.season_id, config=self.config)
@@ -125,6 +150,7 @@ class Match:
         self.TableStats = config.TableStats(config=config)
         self.ChartStats = config.ChartStats(config=config)
         self.BarStats = config.BarStats(config=config)
+        self.LiveBarStats = config.LiveBarStats(config=config)
         self.season_class = config.season_class
         self.team_class = config.team_class
         self.formatter = config.formatter(config=config)
@@ -199,6 +225,9 @@ class Match:
         if self.data.status != 'finished':
             return 'The match is not over yet'
         return self.BarStats.calculate(self)
+
+    def get_live_bar_stats(self, match_data):
+        return self.LiveBarStats.calculate(match_data)
 
     def get_chart_stats(self):
         team_list = (self.team1, self.team2)

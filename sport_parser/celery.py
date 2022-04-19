@@ -12,7 +12,7 @@ app = Celery('sport_parser')
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
-app.conf.broker_url = 'redis://localhost:6379/0'
+app.conf.broker_url = f'redis://{os.getenv("REDIS_HOST")}:6379/0'
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 

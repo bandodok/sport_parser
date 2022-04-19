@@ -12,12 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 from os.path import join, dirname
-from dotenv import load_dotenv
 import rollbar
-
-
-dotenv_path = join(dirname(__file__), '.env')
-load_dotenv(dotenv_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +28,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
+ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS"), os.getenv("HOST_NAME")]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -49,6 +44,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'dbview',
     'django_celery_beat',
+    'sport_parser.core',
     'sport_parser.khl',
     'sport_parser.nhl',
     'sport_parser.api',
@@ -89,8 +85,7 @@ ROOT_URLCONF = 'sport_parser.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -111,7 +106,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(os.getenv("REDIS_HOST"), 6379)],
             "capacity": 1500,
             "expiry": 10,
         },
@@ -119,7 +114,7 @@ CHANNEL_LAYERS = {
 }
 
 # REDIS related settings
-REDIS_HOST = 'localhost'
+REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
@@ -180,7 +175,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static/static')
 
 STATICFILES_DIRS = (os.path.join('static'), )
 

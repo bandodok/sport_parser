@@ -47,12 +47,16 @@ function createMatchFrame(block, finished_matches) {
         if (match_data["status"] === 'finished') {
             score_p.innerHTML = match_data["team1_score"]['match'] + " - " + match_data["team2_score"]['match']; // "4 - 0"
         }
-        else {
+        else if (match_data["status"] === 'scheduled') {
             let time = new Date(match_data["date"]).toLocaleTimeString().substring(0, 5);
             if (time[0] === '0') {
                 time = time.substring(1, 5)
             }
             score_p.innerHTML = time;
+        }
+        else {
+            score_p.innerHTML = match_data['match_data']["team_1_score"] + " - " + match_data['match_data']["team_2_score"];
+            date.innerHTML = 'live'
         }
 
         score.appendChild(score_p);
@@ -83,6 +87,14 @@ function createMatchFrame(block, finished_matches) {
         if (match_data["status"] === 'postponed') {
             score_p_extra.id = "postponed";
             score_p_extra.innerHTML = "Отменен"
+            score.appendChild(score_p_extra);
+        }
+
+        if (match_data["status"] !== 'postponed' &&
+            match_data["status"] !== 'scheduled' &&
+            match_data["status"] !== 'finished') {
+            score_p_extra.id = "live";
+            score_p_extra.innerHTML = match_data["match_data"]["match_status"]
             score.appendChild(score_p_extra);
         }
 

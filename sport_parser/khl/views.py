@@ -5,13 +5,14 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 
-from sport_parser.khl.creator import Creator
-from sport_parser.khl.tasks import update, parse_season
+from sport_parser.core.creator import Creator
+from sport_parser.core.tasks import update, parse_season
 
 
 class HockeyView(View):
     config = 'khl'
     template = ''
+    creator: Creator = None
 
     def get(self, request, **kwargs):
         request.app_name = self.config
@@ -38,6 +39,7 @@ class HockeyView(View):
             'league_logo': self.get_league_logo(),
             'config': self.config,
             'glossary': self.get_glossary(),
+            'league': self.config,
 
             'url_stats': reverse_lazy(f'{self.config}:index_stats'),
             'url_team': reverse_lazy(f'{self.config}:index_team'),
@@ -81,7 +83,8 @@ class StatsView(HockeyView):
             'stats': s.get_table_stats(),
             'season': s.data.id,
             'last_matches': s.get_json_last_matches(5),
-            'future_matches': s.get_json_future_matches(5)
+            'future_matches': s.get_json_future_matches(5),
+            'live_matches': s.get_json_live_matches()
         }
 
 

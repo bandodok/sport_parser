@@ -1,0 +1,12 @@
+deployment
+postgresql
+collected_static
+.venv
+.pytest_cache
+.git
+.gitignore
+.idea
+.coverage
+db.sqlite3
+db.sqlite31
+dump.rdb

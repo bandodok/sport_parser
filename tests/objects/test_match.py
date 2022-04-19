@@ -1,10 +1,9 @@
 import pytest
 import json
 
-from sport_parser.khl.objects import Match
-from sport_parser.khl.config import Config
+from sport_parser.core.objects import Match
+from sport_parser.core.config import Config
 from sport_parser.khl.models import KHLMatch
-from fixtures.db_fixture import update_db
 
 from sport_parser.khl.models import KHLTeams
 

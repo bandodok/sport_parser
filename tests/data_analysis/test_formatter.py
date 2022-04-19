@@ -1,7 +1,7 @@
 from datetime import time
 
-from sport_parser.khl.data_analysis.formatter import Formatter
-from sport_parser.khl.config import Config
+from sport_parser.core.data_analysis.formatter import Formatter
+from sport_parser.core.config import Config
 
 
 class TestFormatter:

@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 import pytest
 
 from sport_parser.khl.models import KHLSeason
-from sport_parser.khl.data_taking.db import DB
-from sport_parser.khl.config import Config
+from sport_parser.core.data_taking.db import DB
+from sport_parser.core.config import Config
 
 
 @pytest.fixture()

@@ -1,33 +1,18 @@
-from sport_parser.api.serializers import CalendarSerializer
+from sport_parser.core.config import Config
+
 from sport_parser.khl.models import ModelList
-from sport_parser.khl.objects import Season, Team, Match
-from sport_parser.khl.data_analysis.chart_stats import ChartStats
-from sport_parser.khl.data_analysis.table_stats import TableStats
-from sport_parser.khl.data_analysis.bar_stats import BarStats
-from sport_parser.khl.data_analysis.formatter import Formatter
-from sport_parser.khl.data_taking.parser import Parser
-from sport_parser.khl.data_taking.db import DB
-from sport_parser.khl.updater import Updater
+from sport_parser.khl.parser import KHLParser
 
 
-class Config:
+class KHLConfig(Config):
+    name = 'khl'
     title = 'КХЛ'
     league_title = 'Континентальная хоккейная лига'
     league_logo = 'KHL.webp'
     background_image = 'tribuna.webp'
     theme = 'khlTheme.css'
-
-    models = ModelList()
-    season_class = Season
-    team_class = Team
-    match_class = Match
-    TableStats = TableStats
-    ChartStats = ChartStats
-    BarStats = BarStats
-    formatter = Formatter
-    parser = Parser
-    db = DB
-    updater = Updater
+    models = ModelList
+    parser = KHLParser
     table_stats_names = {
         'sh': ('Sh', 'int'),
         'sh__a': ('Sh(A)', 'int'),
@@ -86,6 +71,15 @@ class Config:
         'penalty': ('Penalty', 'int'),
         'time_a': ('TimeA', 'time'),
     }
+    chart_stats_names = {
+        'sh': ('Sh', 'Все броски', 'int'),
+        'sog': ('SoG', 'Броски в створ', 'int'),
+        'g': ('G', 'Голы', 'int'),
+        'blocks': ('Blocks', 'Блокированные броски', 'int'),
+        'penalty': ('Penalty', 'Штрафное время', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
+        'time_a': ('TimeA', 'Время в атаке', 'time'),
+    }
     bar_stats_names = {
         'sh': ('Sh', 'Все броски', 'int'),
         'sog': ('SoG', 'Броски в створ', 'int'),
@@ -96,13 +90,13 @@ class Config:
         'penalty': ('Penalty', 'Штрафное время', 'int'),
         'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
-    chart_stats_names = {
-        'sh': ('Sh', 'Все броски', 'int'),
+    live_bar_stats_names = {
         'sog': ('SoG', 'Броски в створ', 'int'),
         'g': ('G', 'Голы', 'int'),
+        'faceoff': ('FaceOff', 'Выигранные вбрасывания', 'int'),
+        'hits': ('Hits', 'Силовые приемы', 'int'),
         'blocks': ('Blocks', 'Блокированные броски', 'int'),
         'penalty': ('Penalty', 'Штрафное время', 'int'),
-        'hits': ('Hits', 'Силовые приемы', 'int'),
         'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
     updated_team_names = {
@@ -142,5 +136,5 @@ class Config:
         'Blocks%': {'short': 'Процент блокированных бросков', 'long': ''},
         'Penalty': {'short': 'Удаления', 'long': ''},
     }
-    updater_ignore = ['872325', '872404', '872667']
-    calendar_serializer = CalendarSerializer()
+    updater_ignore = ['872325', '872404', '872667', '880834']
+

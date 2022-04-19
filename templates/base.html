@@ -19,6 +19,9 @@
             createMatchFrame('team1', left_matches);
             createMatchFrame('team2', right_matches);
         }
+        if (typeof live_matches !== 'undefined') {
+            createMatchFrame('LiveMatches', live_matches);
+        }
         if (typeof hideChart !== 'undefined') {
             hideChart()
         }
