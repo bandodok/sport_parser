@@ -39,9 +39,9 @@ celery_beat:
 
 # dev app
 
-run:
+dev_run:
 	python deployment/dev/sql_render.py > deployment/dev/_init.sql
-	docker-compose -f deployment/dev/docker-compose-dev.yml -p sport_parser up --abort-on-container-exit
+	docker-compose -f deployment/dev/docker-compose-dev.yml -p sport_parser up --build --abort-on-container-exit
 
 
 
