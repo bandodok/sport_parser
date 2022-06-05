@@ -1,6 +1,6 @@
 from sport_parser.core.config import Config
 
-from sport_parser.khl.models import ModelList
+from sport_parser.khl.models import KHLModelList
 from sport_parser.khl.parser import KHLParser
 
 
@@ -11,7 +11,7 @@ class KHLConfig(Config):
     league_logo = 'KHL.webp'
     background_image = 'tribuna.webp'
     theme = 'khlTheme.css'
-    models = ModelList
+    models = KHLModelList
     parser = KHLParser
     table_stats_names = {
         'sh': ('Sh', 'int'),

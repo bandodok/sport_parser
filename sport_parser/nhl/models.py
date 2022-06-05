@@ -1,70 +1,26 @@
 from django.db import models
-import json
+
+from sport_parser.core.models import SeasonModel, TeamModel, MatchModel, ProtocolModel, ModelList
 
 
-class NHLSeason(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    id = models.IntegerField(primary_key=True)
-    external_id = models.IntegerField(null=True)
-    table_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
-
-    def __str__(self):
-        return str(self.id)
+class NHLSeason(SeasonModel):
+    pass
 
 
-class NHLTeam(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    api_id = models.IntegerField(null=True)
-    name = models.CharField(max_length=100)
-    short_name = models.CharField(max_length=100)
-    abbreviation = models.CharField(max_length=4)
-    img = models.CharField(max_length=200)
-    city = models.CharField(max_length=100)
-    arena = models.CharField(max_length=100)
-    division = models.CharField(max_length=100)
-    conference = models.CharField(max_length=100)
+class NHLTeam(TeamModel):
     season = models.ForeignKey(NHLSeason, on_delete=models.CASCADE, related_name='teams')
 
-    def __str__(self):
-        return str(self.id)
 
-
-class NHLMatch(models.Model):
-    id = models.IntegerField(primary_key=True)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    date = models.DateTimeField(null=True)
+class NHLMatch(MatchModel):
     season = models.ForeignKey(NHLSeason, on_delete=models.CASCADE, null=True, related_name='matches')
-    arena = models.CharField(max_length=100, null=True, blank=True)
-    status = models.CharField(choices=[
-        ('scheduled', 'scheduled'),
-        ('finished', 'finished'),
-        ('postponed', 'postponed'),
-        ('live', 'live'),
-        ('game over', 'game over'),
-    ], max_length=9, default='scheduled')
+    home_team = models.ForeignKey(NHLTeam, on_delete=models.CASCADE, related_name='home_matches', null=True)
+    guest_team = models.ForeignKey(NHLTeam, on_delete=models.CASCADE, related_name='guest_matches', null=True)
     teams = models.ManyToManyField(NHLTeam, related_name='matches')
-    penalties = models.BooleanField(default=False)
-    overtime = models.BooleanField(default=False)
-    live_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
-
-    def __str__(self):
-        return str(self.id)
 
 
-class NHLProtocol(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+class NHLProtocol(ProtocolModel):
     team = models.ForeignKey(NHLTeam, on_delete=models.CASCADE, related_name='protocols')
     match = models.ForeignKey(NHLMatch, on_delete=models.CASCADE, related_name='protocols')
-    g = models.IntegerField(null=True, default=0)
-    g_1 = models.IntegerField(null=True, default=0)
-    g_2 = models.IntegerField(null=True, default=0)
-    g_3 = models.IntegerField(null=True, default=0)
-    g_ot = models.IntegerField(null=True, default=0)
-    g_b = models.IntegerField(null=True, default=0)
 
     sh = models.IntegerField(null=True, default=0)
     sog = models.IntegerField(null=True, default=0)
@@ -79,7 +35,7 @@ class NHLProtocol(models.Model):
     giveaways = models.IntegerField(null=True, default=0)
 
 
-class ModelList:
+class NHLModelList(ModelList):
     season_model = NHLSeason
     match_model = NHLMatch
     team_model = NHLTeam
