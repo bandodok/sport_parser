@@ -10,6 +10,8 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
+from sport_parser.core.models import SeasonModel
+
 from sport_parser.core.data_analysis.formatter import Formatter
 
 
@@ -75,40 +77,84 @@ class Parser:
         self.formatter = Formatter(config)
 
     @abstractmethod
-    def parse_teams(self, season):
+    def parse_teams(self, season: SeasonModel) -> list[TeamData]:
+        """
+        Парсит информацию о командах сезона
+
+        :param season: строка сезона модели SeasonModel
+        :return: список информации по командам в формате TeamData
+        """
         pass
 
     @abstractmethod
-    def parse_calendar(self, season, *, webdriver=None):
-        """Загружает базовую информацию по матчам в базу данных"""
+    def parse_calendar(self, season: SeasonModel) -> list[MatchData]:
+        """
+        Парсит основную информацию о матчах сезона
+
+        :param season: строка сезона модели SeasonModel
+        :return: список информации по матчам сезона в формате MatchData
+        """
         pass
 
     @abstractmethod
-    def parse_match(self, match):
+    def parse_match_additional_info(self, match: MatchData) -> None:
+        """
+        Парсит дополнительную информацию по конкретному матчу и дополняет MatchData.
+        Вызывается после парсинга календаря для получения информации, которую не удалось получить.
+
+        :param match: информация о матче в формате MatchData
+        """
         pass
 
     @abstractmethod
-    def parse_protocol(self, match):
-        """Возвращает протокол по id матча в виде двух списков - для домашней и для гостевой команды"""
+    def is_match_finished(self, match_id: int) -> bool:
+        """
+        Проверяет по id завершен ли матч.
+        Вызывается во время проверки последних матчей на завершение.
+
+        :param match_id: id матча
+        :return: True, если матч завершен
+        """
         pass
 
     @abstractmethod
-    def parse_live_protocol(self, match):
+    def parse_finished_match(self, match: MatchData) -> MatchData:
+        """
+        Парсит информацию по завершенному матчу.
+        Вызывается для обновления информации после завершения матча.
+
+        :param match: информация о матче в формате MatchData
+        :return: обновленная информация о матче в формате MatchData
+        """
+        pass
+
+    @abstractmethod
+    def parse_protocol(self, match_id: int) -> MatchProtocolsData:
+        """
+        Возвращает протокол матча для обеих команд.
+
+        :param match_id: id матча
+        :return: протокол матча в формате MatchProtocolsData
+        """
+        pass
+
+    @abstractmethod
+    def parse_live_protocol(self, match_id: int):
         """Возвращает статус и протокол текущего матча для параметров, обновляемых в течение матча"""
         pass
 
     @staticmethod
-    def get_request_content(url):
+    def get_request_content(url) -> BeautifulSoup:
         r = requests.get(url)
         return BeautifulSoup(r.content, 'html.parser')
 
     @staticmethod
-    def get_api_request_content(url):
+    def get_api_request_content(url) -> dict:
         r = requests.get(url).content
         return json.loads(r)
 
     @staticmethod
-    def get_selenium_content(url):
+    def get_selenium_content(url) -> BeautifulSoup:
         loc = os.getenv('CHROMEDRIVER')
         op = webdriver.ChromeOptions()
         op.add_argument('headless')

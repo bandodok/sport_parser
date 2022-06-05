@@ -63,14 +63,15 @@ class Formatter:
             return int(secs) + int(mins) * 60 + int(hours) * 3600
 
     def date_format(self, date):
-        splitted_date = date.split(' ')[:-1]
+        if ', ' in date:
+            date = date.split(',')[0]
+        splitted_date = date.split(' ')
         if not splitted_date[0]:
             splitted_date.pop(0)
         day, month, year = splitted_date
         if len(day) == 1:
             day = f'0{day}'
         month = self.month_to_int_replace(month)
-        year = year[:-1]
         return f'{year}-{month}-{day}'
 
     @staticmethod
