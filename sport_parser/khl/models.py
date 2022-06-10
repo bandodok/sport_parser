@@ -41,6 +41,7 @@ class KHLProtocol(ProtocolModel):
     """
     team = models.ForeignKey(KHLTeams, on_delete=models.CASCADE, related_name='protocols')
     match = models.ForeignKey(KHLMatch, on_delete=models.CASCADE, related_name='protocols')
+    season = models.ForeignKey(KHLSeason, on_delete=models.CASCADE, related_name='protocols')
 
     sh = models.IntegerField(null=True, default=0)
     sog = models.IntegerField(null=True, default=0)

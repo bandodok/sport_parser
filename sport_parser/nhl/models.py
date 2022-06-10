@@ -21,6 +21,7 @@ class NHLMatch(MatchModel):
 class NHLProtocol(ProtocolModel):
     team = models.ForeignKey(NHLTeam, on_delete=models.CASCADE, related_name='protocols')
     match = models.ForeignKey(NHLMatch, on_delete=models.CASCADE, related_name='protocols')
+    season = models.ForeignKey(NHLSeason, on_delete=models.CASCADE, related_name='protocols')
 
     sh = models.IntegerField(null=True, default=0)
     sog = models.IntegerField(null=True, default=0)

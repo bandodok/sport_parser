@@ -25,6 +25,8 @@ class SeasonModel(models.Model):
 
 
 class TeamModel(models.Model):
+    season: models.ForeignKey  # related_name='teams'
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=100)
@@ -33,6 +35,8 @@ class TeamModel(models.Model):
     arena = models.CharField(max_length=100)
     division = models.CharField(max_length=100)
     conference = models.CharField(max_length=100)
+
+    chart_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
 
     def __str__(self):
         return str(self.id)
@@ -63,6 +67,10 @@ class MatchModel(models.Model):
     ], max_length=9, default='scheduled')
     penalties = models.BooleanField(default=False)
     overtime = models.BooleanField(default=False)
+
+    table_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
+    chart_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
+    bar_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
     live_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
 
     def __str__(self):
@@ -75,6 +83,7 @@ class MatchModel(models.Model):
 class ProtocolModel(models.Model):
     team = models.ForeignKey  # related_name='protocols'
     match = models.ForeignKey  # related_name='protocols'
+    season = models.ForeignKey  # related_name='protocols'
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
