@@ -8,7 +8,6 @@ class Season:
 
     def __init__(self, season_id, *, config):
         self.config = config
-        self.TableStats = config.TableStats(config=config)
         self.formatter = config.formatter(config=config)
         self.models = config.models
         self.live_match_model = config.live_match_model
@@ -72,28 +71,13 @@ class Season:
             fields.pop(field)
         return [key for key, value in fields.items()]
 
-    def get_table_stats(self, *, match_list=None, team_list=None, protocol_list=None):
-        if not match_list and not team_list and not protocol_list:
-            return self.data.table_data
-        if not match_list:
-            match_list = self.get_match_list()
-        if not team_list:
-            team_list = self.get_team_list()
-        if not protocol_list:
-            protocol_list = self.get_protocol_list()
-        return self.TableStats.season_stats_calculate(match_list, team_list, protocol_list)
-
-    def update_season_table_stats(self):
-        data = self.get_table_stats(match_list=self.get_match_list())
-        self.data.table_data = data
-        self.data.save()
+    def get_table_stats(self):
+        return self.data.table_data
 
 
 class Team:
     def __init__(self, team_id, *, config):
         self.config = config
-        self.TableStats = config.TableStats(config=config)
-        self.ChartStats = config.ChartStats(config=config)
         self.season_class = config.season_class
         self.formatter = config.formatter(config=config)
         self.models = config.models
@@ -129,13 +113,10 @@ class Team:
         return self.formatter.get_json_matches_info(future_matches)
 
     def get_table_stats(self):
-        season = self.season_class(self.data.season_id, config=self.config)
-        return season.get_table_stats(team_list=[self.data])
+        return self.data.table_data
 
-    def get_chart_stats(self, team_list=None):
-        if not team_list:
-            team_list = self
-        return self.ChartStats.calculate(team_list)
+    def get_chart_stats(self):
+        return self.data.chart_data
 
     def get_another_season_team_ids(self):
         """Возвращает список id команды для разных сезонов"""
@@ -218,31 +199,20 @@ class Match:
         return self.TableStats.match_stats_calculate(self.data)
 
     def get_table_stats(self):
-        season = self.season_class(self.data.season_id, config=self.config)
-        return season.get_table_stats(team_list=[self.team1.data, self.team2.data])
+        return self.data.table_data
 
     def get_bar_stats(self):
-        if self.data.status != 'finished':
-            return 'The match is not over yet'
-        return self.BarStats.calculate(self)
+        return self.data.bar_data
 
     def get_live_bar_stats(self, match_data):
         return self.LiveBarStats.calculate(match_data)
 
     def get_chart_stats(self):
-        team_list = (self.team1, self.team2)
-        return self.ChartStats.calculate(team_list)
-
-    def _get_m2m_table_name(self):
-        meta = self.models.match_model._meta
-        app_label = meta.app_label
-        match_model = meta.model_name
-        team_model = meta.many_to_many[0].column
-        return f'{app_label}_{match_model}_{team_model}'
+        return self.data.chart_data
 
     def _set_teams(self):
-        m2m_table = self._get_m2m_table_name()
-        team1, team2 = self.data.teams.all().extra(select={'add_id': f'{m2m_table}.id'}).order_by('add_id')
+        team1 = self.data.home_team
+        team2 = self.data.guest_team
         self.team1 = self.team_class(team1.id, config=self.config)
         self.team2 = self.team_class(team2.id, config=self.config)
 

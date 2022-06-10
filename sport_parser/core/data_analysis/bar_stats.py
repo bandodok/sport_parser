@@ -1,45 +1,43 @@
+from sport_parser.core.exceptions import UnableToCalculateBarStats
+from sport_parser.core.models import MatchModel
+
+
 class BarStats:
+    """
+    Класс для расчета статистики, отображаемой в виде полос.
+
+    :param stat_names: параметры расчета статистики, полученные из конфига.
+    :param formatter: экземпляр класса форматирования результатов.
+    """
+
     def __init__(self, config):
         self.formatter = config.formatter
         self.bar_stats_names = config.bar_stats_names
         self.live_bar_stats_names = config.live_bar_stats_names
 
-    def calculate(self, match):
+    def match_stats_calculate(self, match: MatchModel):
         """
-        output = {
-            stat: {
-                'short_title': '',
-                'long_title': '',
-                'left': {
-                    'value': 123,
-                    'perc': 50,
-                },
-                'right': {
-                    'value': 321,
-                    'perc': 50,
-                }
-            },
-            stat2: ...
-        }
-        """
-        team1 = match.team1.data
-        team2 = match.team2.data
-        match = match.data
+        Рассчитывает статистику для команды.
 
-        comparison_stats = self.get_comparison_stats(
-            self.get_team_stats(team1, match),
-            self.get_team_stats(team2, match)
+        :param match: строка матча модели MatchModel.
+        :return: рассчитанная статистика.
+        """
+        if match.status != 'finished':
+            raise UnableToCalculateBarStats
+        comparison_stats = self._get_comparison_stats(
+            self._get_team_stats(match.home_team, match),
+            self._get_team_stats(match.guest_team, match)
         )
         return self.formatter.bar_stat_format(comparison_stats, self.bar_stats_names)
 
-    def get_team_stats(self, team, match):
+    def _get_team_stats(self, team, match):
         stats = {}
         t = match.protocols.get(team=team)
         for stat in self.bar_stats_names.keys():
             stats[stat] = self.formatter.chart_stat_format(t.__dict__.get(stat))
         return stats
 
-    def get_comparison_stats(self, team1_stats, team2_stats):
+    def _get_comparison_stats(self, team1_stats, team2_stats):
         comparison_stats = {}
         for stat, team1_value, team2_value in zip(team1_stats.keys(), team1_stats.values(), team2_stats.values()):
             sum_value = team1_value + team2_value
@@ -62,7 +60,7 @@ class BarStats:
 
 class LiveBarStats(BarStats):
     def calculate(self, match_data):
-        comparison_stats = self.get_comparison_stats(
+        comparison_stats = self._get_comparison_stats(
             self.get_team_live_stats(match_data['row_home']),
             self.get_team_live_stats(match_data['row_guest'])
         )

@@ -6,6 +6,8 @@ from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from django.utils import timezone
 from django.db.models import Q
 
+from sport_parser.core.data_analysis.stats_updater import StatsUpdater
+
 from sport_parser.core.data_taking.db import DB
 from sport_parser.core.data_taking.parser import Parser, MatchStatus, MatchData, TeamData, MatchProtocolsData
 from sport_parser.core.exceptions import UnableToGetProtocolException
@@ -22,6 +24,12 @@ class Updater:
         self.season_class = config.season_class
         self.match_class = config.match_class
         self.config = config
+        self.stats_updater = StatsUpdater(
+            db=config.db(config),
+            table_stats=config.TableStats(config=config),
+            chart_stats=config.ChartStats(config=config),
+            bar_stats=config.BarStats(config=config),
+        )
 
     def update(self):
         """Обновляет последний сезон. Парсит сезон, если  он еще не выгружен."""
@@ -39,14 +47,14 @@ class Updater:
 
         :param season_id: id сезона
         """
+        self._add_season_to_stats_updater(season_id)
         calendar_data = self._parse_calendar(season_id, skip_finished=True, skip_live=True)
         for match in calendar_data:
             self._add_match_to_db(match)
         self._update_finished_matches()
         self._postpone_missed_matches(calendar_data)
 
-        self._update_season_stats_data(season_id)
-        self._add_matches_to_live_updater()
+        self._update_stats()
 
     def parse_season(self, season_id: int) -> None:
         """
@@ -54,6 +62,7 @@ class Updater:
 
         :param season_id: id сезона
         """
+        self._add_season_to_stats_updater(season_id)
         # парсинг команд
         teams_data = self._parse_teams(season_id)
         self._add_teams_to_db(teams_data)
@@ -63,11 +72,8 @@ class Updater:
         for match in calendar_data:
             self._add_match_to_db(match)
 
-        self.ws_send_status('complete')
-
-        # обновление статистики сезона
-        self._update_season_stats_data(season_id)
-        self._add_matches_to_live_updater()
+        # обновление статистики
+        self._update_stats()
 
     def update_live_match(self, match_id):
         live_match_data = self.parser.parse_live_protocol(match_id)
@@ -90,11 +96,12 @@ class Updater:
             'update', {'type': 'update.update', 'text': message}
         )
 
-    def _update_season_stats_data(self, season_id: int):
-        self.ws_send_status('updating season stats data')
-        season_class = self.season_class(season_id, config=self.config)
-        season_class.update_season_table_stats()
-        self.ws_send_status('season stats data updated')
+    def _update_stats(self) -> None:
+        """Запускает обновление статистики сезонов, команд и матчей, добавленных ранее в stats_updater"""
+        self.ws_send_status('updating stats')
+        self.stats_updater.update()
+        self._add_matches_to_live_updater()
+        self.ws_send_status('complete')
 
     def _update_finished_matches(self) -> None:
         """Проверяет последние незавершенные матчи, если они завершились - обновляет статус и парсит протоколы"""
@@ -108,9 +115,9 @@ class Updater:
                         self.ws_send_status(f'Unable to parse protocol for match {match.id}.')
                     else:
                         match_data = self._parse_finished_match(match.id)
+                        match_data.status = MatchStatus.FINISHED
                         self._add_match_to_db(match_data)
                         self._add_protocol_to_db(protocol)
-                        self.db.set_match_status(match.id, MatchStatus.FINISHED)
 
     def _parse_teams(self, season_id: int) -> list[TeamData]:
         """
@@ -188,27 +195,68 @@ class Updater:
             self.db.add_team(team)
         self.ws_send_status('teams saved')
 
-    def _add_match_to_db(self, match: MatchData):
+    def _add_match_to_db(self, match: MatchData) -> None:
+        """
+        Сохраняет информацию по матчу в базу данных.
+
+        :param match: информацию по матчу в формате MatchData
+        """
         if match != 'match not updated':
             self.ws_send_status(f"updating match info: {match.id}")
-            self.db.add_match(match)
+            match_model, new = self.db.add_match(match)
+            if new:
+                self._add_match_to_stats_updater(match_model)
             if match.status.value == 'finished':
                 try:
                     protocol = self._parse_protocol(match.id)
-                    self._add_protocol_to_db(protocol)
                 except UnableToGetProtocolException:
                     self.ws_send_status(
                         f'Unable to parse protocol for match {match.id}. Match status will be changed for "scheduled"'
                     )
                     self.db.set_match_status(match.id, MatchStatus.SCHEDULED)
+                else:
+                    self._add_protocol_to_db(protocol)
+                    self._add_match_to_stats_updater(match_model)
 
     def _add_protocol_to_db(self, protocol: MatchProtocolsData):
+        """
+        Сохраняет протокол матча в базу данных.
+
+        :param protocol: протокол матча в формате MatchProtocolData
+        """
         self.db.add_protocol(protocol)
 
+    def _add_season_to_stats_updater(self, season_id: int) -> None:
+        """
+        Добавляет сезон в список к обновлению статистики.
+
+        :param season_id: id сезона
+        """
+        self.stats_updater.add_season(season_id)
+
+    def _add_match_to_stats_updater(self, match: MatchModel) -> None:
+        """
+        Добавляет матч и команды матча в список к обновлению статистики.
+        :param match: id матча
+        """
+        self.stats_updater.add_match(match.id)
+        self.stats_updater.add_team(match.home_team.id)
+        self.stats_updater.add_team(match.guest_team.id)
+
     def _get_unfinished_matches_id(self) -> list[int]:
+        """
+        Возвращает список id всех незавершенных матчей.
+
+        :return: список id матчей
+        """
         return self.model_list.match_model.objects.filter(status='scheduled').values_list('id', flat=True)
 
     def _get_unfinished_matches_until_today(self) -> list[MatchModel]:
+        """
+        Возвращает список незавершенных матчей по текущий день.
+
+        :return: список матчей в формате строк модели MatchModel
+        """
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(1)
         return self.model_list.match_model.objects\
@@ -238,7 +286,13 @@ class Updater:
                 new_season = True
         return season, new_season
 
-    def _get_postponed_matches(self, season):
+    def _get_postponed_matches(self, season) -> list[MatchModel]:
+        """
+        Возвращает все отмененные матчи сезона.
+
+        :param season: id сезона
+        :return: список матчей в формате строк модели MatchModel
+        """
         return self.model_list.match_model.objects.filter(status='postponed').filter(season=season)
 
     def _postpone_missed_matches(self, calendar: list[MatchData]) -> None:
@@ -281,12 +335,3 @@ class Updater:
                 enabled=True,
                 queue='regular_update'
             )
-
-    def _set_game_over_status(self, match):
-        """
-        Устанавливает статус 'game over' для матча
-        Такой матч не будет проигнорирован при регулярном обновлении
-
-        :param match трока базы данных матча
-        """
-        self.db.set_match_status(match, 'game over')

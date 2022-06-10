@@ -1,7 +1,7 @@
 from django.db import transaction
 
 from sport_parser.core.data_taking.parser import TeamData, MatchData, MatchProtocolsData, ProtocolData, MatchStatus
-from sport_parser.core.models import LiveMatches, MatchModel
+from sport_parser.core.models import LiveMatches, MatchModel, TeamModel, SeasonModel
 
 
 class DB:
@@ -9,7 +9,7 @@ class DB:
         self.model_list = config.models
         self.updated_team_names = config.updated_team_names
 
-    def add_team(self, team: TeamData) -> None:
+    def add_team(self, team: TeamData) -> TeamModel:
         """
         Добавляет информацию о команде в базу данных.
 
@@ -26,8 +26,9 @@ class DB:
             conference=team.conference,
         )
         t.save()
+        return t
 
-    def add_match(self, match: MatchData) -> None:
+    def add_match(self, match: MatchData) -> tuple[MatchModel, bool]:
         """
         Добавляет информацию о матче в базу данных.
 
@@ -35,7 +36,7 @@ class DB:
         """
         season = self.model_list.season_model.objects.get(id=match.season_num)
         with transaction.atomic():
-            m, _ = self.model_list.match_model.objects.get_or_create(
+            m, new = self.model_list.match_model.objects.get_or_create(
                 id=match.id
             )
             m.season = season
@@ -59,6 +60,7 @@ class DB:
             m.save()
             m.teams.add(guest_team)
             m.save()
+            return m, new
 
     def add_protocol(self, protocol: MatchProtocolsData) -> None:
         """
@@ -100,6 +102,87 @@ class DB:
             viewers=match.viewers
         )
 
+    def get_season(self, season_id: int) -> SeasonModel:
+        """
+        По id сезона возвращает строку модели SeasonModel.
+
+        :param season_id: id сезона
+        :return: строка модели SeasonModel
+        """
+        return self.model_list.season_model.objects.get(id=season_id)
+
+    def get_team(self, team_id: int) -> TeamModel:
+        """
+        По id команды возвращает строку модели TeamModel.
+
+        :param team_id: id команды
+        :return: строка модели TeamModel
+        """
+        return self.model_list.team_model.objects.get(id=team_id)
+
+    def get_match(self, match_id: int) -> MatchModel:
+        """
+        По id матча возвращает строку модели MatchModel.
+
+        :param match_id: id матча
+        :return: строка модели MatchModel
+        """
+        return self.model_list.match_model.objects.get(id=match_id)
+
+    def set_season_table_stats(self, season_id: int, table_data) -> None:
+        """
+        Сохраняет табличную статистику сезона в базу данных
+
+        :param season_id: id сезона
+        :param table_data: статистика
+        """
+        season = self.model_list.season_model.objects.get(id=season_id)
+        season.table_data = table_data
+        season.save()
+
+    def set_match_table_stats(self, match_id: int, table_data) -> None:
+        """
+        Сохраняет табличную статистику матча в базу данных
+
+        :param match_id: id матча
+        :param table_data: статистика
+        """
+        match = self.model_list.match_model.objects.get(id=match_id)
+        match.table_data = table_data
+        match.save()
+
+    def set_team_chart_stats(self, team_id: int, chart_data) -> None:
+        """
+        Сохраняет статистику для графика команды в базу данных
+
+        :param team_id: id команды
+        :param chart_data: статистика
+        """
+        team = self.model_list.team_model.objects.get(id=team_id)
+        team.chart_data = chart_data
+        team.save()
+
+    def set_match_chart_stats(self, match_id, chart_data) -> None:
+        """
+        Сохраняет статистику для графика матча в базу данных
+        :param match_id: id матча
+        :param chart_data: статистика
+        """
+        match = self.model_list.match_model.objects.get(id=match_id)
+        match.chart_data = chart_data
+        match.save()
+
+    def set_match_bar_stats(self, match_id: int, bar_data) -> None:
+        """
+        Сохраняет статистику для полос матча в базу данных
+
+        :param match_id: id матча
+        :param bar_data: статистика
+        """
+        match = self.model_list.match_model.objects.get(id=match_id)
+        match.bar_data = bar_data
+        match.save()
+
     def update_live_match(self, live_data):
         match = self.model_list.match_model.objects.get(
             id=live_data['match_id']
@@ -132,12 +215,14 @@ class DB:
         :param match: строка матча модели MatchModel
         :param protocol: протокол матча для команды в формате ProtocolData
         """
+        season = match.season
         team_name = self._team_name_update(protocol.team_name)
-        team = self.model_list.team_model.objects.filter(season=match.season).get(name=team_name)
+        team = self.model_list.team_model.objects.filter(season=season).get(name=team_name)
 
         p, _ = self.model_list.protocol_model.objects.get_or_create(
             team=team,
-            match=match
+            match=match,
+            season=season
         )
 
         # обязательные данные
