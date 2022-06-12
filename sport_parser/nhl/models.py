@@ -1,6 +1,6 @@
 from django.db import models
 
-from sport_parser.core.models import SeasonModel, TeamModel, MatchModel, ProtocolModel, ModelList
+from sport_parser.core.models import SeasonModel, TeamModel, MatchModel, ProtocolModel, ModelList, LiveMatchModel
 
 
 class NHLSeason(SeasonModel):
@@ -36,8 +36,13 @@ class NHLProtocol(ProtocolModel):
     giveaways = models.IntegerField(null=True, default=0)
 
 
+class NHLLiveMatch(LiveMatchModel):
+    match = models.OneToOneField(NHLMatch, on_delete=models.CASCADE, related_name='live')
+
+
 class NHLModelList(ModelList):
     season_model = NHLSeason
     match_model = NHLMatch
     team_model = NHLTeam
     protocol_model = NHLProtocol
+    live_match_model = NHLLiveMatch

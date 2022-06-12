@@ -1,7 +1,7 @@
 from django.db import models
 import json
 
-from sport_parser.core.models import SeasonModel, TeamModel, MatchModel, ProtocolModel, ModelList
+from sport_parser.core.models import SeasonModel, TeamModel, MatchModel, ProtocolModel, ModelList, LiveMatchModel
 
 
 class KHLSeason(SeasonModel):
@@ -57,8 +57,13 @@ class KHLProtocol(ProtocolModel):
     pd = models.DecimalField(max_length=100, decimal_places=2, max_digits=5, null=True, blank=True, default=0)
 
 
+class KHLLiveMatch(LiveMatchModel):
+    match = models.OneToOneField(KHLMatch, on_delete=models.CASCADE, related_name='live')
+
+
 class KHLModelList(ModelList):
     season_model = KHLSeason
     match_model = KHLMatch
     team_model = KHLTeams
     protocol_model = KHLProtocol
+    live_match_model = KHLLiveMatch
