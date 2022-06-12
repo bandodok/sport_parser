@@ -1,3 +1,4 @@
+from sport_parser.core.data_taking.parser import MatchLiveProtocolsData
 from sport_parser.core.exceptions import UnableToCalculateBarStats
 from sport_parser.core.models import MatchModel
 
@@ -30,11 +31,24 @@ class BarStats:
         )
         return self.formatter.bar_stat_format(comparison_stats, self.bar_stats_names)
 
+    def live_match_stats_calculate(self, match_data: MatchLiveProtocolsData):
+        comparison_stats = self._get_comparison_stats(
+            self._get_team_live_stats(match_data.home_protocol),
+            self._get_team_live_stats(match_data.guest_protocol)
+        )
+        return self.formatter.bar_stat_format(comparison_stats, self.live_bar_stats_names)
+
     def _get_team_stats(self, team, match):
         stats = {}
         t = match.protocols.get(team=team)
         for stat in self.bar_stats_names.keys():
             stats[stat] = self.formatter.chart_stat_format(t.__dict__.get(stat))
+        return stats
+
+    def _get_team_live_stats(self, data):
+        stats = {}
+        for stat in self.live_bar_stats_names.keys():
+            stats[stat] = self.formatter.live_bar_stat_format(data[stat])
         return stats
 
     def _get_comparison_stats(self, team1_stats, team2_stats):
@@ -56,18 +70,3 @@ class BarStats:
                 'right_perc': right_perc
             }
         return comparison_stats
-
-
-class LiveBarStats(BarStats):
-    def calculate(self, match_data):
-        comparison_stats = self._get_comparison_stats(
-            self.get_team_live_stats(match_data['row_home']),
-            self.get_team_live_stats(match_data['row_guest'])
-        )
-        return self.formatter.bar_stat_format(comparison_stats, self.live_bar_stats_names)
-
-    def get_team_live_stats(self, data):
-        stats = {}
-        for stat in self.live_bar_stats_names.keys():
-            stats[stat] = self.formatter.live_bar_stat_format(data[stat])
-        return stats

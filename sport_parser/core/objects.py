@@ -131,7 +131,6 @@ class Match:
         self.TableStats = config.TableStats(config=config)
         self.ChartStats = config.ChartStats(config=config)
         self.BarStats = config.BarStats(config=config)
-        self.LiveBarStats = config.LiveBarStats(config=config)
         self.season_class = config.season_class
         self.team_class = config.team_class
         self.formatter = config.formatter(config=config)
@@ -203,9 +202,6 @@ class Match:
 
     def get_bar_stats(self):
         return self.data.bar_data
-
-    def get_live_bar_stats(self, match_data):
-        return self.LiveBarStats.calculate(match_data)
 
     def get_chart_stats(self):
         return self.data.chart_data
