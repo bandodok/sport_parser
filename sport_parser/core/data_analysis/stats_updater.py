@@ -2,6 +2,7 @@ from sport_parser.core.data_analysis.bar_stats import BarStats
 from sport_parser.core.data_analysis.chart_stats import ChartStats
 from sport_parser.core.data_analysis.table_stats import TableStats
 from sport_parser.core.data_taking.db import DB
+from sport_parser.core.data_taking.parser import MatchLiveProtocolsData
 from sport_parser.core.exceptions import UnableToCalculateBarStats
 
 
@@ -40,6 +41,16 @@ class StatsUpdater:
         self._update_seasons()
         self._update_teams()
         self._update_matches()
+
+    def update_live_match(self, match_id: int, match_data: MatchLiveProtocolsData) -> None:
+        """
+        Рассчитывает статистику текущего матча и сохраняет ее в базе данных.
+
+        :param match_id: id матча
+        :param match_data: текущие данные матча в формате MatchLiveProtocolsData
+        """
+        data = self._calculate_match_live_bar_stats(match_data)
+        self.db.set_live_bar_stats(match_id, data)
 
     def add_season(self, season_id: int) -> None:
         """
@@ -111,3 +122,6 @@ class StatsUpdater:
     def _calculate_match_bar_stats(self, match_id: int):
         match = self.db.get_match(match_id)
         return self.bar_stats.match_stats_calculate(match)
+
+    def _calculate_match_live_bar_stats(self, match_data: MatchLiveProtocolsData):
+        return self.bar_stats.live_match_stats_calculate(match_data)

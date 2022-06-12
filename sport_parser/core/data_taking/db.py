@@ -1,7 +1,8 @@
 from django.db import transaction
 
-from sport_parser.core.data_taking.parser import TeamData, MatchData, MatchProtocolsData, ProtocolData, MatchStatus
-from sport_parser.core.models import LiveMatches, MatchModel, TeamModel, SeasonModel
+from sport_parser.core.data_taking.parser import TeamData, MatchData, MatchProtocolsData, ProtocolData, MatchStatus, \
+    MatchLiveData
+from sport_parser.core.models import LiveMatches, MatchModel, TeamModel, SeasonModel, LiveMatchModel
 
 
 class DB:
@@ -62,6 +63,22 @@ class DB:
             m.save()
             return m, new
 
+    def add_live_match(self, live_match: MatchLiveData) -> tuple[LiveMatchModel, bool]:
+        """
+        Добавляет информацию о текущем матче в базу данных.
+
+        :param live_match: информация о матче в формате MatchLiveData
+        """
+        match = self.model_list.match_model.objects.get(id=live_match.match_id)
+        m, new = self.model_list.live_match_model.objects.get_or_create(
+            match=match,
+        )
+        m.status = live_match.status
+        m.team1_score = live_match.team1_score
+        m.team2_score = live_match.team2_score
+        m.save()
+        return m, new
+
     def add_protocol(self, protocol: MatchProtocolsData) -> None:
         """
         Добавляет данные протокола матча в базу данных.
@@ -77,7 +94,9 @@ class DB:
             self._add_protocol_data(match, guest_protocol)
 
         # очистка данных прямого эфира
-        match.live_data = ""
+        live_match = self.model_list.live_match_model.objects.filter(match=match)
+        if live_match:
+            match.live.delete()
         match.save()
 
     def get_match_data(self, match_id: int) -> MatchData:
@@ -182,6 +201,18 @@ class DB:
         match = self.model_list.match_model.objects.get(id=match_id)
         match.bar_data = bar_data
         match.save()
+
+    def set_live_bar_stats(self, match_id: int, bar_data) -> None:
+        """
+        Сохраняет статистику для полос текущего матча в базу данных
+
+        :param match_id: id матча
+        :param bar_data: статистика
+        """
+        match = self.get_match(match_id)
+        live_match = self.model_list.live_match_model.objects.get(match=match)
+        live_match.bar_data = bar_data
+        live_match.save()
 
     def update_live_match(self, live_data):
         match = self.model_list.match_model.objects.get(

@@ -20,25 +20,15 @@ def parse_season(config, season_id):
 
 
 @shared_task(name='schedule_live_match', queue='regular_update')
-def schedule_live_match(league, match_id):
-    live_match, created = LiveMatches.objects.get_or_create(
+def schedule_live_match(league: str, match_id: int):
+    LiveMatches.objects.get_or_create(
         league=league,
         match_id=match_id
     )
     PeriodicTask.objects.get(name=f'{league}_{match_id}_live_match').delete()
     creator = Creator(league)
-    match = creator.get_match_class(match_id)
-    match.data.status = 'live'
-    if created:
-        match.data.live_data = {
-            'match_status': 'матч скоро начнется',
-            'team_1_score': '-',
-            'team_2_score': '-',
-            'data': {
-                'row_home': '',
-                'row_guest': ''
-            }}
-    match.data.save()
+    updater = creator.get_updater()
+    updater.update_live_match(match_id)
 
 
 @shared_task(name='update_live_matches', queue='update_live_matches')

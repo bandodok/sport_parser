@@ -21,9 +21,8 @@ class Updater:
         self.db: DB = config.db(config)
         self.ignore = config.updater_ignore
         self.channel_layer = get_channel_layer()
-        self.season_class = config.season_class
         self.match_class = config.match_class
-        self.config = config
+        self.league = config.name
         self.stats_updater = StatsUpdater(
             db=config.db(config),
             table_stats=config.TableStats(config=config),
@@ -75,18 +74,19 @@ class Updater:
         # обновление статистики
         self._update_stats()
 
-    def update_live_match(self, match_id):
-        live_match_data = self.parser.parse_live_protocol(match_id)
-        if live_match_data['match_status'] == 'матч скоро начнется':
+    def update_live_match(self, match_id: int) -> None:
+        live_match_data = self.parser.parse_live_match(match_id)
+        _, new = self.db.add_live_match(live_match_data)
+        if new:
+            self.db.set_match_status(match_id, MatchStatus.LIVE)
+
+        if live_match_data.status == 'матч скоро начнется':
             return
 
-        match_class = self.match_class(match_id, config=self.config)
-        live_match_data['match_id'] = match_id
-        live_match_data['data'] = match_class.get_live_bar_stats(live_match_data['data'])
-        self.db.update_live_match(live_match_data)
+        self.stats_updater.update_live_match(match_id, live_match_data.protocols)
 
-        if live_match_data['match_status'] == 'матч завершен':
-            self.db.remove_live_match(self.config.name, match_id)
+        if live_match_data.status == 'матч завершен':
+            self.db.remove_live_match(self.league, match_id)
             self.db.set_match_status(match_id, MatchStatus.GAME_OVER)
             return
 
@@ -105,6 +105,7 @@ class Updater:
 
     def _update_finished_matches(self) -> None:
         """Проверяет последние незавершенные матчи, если они завершились - обновляет статус и парсит протоколы"""
+        self.ws_send_status('updating finished matches')
         matches = self._get_unfinished_matches_until_today()
         if matches:
             for match in matches:
@@ -116,8 +117,9 @@ class Updater:
                     else:
                         match_data = self._parse_finished_match(match.id)
                         match_data.status = MatchStatus.FINISHED
-                        self._add_match_to_db(match_data)
+                        self._add_match_to_db(match_data, download_protocol=False)
                         self._add_protocol_to_db(protocol)
+                        self._add_match_to_stats_updater(match)
 
     def _parse_teams(self, season_id: int) -> list[TeamData]:
         """
@@ -195,18 +197,19 @@ class Updater:
             self.db.add_team(team)
         self.ws_send_status('teams saved')
 
-    def _add_match_to_db(self, match: MatchData) -> None:
+    def _add_match_to_db(self, match: MatchData, download_protocol: bool = True) -> None:
         """
         Сохраняет информацию по матчу в базу данных.
 
         :param match: информацию по матчу в формате MatchData
+        :param download_protocol: если True, скачивает протоколы для завершенных матчей
         """
         if match != 'match not updated':
             self.ws_send_status(f"updating match info: {match.id}")
             match_model, new = self.db.add_match(match)
             if new:
                 self._add_match_to_stats_updater(match_model)
-            if match.status.value == 'finished':
+            if download_protocol and match.status.value == 'finished':
                 try:
                     protocol = self._parse_protocol(match.id)
                 except UnableToGetProtocolException:
@@ -305,6 +308,7 @@ class Updater:
 
     def _update_postponed(self, calendar) -> None:
         """Обновляет информацию по отмененным матчам"""
+        self.ws_send_status('updating postponed matches')
         calendar_dict = {match['match_id']: match for match in calendar}
         season = calendar[0]['season']
         postponed_matches = self._get_postponed_matches(season)
@@ -322,7 +326,7 @@ class Updater:
             filter(date__gte=today). \
             filter(date__lte=tomorrow)
         for match in matches:
-            config = self.config.name
+            config = self.league
             match_id = match.id
             update_start_date = match.date - datetime.timedelta(minutes=10)
             PeriodicTask.objects.get_or_create(

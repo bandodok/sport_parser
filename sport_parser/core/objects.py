@@ -40,15 +40,9 @@ class Season:
         return self.formatter.get_json_matches_info(future_matches)
 
     def get_live_matches(self):
-        live_matches = []
-        matches = self.data.matches\
+        return self.data.matches\
             .filter(Q(status='live') | Q(status='game over'))\
             .order_by('date')
-        for match in matches:
-            live_data = match.live_data
-            match.status = live_data['match_status']
-            live_matches.append(match)
-        return live_matches
 
     def get_json_live_matches(self):
         live_matches = self.get_live_matches()
