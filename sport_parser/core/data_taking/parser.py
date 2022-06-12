@@ -72,6 +72,21 @@ class MatchProtocolsData(NamedTuple):
     guest_protocol: ProtocolData
 
 
+@dataclass
+class MatchLiveProtocolsData:
+    home_protocol: dict
+    guest_protocol: dict
+
+
+@dataclass
+class MatchLiveData:
+    match_id: int
+    status: str
+    team1_score: int
+    team2_score: int
+    protocols: MatchLiveProtocolsData
+
+
 class Parser:
     def __init__(self, config):
         self.formatter = Formatter(config)
@@ -139,8 +154,13 @@ class Parser:
         pass
 
     @abstractmethod
-    def parse_live_protocol(self, match_id: int):
-        """Возвращает статус и протокол текущего матча для параметров, обновляемых в течение матча"""
+    def parse_live_match(self, match_id: int) -> MatchLiveData:
+        """
+        Возвращает данные текущего матча для обеих команд.
+
+        :param match_id: id матча
+        :return: данные матча в формате MatchLiveData
+        """
         pass
 
     @staticmethod

@@ -1,5 +1,5 @@
 from sport_parser.core.data_taking.parser import Parser, TeamData, MatchData, MatchStatus, MatchProtocolsData, \
-    ProtocolRequiredStats, ProtocolData
+    ProtocolRequiredStats, ProtocolData, MatchLiveData, MatchLiveProtocolsData
 from datetime import datetime
 import pytz
 
@@ -85,7 +85,10 @@ class NHLParser(Parser):
     def parse_finished_match(self, match: MatchData) -> MatchData:
         url = f'https://statsapi.web.nhl.com/api/v1/game/{match.id}/feed/live'  # 2021010003
         match_dict = self.get_api_request_content(url)
-        linescore = match_dict.get('liveData').get('linescore')
+        if match_dict.get('message') == "Game data couldn't be found":
+            return match
+        live_data = match_dict.get('liveData')
+        linescore = live_data.get('linescore')
         match_status = linescore.get('currentPeriodOrdinal')
         if match_status == 'OT':
             match.overtime = True
@@ -142,6 +145,51 @@ class NHLParser(Parser):
             guest_protocol=guest_protocol
         )
         return protocols
+
+    def parse_live_match(self, match_id: int) -> MatchLiveData:
+        match_data = self._get_match_data(match_id)
+        match_status = self._get_match_status(match_data)
+
+        match_live_data = MatchLiveData(
+            match_id=match_id,
+            status=match_status,
+            team1_score=0,
+            team2_score=0,
+            protocols=MatchLiveProtocolsData(
+                home_protocol={},
+                guest_protocol={}
+            )
+        )
+        if match_status == 'матч скоро начнется':
+            return match_live_data
+
+        home_team = match_data['liveData']['boxscore']['teams']['home']['team']['name']
+        guest_team = match_data['liveData']['boxscore']['teams']['away']['team']['name']
+
+        # статистика из основного раздела
+        stat_dict = {
+            'g': 'goals',
+            'sog': 'shots',
+            'penalty': 'pim',
+            'blocks': 'blocked',
+            'hits': 'hits',
+            'takeaways': 'takeaways',
+            'giveaways': 'giveaways'
+        }
+        main_data = self._get_main_data(match_data, stat_dict)
+
+        # сбор статистики из всех ивентов матча
+        event_data = self._get_events_data(match_data, home_team, guest_team)
+
+        home_protocol = main_data['row_home'] | event_data['row_home']
+        guest_protocol = main_data['row_guest'] | event_data['row_guest']
+
+        match_live_data.team1_score = home_protocol.get('g', 0)
+        match_live_data.team2_score = guest_protocol.get('g', 0)
+        match_live_data.protocols.home_protocol = home_protocol
+        match_live_data.protocols.guest_protocol = guest_protocol
+
+        return match_live_data
 
     def parse_live_protocol(self, match_id):
         match_data = self._get_match_data(match_id)

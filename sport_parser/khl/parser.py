@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from sport_parser.core.exceptions import UnableToGetProtocolException
 
 from sport_parser.core.data_taking.parser import Parser, TeamData, MatchData, MatchStatus, MatchProtocolsData, \
-    ProtocolRequiredStats, ProtocolData
+    ProtocolRequiredStats, ProtocolData, MatchLiveData, MatchLiveProtocolsData
 from sport_parser.core.models import SeasonModel
 
 
@@ -255,6 +255,48 @@ class KHLParser(Parser):
                 additional_stats=guest_add_stats
             )
         )
+
+    def parse_live_match(self, match_id: int) -> MatchLiveData:
+        url = f'https://text.khl.ru/text/{match_id}.html'
+        soup = self.get_request_content(url)
+        match_status = self._get_match_status(soup)
+
+        match_data = MatchLiveData(
+            match_id=match_id,
+            status=match_status,
+            team1_score=0,
+            team2_score=0,
+            protocols=MatchLiveProtocolsData(
+                home_protocol={},
+                guest_protocol={}
+            )
+        )
+
+        if match_status in ('матч скоро начнется', 'status not found', 'подготовка'):
+            match_data.status = 'матч скоро начнется'
+            return match_data
+
+        if match_status != 'подготовка' and match_status != 'status not found':
+            stat_dict = {
+                'Команда': 'team',
+                'Ш': 'g',
+                'БВ': 'sog',
+                'Штр': 'penalty',
+                'ВВбр': 'faceoff',
+                '%ВВбр': 'faceoff_p',
+                'БлБ': 'blocks',
+                'СПр': 'hits',
+                'ФоП': 'fop',
+                'ВВА': 'time_a',
+            }
+            main_data = self._get_additional_stats(soup, stat_dict)
+
+            match_data.team1_score = main_data['row_home'].get('g', 0)
+            match_data.team2_score = main_data['row_guest'].get('g', 0)
+            match_data.protocols.home_protocol = main_data['row_home']
+            match_data.protocols.guest_protocol = main_data['row_home']
+
+        return match_data
 
     def parse_live_protocol(self, match_id):
         url = f"https://text.khl.ru/text/{match_id}.html"
