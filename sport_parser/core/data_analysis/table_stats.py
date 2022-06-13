@@ -20,7 +20,7 @@ class TableStats:
     def __init__(self, config):
         self.formatter = config.formatter
         self.stat_names = config.table_stats_names
-        self._parse_stats(config.table_stats)
+        self._parse_stats(config.table_stats_types)
 
     def season_stats_calculate(self, season: SeasonModel):
         """

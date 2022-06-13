@@ -1,4 +1,5 @@
 from sport_parser.api.serializers import CalendarSerializer
+from sport_parser.core.data_analysis.stats_updater import StatsUpdater
 from sport_parser.khl.models import ModelList
 from sport_parser.core.objects import Season, Team, Match
 from sport_parser.core.data_analysis.chart_stats import ChartStats
@@ -23,9 +24,10 @@ class Config:
     season_class = Season
     team_class = Team
     match_class = Match
-    TableStats = TableStats
-    ChartStats = ChartStats
-    BarStats = BarStats
+    stats_updater = StatsUpdater
+    table_stats = TableStats
+    chart_stats = ChartStats
+    bar_stats = BarStats
     formatter = Formatter
     parser = Parser
     db = DB
@@ -51,7 +53,7 @@ class Config:
         'blocks__e': ('Blocks%', 'percent'),
         'penalty': ('Penalty', 'int'),
     }
-    table_stats = {
+    table_stats_types = {
         'sh': 'median',
         'sog': 'median',
         'g': 'median',

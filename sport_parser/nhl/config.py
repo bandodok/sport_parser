@@ -33,7 +33,7 @@ class NHLConfig(Config):
         'takeaways': ('TA', 'int'),
         'giveaways': ('GA', 'int'),
     }
-    table_stats = {
+    table_stats_types = {
         'sh': 'median',
         'sog': 'median',
         'g': 'median',

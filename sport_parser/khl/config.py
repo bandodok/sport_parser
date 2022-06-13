@@ -34,7 +34,7 @@ class KHLConfig(Config):
         'blocks__e': ('Blocks%', 'percent'),
         'penalty': ('Penalty', 'int'),
     }
-    table_stats = {
+    table_stats_types = {
         'sh': 'median',
         'sog': 'median',
         'g': 'median',
