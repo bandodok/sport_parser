@@ -1,21 +1,11 @@
 from django.db.models import Max
 
-from sport_parser.khl.config import KHLConfig
-from sport_parser.nhl.config import NHLConfig
+from sport_parser.core.configs import ConfigType
 
 
 class Creator:
-    def __init__(self, request):
-        if isinstance(request, str):
-            app_name = request
-        else:
-            app_name = request.app_name
-        if app_name == 'khl':
-            self.config = KHLConfig
-        elif app_name == 'nhl':
-            self.config = NHLConfig
-        else:
-            raise AttributeError('no config selected')
+    def __init__(self, config: ConfigType):
+        self.config = config.value
 
     def get_season_class(self, season_id):
         if season_id == 0:

@@ -5,18 +5,18 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 
+from sport_parser.core.configs import ConfigType
 from sport_parser.core.creator import Creator
 from sport_parser.core.tasks import update, parse_season
 
 
 class HockeyView(View):
-    config = 'khl'
-    template = ''
+    config: ConfigType = ConfigType.khl
+    template: str = ''
     creator: Creator = None
 
     def get(self, request, **kwargs):
-        request.app_name = self.config
-        self.creator = Creator(request)
+        self.creator = Creator(self.config)
         object1 = self.get_object(*kwargs.values())
         context = self.get_context(object1)
         context.update(self.get_meta_context())
@@ -37,15 +37,15 @@ class HockeyView(View):
             'title': self.get_title(),
             'league_title': self.get_league_title(),
             'league_logo': self.get_league_logo(),
-            'config': self.config,
+            'config': self.config.name,
             'glossary': self.get_glossary(),
-            'league': self.config,
+            'league': self.config.name,
 
-            'url_stats': reverse_lazy(f'{self.config}:index_stats'),
-            'url_team': reverse_lazy(f'{self.config}:index_team'),
-            'url_match': reverse_lazy(f'{self.config}:index_match'),
-            'url_calendar': reverse_lazy(f'{self.config}:index_calendar'),
-            'url_calendar_api': reverse_lazy(f'{self.config}_calendar_api'),
+            'url_stats': reverse_lazy(f'{self.config.name}:index_stats'),
+            'url_team': reverse_lazy(f'{self.config.name}:index_team'),
+            'url_match': reverse_lazy(f'{self.config.name}:index_match'),
+            'url_calendar': reverse_lazy(f'{self.config.name}:index_calendar'),
+            'url_calendar_api': reverse_lazy(f'{self.config.name}_calendar_api'),
         }
 
     def get_theme(self):
@@ -68,8 +68,8 @@ class HockeyView(View):
 
 
 class StatsView(HockeyView):
-    config = 'khl'
-    template = 'khl_stats.html'
+    config: ConfigType = ConfigType.khl
+    template: str = 'khl_stats.html'
 
     def get_object(self, season_id=0):
         s = self.creator.get_season_class(season_id)
@@ -89,8 +89,8 @@ class StatsView(HockeyView):
 
 
 class TeamView(HockeyView):
-    config = 'khl'
-    template = 'khl_team.html'
+    config: ConfigType = ConfigType.khl
+    template: str = 'khl_team.html'
 
     def get_object(self, team_id=0):
         return self.creator.get_team_class(team_id)
@@ -106,8 +106,8 @@ class TeamView(HockeyView):
 
 
 class MatchView(HockeyView):
-    config = 'khl'
-    template = 'khl_match.html'
+    config: ConfigType = ConfigType.khl
+    template: str = 'khl_match.html'
 
     def get_object(self, match_id=0):
         return self.creator.get_match_class(match_id)
@@ -134,8 +134,8 @@ class MatchView(HockeyView):
 
 
 class CalendarView(HockeyView):
-    config = 'khl'
-    template = 'khl_calendar.html'
+    config: ConfigType = ConfigType.khl
+    template: str = 'khl_calendar.html'
 
     def get_object(self, season_id=0):
         return self.creator.get_season_class(season_id)
@@ -148,16 +148,16 @@ class CalendarView(HockeyView):
 
 
 class UpdateView(View):
-    config = 'khl'
+    config: ConfigType = ConfigType.khl
 
     def get(self, request):
-        update.delay(self.config)
+        update.delay(self.config.name)
         return render(request, 'ws_update.html', {})
 
 
 class UpdateSeasonView(View):
-    config = 'khl'
+    config: ConfigType = ConfigType.khl
 
-    def get(self, request, season):
-        parse_season.delay(self.config, season)
+    def get(self, request, season: int):
+        parse_season.delay(self.config.name, season)
         return render(request, 'ws_update.html', {})

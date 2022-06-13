@@ -1,30 +1,31 @@
+from sport_parser.core.configs import ConfigType
 from sport_parser.khl.views import StatsView, TeamView, MatchView, CalendarView, UpdateView, UpdateSeasonView
 from sport_parser.api.views import Calendar
 
 
 class NHLStatsView(StatsView):
-    config = 'nhl'
+    config = ConfigType.nhl
 
 
 class NHLMatchView(MatchView):
-    config = 'nhl'
+    config = ConfigType.nhl
 
 
 class NHLTeamView(TeamView):
-    config = 'nhl'
+    config = ConfigType.nhl
 
 
 class NHLCalendarView(CalendarView):
-    config = 'nhl'
+    config = ConfigType.nhl
 
 
 class NHLCalendarApi(Calendar):
-    config = 'nhl'
+    config = ConfigType.nhl
 
 
 class NHLUpdateView(UpdateView):
-    config = 'nhl'
+    config = ConfigType.nhl
 
 
 class NHLUpdateSeasonView(UpdateSeasonView):
-    config = 'nhl'
+    config = ConfigType.nhl
