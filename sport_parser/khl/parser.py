@@ -68,7 +68,7 @@ class KHLParser(Parser):
             match_list = matches.find_all('li', class_='b-wide_tile_item')
 
             # определение даты
-            string_date = self.formatter.date_format(date)
+            string_date = self._date_format(date)
             msk = pytz.timezone('Europe/Moscow')
             date = datetime.datetime.strptime(string_date, '%Y-%m-%d')
             date_msk = msk.localize(date)
@@ -494,3 +494,34 @@ class KHLParser(Parser):
 
         matches = match_soup.find_all('div', class_='m-future')
         return dates, matches
+
+    def _date_format(self, date):
+        if ', ' in date:
+            date = date.split(',')[0]
+        splitted_date = date.split(' ')
+        if not splitted_date[0]:
+            splitted_date.pop(0)
+        day, month, year = splitted_date
+        if len(day) == 1:
+            day = f'0{day}'
+        month = self._month_to_int_replace(month)
+        return f'{year}-{month}-{day}'
+
+    @staticmethod
+    def _month_to_int_replace(month: str):
+        """Возвращает номер месяца по слову"""
+        months = {
+            'января': '01',
+            'февраля': '02',
+            'марта': '03',
+            'апреля': '04',
+            'мая': '05',
+            'июня': '06',
+            'июля': '07',
+            'августа': '08',
+            'сентября': '09',
+            'октября': '10',
+            'ноября': '11',
+            'декабря': '12'
+        }
+        return months.get(month)

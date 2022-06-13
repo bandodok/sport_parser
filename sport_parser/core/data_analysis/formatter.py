@@ -62,37 +62,6 @@ class Formatter:
             hours, mins, secs = stat.split(':')
             return int(secs) + int(mins) * 60 + int(hours) * 3600
 
-    def date_format(self, date):
-        if ', ' in date:
-            date = date.split(',')[0]
-        splitted_date = date.split(' ')
-        if not splitted_date[0]:
-            splitted_date.pop(0)
-        day, month, year = splitted_date
-        if len(day) == 1:
-            day = f'0{day}'
-        month = self.month_to_int_replace(month)
-        return f'{year}-{month}-{day}'
-
-    @staticmethod
-    def month_to_int_replace(month: str):
-        """Возвращает номер месяца по слову"""
-        months = {
-            'января': '01',
-            'февраля': '02',
-            'марта': '03',
-            'апреля': '04',
-            'мая': '05',
-            'июня': '06',
-            'июля': '07',
-            'августа': '08',
-            'сентября': '09',
-            'октября': '10',
-            'ноября': '11',
-            'декабря': '12'
-        }
-        return months.get(month)
-
     def get_json_matches_info(self, matches):
         json_matches = {}
         for match in matches:

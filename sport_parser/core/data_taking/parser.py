@@ -88,8 +88,6 @@ class MatchLiveData:
 
 
 class Parser:
-    def __init__(self, config):
-        self.formatter = Formatter(config)
 
     @abstractmethod
     def parse_teams(self, season: SeasonModel) -> list[TeamData]:
