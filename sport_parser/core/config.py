@@ -24,9 +24,9 @@ class Config:
     table_stats_types: dict
     bar_stats_names: dict
     chart_stats_names: dict
-    updated_team_names: dict
     glossary: dict
-    updater_ignore: list
+    updated_team_names: dict = {}
+    updater_ignore: list = []
 
     models: ModelList = ModelList
     live_match_model: LiveMatches = LiveMatches
