@@ -1,5 +1,7 @@
 import datetime
 from django.db.models import Q
+
+from .formatter import Formatter
 from ..models import SeasonModel, MatchModel
 
 
@@ -17,10 +19,15 @@ class TableStats:
     _opponent_stats: dict
     _extra_stats: dict
 
-    def __init__(self, config):
-        self.formatter = config.formatter
-        self.stat_names = config.table_stats_names
-        self._parse_stats(config.table_stats_types)
+    def __init__(
+            self,
+            stat_names: dict,
+            stat_types: dict,
+            formatter: Formatter,
+    ):
+        self.formatter = formatter
+        self.stat_names = stat_names
+        self._parse_stats(stat_types)
 
     def season_stats_calculate(self, season: SeasonModel):
         """

@@ -1,4 +1,5 @@
 import datetime
+
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db.models import Max
@@ -11,24 +12,38 @@ from sport_parser.core.data_analysis.stats_updater import StatsUpdater
 from sport_parser.core.data_taking.db import DB
 from sport_parser.core.data_taking.parser import Parser, MatchStatus, MatchData, TeamData, MatchProtocolsData
 from sport_parser.core.exceptions import UnableToGetProtocolException
-from sport_parser.core.models import MatchModel
+from sport_parser.core.models import MatchModel, ModelList
 
 
 class Updater:
-    def __init__(self, config):
-        self.model_list = config.models
-        self.parser: Parser = config.parser(config)
-        self.db: DB = config.db(config)
-        self.ignore = config.updater_ignore
+    """
+    Класс обновления информации по лиге.
+    Получает внешнюю информацию, сохраняет ее в базе данных, запускает обработку статистики.
+
+    :param model_list: экземпляр класса ModelList, содержащий список моделей базы данных.
+    :param parser: экземпляр класса Parser, содержащий методы для получения внешней информации.
+    :param db: экземпляр класса DB, отвечающий за взаимодействие с базой данных.
+    :param stats_updater: экземпляр класса Stats_updater, отвечающий за обработку статистики.
+    :param league: название лиги.
+    :param ignore: список id матчей, которые будут проигнорированы при парсинге.
+    """
+
+    def __init__(
+            self,
+            model_list: ModelList,
+            parser: Parser,
+            db: DB,
+            stats_updater: StatsUpdater,
+            league: str,
+            ignore: list[int]
+    ):
+        self.model_list = model_list
+        self.parser = parser
+        self.db = db
+        self.stats_updater = stats_updater
+        self.ignore = ignore
+        self.league = league
         self.channel_layer = get_channel_layer()
-        self.match_class = config.match_class
-        self.league = config.name
-        self.stats_updater = StatsUpdater(
-            db=config.db(config),
-            table_stats=config.TableStats(config=config),
-            chart_stats=config.ChartStats(config=config),
-            bar_stats=config.BarStats(config=config),
-        )
 
     def update(self):
         """Обновляет последний сезон. Парсит сезон, если  он еще не выгружен."""

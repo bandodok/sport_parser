@@ -2,13 +2,24 @@ from django.db import transaction
 
 from sport_parser.core.data_taking.parser import TeamData, MatchData, MatchProtocolsData, ProtocolData, MatchStatus, \
     MatchLiveData
-from sport_parser.core.models import LiveMatches, MatchModel, TeamModel, SeasonModel, LiveMatchModel
+from sport_parser.core.models import LiveMatches, MatchModel, TeamModel, SeasonModel, LiveMatchModel, ModelList
 
 
 class DB:
-    def __init__(self, config):
-        self.model_list = config.models
-        self.updated_team_names = config.updated_team_names
+    """
+    Класс взаимодействия с базой данных.
+
+    :param model_list: список моделей для конкретной лиги, получаемый из конфига
+    :param updated_team_names: словарь с соответствием фактического названия команды с желаемым названием в базе данных
+    """
+
+    def __init__(
+            self,
+            model_list: ModelList,
+            updated_team_names: dict
+    ):
+        self.model_list = model_list
+        self.updated_team_names = updated_team_names
 
     def add_team(self, team: TeamData) -> TeamModel:
         """

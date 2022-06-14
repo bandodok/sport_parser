@@ -2,15 +2,21 @@ from django.db.models import Max
 import datetime
 from django.db.models import Q
 
+from sport_parser.core.data_analysis.formatter import Formatter
+from sport_parser.core.models import ModelList
+
 
 class Season:
     season_does_not_exist = False
 
-    def __init__(self, season_id, *, config):
-        self.config = config
-        self.formatter = config.formatter(config=config)
-        self.models = config.models
-        self.live_match_model = config.live_match_model
+    def __init__(
+            self,
+            season_id: int,
+            formatter: Formatter,
+            models: ModelList
+    ):
+        self.formatter = formatter
+        self.models = models
         try:
             self.data = self.models.season_model.objects.get(id=season_id)
         except self.models.season_model.DoesNotExist:
@@ -70,11 +76,15 @@ class Season:
 
 
 class Team:
-    def __init__(self, team_id, *, config):
-        self.config = config
-        self.season_class = config.season_class
-        self.formatter = config.formatter(config=config)
-        self.models = config.models
+
+    def __init__(
+            self,
+            team_id: int,
+            formatter: Formatter,
+            models: ModelList
+    ):
+        self.formatter = formatter
+        self.models = models
 
         self.data = self.models.team_model.objects.get(id=team_id)
 
@@ -120,18 +130,21 @@ class Team:
 
 
 class Match:
-    def __init__(self, match_id, *, config):
-        self.config = config
-        self.TableStats = config.TableStats(config=config)
-        self.ChartStats = config.ChartStats(config=config)
-        self.BarStats = config.BarStats(config=config)
-        self.season_class = config.season_class
-        self.team_class = config.team_class
-        self.formatter = config.formatter(config=config)
-        self.models = config.models
+
+    def __init__(
+            self,
+            match_id: int,
+            formatter: Formatter,
+            models: ModelList,
+            team1: Team,
+            team2: Team,
+    ):
+        self.formatter = formatter
+        self.models = models
+        self.team1 = team1
+        self.team2 = team2
 
         self.data = self.models.match_model.objects.get(id=match_id)
-        self._set_teams()
         self._set_exclude()
 
     def get_team1_score_by_period(self):
@@ -186,11 +199,6 @@ class Match:
     def get_team2_future_matches(self, num):
         return self.team2.get_json_future_matches(num, exclude=self._exclude)
 
-    def get_match_stats(self):
-        if self.data.status != 'finished':
-            return 'The match is not over yet'
-        return self.TableStats.match_stats_calculate(self.data)
-
     def get_table_stats(self):
         return self.data.table_data
 
@@ -199,12 +207,6 @@ class Match:
 
     def get_chart_stats(self):
         return self.data.chart_data
-
-    def _set_teams(self):
-        team1 = self.data.home_team
-        team2 = self.data.guest_team
-        self.team1 = self.team_class(team1.id, config=self.config)
-        self.team2 = self.team_class(team2.id, config=self.config)
 
     def _set_exclude(self):
         self._exclude = 0

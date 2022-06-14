@@ -1,11 +1,16 @@
 import datetime
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from rest_framework import serializers
 
 
 class Formatter:
-    def __init__(self, config):
-        self.calendar_serializer = config.calendar_serializer
+
+    def __init__(
+            self,
+            calendar_serializer: serializers.BaseSerializer
+    ):
+        self.calendar_serializer = calendar_serializer
 
     @staticmethod
     def time_to_sec(time):

@@ -1,3 +1,4 @@
+from sport_parser.core.data_analysis.formatter import Formatter
 from sport_parser.core.data_taking.parser import MatchLiveProtocolsData
 from sport_parser.core.exceptions import UnableToCalculateBarStats
 from sport_parser.core.models import MatchModel
@@ -11,10 +12,15 @@ class BarStats:
     :param formatter: экземпляр класса форматирования результатов.
     """
 
-    def __init__(self, config):
-        self.formatter = config.formatter
-        self.bar_stats_names = config.bar_stats_names
-        self.live_bar_stats_names = config.live_bar_stats_names
+    def __init__(
+            self,
+            stat_names: dict,
+            live_stat_names: dict,
+            formatter: Formatter
+    ):
+        self.formatter = formatter
+        self.bar_stats_names = stat_names
+        self.live_bar_stats_names = live_stat_names
 
     def match_stats_calculate(self, match: MatchModel):
         """

@@ -1,5 +1,6 @@
 import datetime
 
+from sport_parser.core.data_analysis.formatter import Formatter
 from sport_parser.core.models import TeamModel, MatchModel
 
 
@@ -18,9 +19,13 @@ class ChartStats:
     _short_name_list: list
     _full_name_list: list
 
-    def __init__(self, *, config):
-        self.formatter = config.formatter(config=config)
-        self._parse_stats(config.chart_stats_names)
+    def __init__(
+            self,
+            stat_names: dict,
+            formatter: Formatter
+    ):
+        self.formatter = formatter
+        self._parse_stats(stat_names)
 
     def team_stats_calculate(self, team: TeamModel):
         """
