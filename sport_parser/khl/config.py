@@ -60,17 +60,6 @@ class KHLConfig(Config):
         'time_a__e': 'time_a / (time_a + time_a__a) * 100',
         'pdo__e': 'sog__e + dev__e',
     }
-    match_stats_names = {
-        'sh': ('Sh', 'int'),
-        'sog': ('SoG', 'int'),
-        'g': ('G', 'int'),
-        'faceoff': ('FaceOff', 'int'),
-        'faceoff_p': ('FaceOff%', 'percent'),
-        'hits': ('Hits', 'int'),
-        'blocks': ('Blocks', 'int'),
-        'penalty': ('Penalty', 'int'),
-        'time_a': ('TimeA', 'time'),
-    }
     chart_stats_names = {
         'sh': ('Sh', 'Все броски', 'int'),
         'sog': ('SoG', 'Броски в створ', 'int'),
