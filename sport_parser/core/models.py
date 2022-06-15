@@ -29,7 +29,7 @@ class SeasonModel(AbstractModel):
 
 
 class TeamModel(AbstractModel):
-    season: models.ForeignKey  # related_name='teams'
+    season = models.ForeignKey(SeasonModel, on_delete=models.CASCADE, related_name='teams')
 
     name = models.CharField(max_length=100)
     img = models.CharField(max_length=200)
@@ -48,10 +48,10 @@ class TeamModel(AbstractModel):
 
 
 class MatchModel(AbstractModel):
-    season: models.ForeignKey  # related_name='matches'
-    home_team: models.ForeignKey  # related_name='home_matches'
-    guest_team: models.ForeignKey  # related_name='guest_matches'
-    teams: models.ManyToManyField  # related_name='matches'
+    season = models.ForeignKey(SeasonModel, on_delete=models.CASCADE, null=True, related_name='matches')
+    home_team = models.ForeignKey(TeamModel, on_delete=models.CASCADE, related_name='home_matches', null=True)
+    guest_team = models.ForeignKey(TeamModel, on_delete=models.CASCADE, related_name='guest_matches', null=True)
+    teams = models.ManyToManyField(TeamModel, related_name='matches')
 
     id = models.IntegerField(primary_key=True)
     date = models.DateTimeField(null=True)
@@ -80,9 +80,9 @@ class MatchModel(AbstractModel):
 
 
 class ProtocolModel(AbstractModel):
-    team = models.ForeignKey  # related_name='protocols'
-    match = models.ForeignKey  # related_name='protocols'
-    season = models.ForeignKey  # related_name='protocols'
+    team = models.ForeignKey(TeamModel, on_delete=models.CASCADE, related_name='protocols')
+    match = models.ForeignKey(MatchModel, on_delete=models.CASCADE, related_name='protocols')
+    season = models.ForeignKey(SeasonModel, on_delete=models.CASCADE, related_name='protocols')
 
     g = models.IntegerField(null=True, default=0)
     g_1 = models.IntegerField(null=True, default=0)
@@ -96,7 +96,7 @@ class ProtocolModel(AbstractModel):
 
 
 class LiveMatchModel(AbstractModel):
-    match = models.OneToOneField  # related_name='live'
+    match = models.OneToOneField(MatchModel, on_delete=models.CASCADE, related_name='live')
 
     status = models.CharField(max_length=100, null=True, blank=True)
     team1_score = models.IntegerField(null=True, default=0)
