@@ -8,7 +8,8 @@ from sport_parser.core.data_analysis.stats_updater import StatsUpdater
 from sport_parser.core.data_analysis.table_stats import TableStats
 from sport_parser.core.data_taking.db import DB
 from sport_parser.core.data_taking.parser import Parser
-from sport_parser.core.models import ModelList
+from sport_parser.core.exceptions import SeasonDoesNotExist, TeamDoesNotExist, MatchDoesNotExist
+from sport_parser.core.models import ModelList, SeasonModel, TeamModel, MatchModel
 from sport_parser.core.objects import Season, Team, Match
 from sport_parser.core.updater import Updater
 
@@ -25,8 +26,9 @@ class Creator:
     def get_season_class(self, season_id: int) -> Season:
         if season_id == 0:
             season_id = self.config.models.season_model.objects.aggregate(Max('id'))['id__max']
+        data = self._get_season_data(season_id)
         return self.config.season_class(
-            season_id=season_id,
+            data=data,
             formatter=self.get_formatter(),
             models=self.get_model_list()
         )
@@ -34,8 +36,9 @@ class Creator:
     def get_team_class(self, team_id: int) -> Team:
         if team_id == 0:
             team_id = self.config.models.team_model.objects.aggregate(Max('id'))['id__max']
+        data = self._get_team_data(team_id)
         return self.config.team_class(
-            team_id=team_id,
+            data=data,
             formatter=self.get_formatter(),
             models=self.get_model_list()
         )
@@ -43,11 +46,12 @@ class Creator:
     def get_match_class(self, match_id: int) -> Match:
         if match_id == 0:
             match_id = self.config.models.match_model.objects.aggregate(Max('id'))['id__max']
+        data = self._get_match_data(match_id)
         match = self.config.models.match_model.objects.get(id=match_id)
         team1 = match.home_team
         team2 = match.guest_team
         return self.config.match_class(
-            match_id=match_id,
+            data=data,
             formatter=self.get_formatter(),
             models=self.get_model_list(),
             team1=self.get_team_class(team1.id),
@@ -128,3 +132,24 @@ class Creator:
 
     def get_glossary(self):
         return self.config.glossary
+
+    # методы получения данных из моделей
+    def _get_season_data(self, season_id: int) -> SeasonModel:
+        model = self.config.models.season_model
+        return self._get_data(season_id, model, SeasonDoesNotExist)
+
+    def _get_team_data(self, team_id: int) -> TeamModel:
+        model = self.config.models.team_model
+        return self._get_data(team_id, model, TeamDoesNotExist)
+
+    def _get_match_data(self, match_id: int) -> MatchModel:
+        model = self.config.models.match_model
+        return self._get_data(match_id, model, MatchDoesNotExist)
+
+    @staticmethod
+    def _get_data(item_id, model, exception):
+        try:
+            data = model.objects.get(id=item_id)
+        except model.DoesNotExist:
+            raise exception
+        return data

@@ -7,6 +7,7 @@ from django.views import View
 
 from sport_parser.core.configs import ConfigType
 from sport_parser.core.creator import Creator
+from sport_parser.core.exceptions import SeasonDoesNotExist, TeamDoesNotExist, MatchDoesNotExist
 from sport_parser.core.tasks import update, parse_season
 
 
@@ -72,8 +73,9 @@ class StatsView(HockeyView):
     template: str = 'khl_stats.html'
 
     def get_object(self, season_id=0):
-        s = self.creator.get_season_class(season_id)
-        if s.season_does_not_exist:
+        try:
+            s = self.creator.get_season_class(season_id)
+        except SeasonDoesNotExist:
             raise Http404("Season does not exist")
         return s
 
@@ -93,7 +95,11 @@ class TeamView(HockeyView):
     template: str = 'khl_team.html'
 
     def get_object(self, team_id=0):
-        return self.creator.get_team_class(team_id)
+        try:
+            team = self.creator.get_team_class(team_id)
+        except TeamDoesNotExist:
+            raise Http404("Team does not exist")
+        return team
 
     def get_context(self, t):
         return {
@@ -110,7 +116,11 @@ class MatchView(HockeyView):
     template: str = 'khl_match.html'
 
     def get_object(self, match_id=0):
-        return self.creator.get_match_class(match_id)
+        try:
+            match = self.creator.get_match_class(match_id)
+        except MatchDoesNotExist:
+            raise Http404("Match does not exist")
+        return match
 
     def get_context(self, m):
         return {

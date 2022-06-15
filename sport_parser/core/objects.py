@@ -3,33 +3,30 @@ import datetime
 from django.db.models import Q
 
 from sport_parser.core.data_analysis.formatter import Formatter
-from sport_parser.core.models import ModelList
+from sport_parser.core.models import ModelList, SeasonModel, TeamModel, MatchModel
 
 
 class Season:
-    season_does_not_exist = False
+    """
+    Класс представления информации по сезону.
+
+    :param data: данные сезона в формате строки модели SeasonModel
+    :param formatter: экземпляр класса Formatter, форматирующий выходные данные
+    :param models: экземпляр класса ModelList, содержащий модели базы данных
+    """
 
     def __init__(
             self,
-            season_id: int,
+            data: SeasonModel,
             formatter: Formatter,
             models: ModelList
     ):
         self.formatter = formatter
         self.models = models
-        try:
-            self.data = self.models.season_model.objects.get(id=season_id)
-        except self.models.season_model.DoesNotExist:
-            self.season_does_not_exist = True
+        self.data = data
 
     def get_match_list(self):
         return self.data.matches.all()
-
-    def get_team_list(self):
-        return self.data.teams.all().order_by('name')
-
-    def get_protocol_list(self):
-        return self.models.protocol_model.objects.filter(match__season_id=self.data)
 
     def get_last_matches(self, num):
         return self.data.matches.filter(status='finished').order_by('-date')[:num]
@@ -65,42 +62,28 @@ class Season:
             last.save()
         return last_update
 
-    def get_stat_fields_list(self):
-        fields = self.data.matches.all()[0].protocols.all()[0].__dict__
-        for field in ['_state', 'id', 'created', 'updated', 'team_id', 'match_id']:
-            fields.pop(field)
-        return [key for key, value in fields.items()]
-
     def get_table_stats(self):
         return self.data.table_data
 
 
 class Team:
+    """
+    Класс представления информации по команде.
+
+    :param data: данные команды в формате строки модели TeamModel
+    :param formatter: экземпляр класса Formatter, форматирующий выходные данные
+    :param models: экземпляр класса ModelList, содержащий модели базы данных
+    """
 
     def __init__(
             self,
-            team_id: int,
+            data: TeamModel,
             formatter: Formatter,
             models: ModelList
     ):
         self.formatter = formatter
         self.models = models
-
-        self.data = self.models.team_model.objects.get(id=team_id)
-
-    def __len__(self):
-        return 1
-
-    def get_match_list(self):
-        return self.data.matches.all()
-
-    def get_self_protocol_list(self):
-        return self.data.protocols.all()
-
-    def get_opponent_protocol_list(self):
-        match_list = self.get_match_list()
-        protocol_list = self.models.protocol_model.objects.filter(match__in=match_list).exclude(team=self.data)
-        return protocol_list.order_by('match__date')
+        self.data = data
 
     def get_last_matches(self, num, *, exclude=0):
         return self.data.matches.filter(status='finished').exclude(id=exclude).order_by('-date')[:num]
@@ -116,9 +99,6 @@ class Team:
         future_matches = self.get_future_matches(num, exclude=exclude)
         return self.formatter.get_json_matches_info(future_matches)
 
-    def get_table_stats(self):
-        return self.data.table_data
-
     def get_chart_stats(self):
         return self.data.chart_data
 
@@ -130,10 +110,19 @@ class Team:
 
 
 class Match:
+    """
+    Класс представления информации по матчу.
+
+    :param data: данные матча в формате строки модели MatchModel
+    :param formatter: экземпляр класса Formatter, форматирующий выходные данные
+    :param models: экземпляр класса ModelList, содержащий модели базы данных
+    :param team1: экземпляр класса Team, содержит информацию по домашней команде
+    :param team2: экземпляр класса Team, содержит информацию по гостевой команде
+    """
 
     def __init__(
             self,
-            match_id: int,
+            data: MatchModel,
             formatter: Formatter,
             models: ModelList,
             team1: Team,
@@ -143,8 +132,7 @@ class Match:
         self.models = models
         self.team1 = team1
         self.team2 = team2
-
-        self.data = self.models.match_model.objects.get(id=match_id)
+        self.data = data
         self._set_exclude()
 
     def get_team1_score_by_period(self):

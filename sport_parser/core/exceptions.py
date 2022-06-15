@@ -11,3 +11,18 @@ class UnableToGetProtocolException(SportParserException):
 class UnableToCalculateBarStats(SportParserException):
     """Вызывается при попытке рассчитать статистику для полосок для незавершенного матча"""
     pass
+
+
+class SeasonDoesNotExist(SportParserException):
+    """Вызывается при попытке получить класс несуществующего сезона"""
+    pass
+
+
+class TeamDoesNotExist(SportParserException):
+    """Вызывается при попытке получить класс несуществующей команды"""
+    pass
+
+
+class MatchDoesNotExist(SportParserException):
+    """Вызывается при попытке получить класс несуществующего матча"""
+    pass
