@@ -15,7 +15,6 @@ class NHLMatch(MatchModel):
     season = models.ForeignKey(NHLSeason, on_delete=models.CASCADE, null=True, related_name='matches')
     home_team = models.ForeignKey(NHLTeam, on_delete=models.CASCADE, related_name='home_matches', null=True)
     guest_team = models.ForeignKey(NHLTeam, on_delete=models.CASCADE, related_name='guest_matches', null=True)
-    teams = models.ManyToManyField(NHLTeam, related_name='matches')
 
 
 class NHLProtocol(ProtocolModel):

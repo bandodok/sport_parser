@@ -60,17 +60,10 @@ class DB:
             m.penalties = match.penalties
             m.overtime = match.overtime
 
-            home_team = self._team_name_update(match.home_team_name)
-            home_team = self.model_list.team_model.objects.filter(season=season).get(name=home_team)
-            guest_team = self._team_name_update(match.guest_team_name)
-            guest_team = self.model_list.team_model.objects.filter(season=season).get(name=guest_team)
-
-            m.home_team = home_team
-            m.guest_team = guest_team
-
-            m.teams.add(home_team)
-            m.save()
-            m.teams.add(guest_team)
+            home_team_name = self._team_name_update(match.home_team_name)
+            guest_team_name = self._team_name_update(match.guest_team_name)
+            m.home_team = self.model_list.team_model.objects.filter(season=season).get(name=home_team_name)
+            m.guest_team = self.model_list.team_model.objects.filter(season=season).get(name=guest_team_name)
             m.save()
             return m, new
 

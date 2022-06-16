@@ -1,5 +1,4 @@
 from django.db import models
-import json
 
 from sport_parser.core.models import SeasonModel, TeamModel, MatchModel, ProtocolModel, ModelList, LiveMatchModel
 
@@ -16,7 +15,6 @@ class KHLMatch(MatchModel):
     season = models.ForeignKey(KHLSeason, on_delete=models.CASCADE, null=True, related_name='matches')
     home_team = models.ForeignKey(KHLTeams, on_delete=models.CASCADE, related_name='home_matches', null=True)
     guest_team = models.ForeignKey(KHLTeams, on_delete=models.CASCADE, related_name='guest_matches', null=True)
-    teams = models.ManyToManyField(KHLTeams, related_name='matches')
 
 
 class KHLProtocol(ProtocolModel):

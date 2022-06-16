@@ -1,6 +1,7 @@
 import json
 
 from django.db import models
+from django.db.models import Q
 
 
 class AbstractModel(models.Model):
@@ -40,6 +41,10 @@ class TeamModel(AbstractModel):
 
     chart_data = models.JSONField(null=True, encoder=json.JSONEncoder, decoder=json.JSONDecoder)
 
+    @property
+    def matches(self):
+        return self.season.matches.filter(Q(home_team=self) | Q(guest_team=self))
+
     def __str__(self):
         return str(self.id)
 
@@ -51,7 +56,6 @@ class MatchModel(AbstractModel):
     season = models.ForeignKey(SeasonModel, on_delete=models.CASCADE, null=True, related_name='matches')
     home_team = models.ForeignKey(TeamModel, on_delete=models.CASCADE, related_name='home_matches', null=True)
     guest_team = models.ForeignKey(TeamModel, on_delete=models.CASCADE, related_name='guest_matches', null=True)
-    teams = models.ManyToManyField(TeamModel, related_name='matches')
 
     id = models.IntegerField(primary_key=True)
     date = models.DateTimeField(null=True)
