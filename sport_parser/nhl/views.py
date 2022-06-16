@@ -1,5 +1,5 @@
 from sport_parser.core.configs import ConfigType
-from sport_parser.khl.views import StatsView, TeamView, MatchView, CalendarView, UpdateView, UpdateSeasonView
+from sport_parser.core.views import StatsView, TeamView, MatchView, CalendarView, UpdateView, UpdateSeasonView
 from sport_parser.api.views import Calendar
 
 
