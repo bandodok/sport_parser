@@ -1,49 +1,103 @@
 import datetime
 
+from sport_parser.core.data_analysis.formatter import Formatter
+from sport_parser.core.models import TeamModel, MatchModel
+
 
 class ChartStats:
-    def __init__(self, *, config):
-        self.formatter = config.formatter(config=config)
-        self.stat_names = config.chart_stats_names
+    """
+    Класс для расчета статистики, отображаемой в виде графиков.
+    Рассчитывает статистику для команды или матча, из которой формируются таблицы в js.
+    При расчете статистики для команды, названиями графиков указываются названия параметров.
+    При расчете статистики для матча, названиями графиков указываются названия команд.
 
-    def calculate(self, team_list):
-        stat_list = [*self.stat_names.keys()]
-        short_name_list = [value[0] for value in self.stat_names.values()]
-        full_name_list = [value[1] for value in self.stat_names.values()]
-        if len(team_list) > 1:
-            team_stats = self.get_team_stats_per_day(team_list[0], stat_list)
-            opponent_stats = self.get_team_stats_per_day(team_list[1], stat_list)
-            self_headers = [team_list[0].data.name for _ in self.stat_names]
-            opponent_headers = [team_list[1].data.name for _ in self.stat_names]
-        else:
-            team_stats = self.get_team_stats_per_day(team_list, stat_list)
-            opponent_stats = self.get_opp_stats_per_day(team_list, stat_list)
-            self_headers = short_name_list
-            opponent_headers = [f'{value}(A)' for value in short_name_list]
+    :param stat_names: параметры расчета статистики, полученные из конфига.
+    :param formatter: экземпляр класса форматирования результатов.
+    """
 
-        while len(team_stats) != len(opponent_stats):
-            if len(team_stats) < len(opponent_stats):
-                opponent_stats.pop()
+    _stat_list: list
+    _short_name_list: list
+    _full_name_list: list
+
+    def __init__(
+            self,
+            stat_names: dict,
+            formatter: Formatter
+    ):
+        self.formatter = formatter
+        self._parse_stats(stat_names)
+
+    def team_stats_calculate(self, team: TeamModel):
+        """
+        Рассчитывает статистику для команды.
+
+        :param team: строка команды модели TeamModel.
+        :return: рассчитанная статистика.
+        """
+
+        team_stats = self._get_team_stats_per_day(team)
+        opponent_stats = self._get_opp_stats_per_day(team)
+
+        self_headers = self._short_name_list
+        opponent_headers = [f'{value}(A)' for value in self._short_name_list]
+        headers = [*self_headers, *opponent_headers]
+
+        return self._calculate(headers, team_stats, opponent_stats)
+
+    def match_stats_calculate(self, match: MatchModel):
+        """
+        Рассчитывает статистику для команды.
+
+        :param match: строка матча модели MatchModel.
+        :return: рассчитанная статистика.
+        """
+
+        team1 = match.home_team
+        team2 = match.guest_team
+
+        team1_stats = self._get_team_stats_per_day(team1)
+        team2_stats = self._get_team_stats_per_day(team2)
+
+        team1_headers = [team1.name for _ in self._short_name_list]
+        team2_headers = [team2.name for _ in self._short_name_list]
+        headers = [*team1_headers, *team2_headers]
+
+        return self._calculate(headers, team1_stats, team2_stats)
+
+    def _calculate(self, headers, team1_stats, team2_stats) -> list:
+        output_stats = [headers]
+        while len(team1_stats) != len(team2_stats):
+            if len(team1_stats) < len(team2_stats):
+                team2_stats.pop()
             else:
-                team_stats.pop()
-
-        output_stats = [[*self_headers, *opponent_headers]]
-
-        for index, value, in enumerate(team_stats):
-            value.extend(opponent_stats[index])
+                team1_stats.pop()
+        for index, value, in enumerate(team1_stats):
+            value.extend(team2_stats[index])
             output_stats.append(value)
+        return [output_stats, self._short_name_list, self._full_name_list]
 
-        return [output_stats, short_name_list, full_name_list]
+    def _get_team_stats_per_day(self, team):
+        protocol_list = team.protocols.all().order_by('updated')
 
-    def get_team_stats_per_day(self, team, stat_list):
-        protocol_list = team.get_self_protocol_list()
-        values_list = protocol_list.values_list(*stat_list)
+        values_list = protocol_list.values_list(*self._stat_list)
         return [[self._format(stat) for stat in day] for day in values_list]
 
-    def get_opp_stats_per_day(self, team, stat_list):
-        protocol_list = team.get_opponent_protocol_list()
-        values_list = protocol_list.values_list(*stat_list)
+    def _get_opp_stats_per_day(self, team):
+        match_list = team.matches.filter(status='finished')
+        all_protocol_list = team.season.protocols.all()
+        protocol_list = all_protocol_list.filter(match__in=match_list).exclude(team=team)
+
+        values_list = protocol_list.values_list(*self._stat_list)
         return [[self._format(stat) for stat in day] for day in values_list]
+
+    def _parse_stats(self, stat_names):
+        self._stat_list = []
+        self._short_name_list = []
+        self._full_name_list = []
+        for stat, values in stat_names.items():
+            self._stat_list.append(stat)
+            self._short_name_list.append(values[0])
+            self._full_name_list.append(values[1])
 
     def _format(self, stat):
         if type(stat) == datetime.time:

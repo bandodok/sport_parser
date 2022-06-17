@@ -1,6 +1,6 @@
 from sport_parser.core.config import Config
 
-from sport_parser.nhl.models import ModelList
+from sport_parser.nhl.models import NHLModelList
 from sport_parser.nhl.parser import NHLParser
 
 
@@ -11,7 +11,7 @@ class NHLConfig(Config):
     league_logo = 'NHL.webp'
     background_image = 'tribuna.webp'
     theme = 'nhlTheme.css'
-    models = ModelList
+    models = NHLModelList
     parser = NHLParser
     table_stats_names = {
         'sh': ('Sh', 'int'),
@@ -33,7 +33,7 @@ class NHLConfig(Config):
         'takeaways': ('TA', 'int'),
         'giveaways': ('GA', 'int'),
     }
-    table_stats = {
+    table_stats_types = {
         'sh': 'median',
         'sog': 'median',
         'g': 'median',

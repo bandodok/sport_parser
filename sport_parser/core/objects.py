@@ -2,29 +2,34 @@ from django.db.models import Max
 import datetime
 from django.db.models import Q
 
+from sport_parser.core.data_analysis.formatter import Formatter
+from sport_parser.core.models import ModelList, SeasonModel, TeamModel, MatchModel
+
 
 class Season:
-    season_does_not_exist = False
+    """
+    Класс представления информации по сезону.
 
-    def __init__(self, season_id, *, config):
-        self.config = config
-        self.TableStats = config.TableStats(config=config)
-        self.formatter = config.formatter(config=config)
-        self.models = config.models
-        self.live_match_model = config.live_match_model
-        try:
-            self.data = self.models.season_model.objects.get(id=season_id)
-        except self.models.season_model.DoesNotExist:
-            self.season_does_not_exist = True
+    :param data: данные сезона в формате строки модели SeasonModel
+    :param formatter: экземпляр класса Formatter, форматирующий выходные данные
+    :param models: экземпляр класса ModelList, содержащий модели базы данных
+    """
+
+    def __init__(
+            self,
+            data: SeasonModel,
+            formatter: Formatter,
+            models: ModelList
+    ):
+        self.formatter = formatter
+        self.models = models
+        self.data = data
 
     def get_match_list(self):
         return self.data.matches.all()
 
     def get_team_list(self):
         return self.data.teams.all().order_by('name')
-
-    def get_protocol_list(self):
-        return self.models.protocol_model.objects.filter(match__season_id=self.data)
 
     def get_last_matches(self, num):
         return self.data.matches.filter(status='finished').order_by('-date')[:num]
@@ -41,15 +46,9 @@ class Season:
         return self.formatter.get_json_matches_info(future_matches)
 
     def get_live_matches(self):
-        live_matches = []
-        matches = self.data.matches\
+        return self.data.matches\
             .filter(Q(status='live') | Q(status='game over'))\
             .order_by('date')
-        for match in matches:
-            live_data = match.live_data
-            match.status = live_data['match_status']
-            live_matches.append(match)
-        return live_matches
 
     def get_json_live_matches(self):
         live_matches = self.get_live_matches()
@@ -66,53 +65,28 @@ class Season:
             last.save()
         return last_update
 
-    def get_stat_fields_list(self):
-        fields = self.data.matches.all()[0].protocols.all()[0].__dict__
-        for field in ['_state', 'id', 'created', 'updated', 'team_id', 'match_id']:
-            fields.pop(field)
-        return [key for key, value in fields.items()]
-
-    def get_table_stats(self, *, match_list=None, team_list=None, protocol_list=None):
-        if not match_list and not team_list and not protocol_list:
-            return self.data.table_data
-        if not match_list:
-            match_list = self.get_match_list()
-        if not team_list:
-            team_list = self.get_team_list()
-        if not protocol_list:
-            protocol_list = self.get_protocol_list()
-        return self.TableStats.season_stats_calculate(match_list, team_list, protocol_list)
-
-    def update_season_table_stats(self):
-        data = self.get_table_stats(match_list=self.get_match_list())
-        self.data.table_data = data
-        self.data.save()
+    def get_table_stats(self):
+        return self.data.table_data
 
 
 class Team:
-    def __init__(self, team_id, *, config):
-        self.config = config
-        self.TableStats = config.TableStats(config=config)
-        self.ChartStats = config.ChartStats(config=config)
-        self.season_class = config.season_class
-        self.formatter = config.formatter(config=config)
-        self.models = config.models
+    """
+    Класс представления информации по команде.
 
-        self.data = self.models.team_model.objects.get(id=team_id)
+    :param data: данные команды в формате строки модели TeamModel
+    :param formatter: экземпляр класса Formatter, форматирующий выходные данные
+    :param models: экземпляр класса ModelList, содержащий модели базы данных
+    """
 
-    def __len__(self):
-        return 1
-
-    def get_match_list(self):
-        return self.data.matches.all()
-
-    def get_self_protocol_list(self):
-        return self.data.protocols.all()
-
-    def get_opponent_protocol_list(self):
-        match_list = self.get_match_list()
-        protocol_list = self.models.protocol_model.objects.filter(match__in=match_list).exclude(team=self.data)
-        return protocol_list.order_by('match__date')
+    def __init__(
+            self,
+            data: TeamModel,
+            formatter: Formatter,
+            models: ModelList
+    ):
+        self.formatter = formatter
+        self.models = models
+        self.data = data
 
     def get_last_matches(self, num, *, exclude=0):
         return self.data.matches.filter(status='finished').exclude(id=exclude).order_by('-date')[:num]
@@ -128,14 +102,8 @@ class Team:
         future_matches = self.get_future_matches(num, exclude=exclude)
         return self.formatter.get_json_matches_info(future_matches)
 
-    def get_table_stats(self):
-        season = self.season_class(self.data.season_id, config=self.config)
-        return season.get_table_stats(team_list=[self.data])
-
-    def get_chart_stats(self, team_list=None):
-        if not team_list:
-            team_list = self
-        return self.ChartStats.calculate(team_list)
+    def get_chart_stats(self):
+        return self.data.chart_data
 
     def get_another_season_team_ids(self):
         """Возвращает список id команды для разных сезонов"""
@@ -145,19 +113,29 @@ class Team:
 
 
 class Match:
-    def __init__(self, match_id, *, config):
-        self.config = config
-        self.TableStats = config.TableStats(config=config)
-        self.ChartStats = config.ChartStats(config=config)
-        self.BarStats = config.BarStats(config=config)
-        self.LiveBarStats = config.LiveBarStats(config=config)
-        self.season_class = config.season_class
-        self.team_class = config.team_class
-        self.formatter = config.formatter(config=config)
-        self.models = config.models
+    """
+    Класс представления информации по матчу.
 
-        self.data = self.models.match_model.objects.get(id=match_id)
-        self._set_teams()
+    :param data: данные матча в формате строки модели MatchModel
+    :param formatter: экземпляр класса Formatter, форматирующий выходные данные
+    :param models: экземпляр класса ModelList, содержащий модели базы данных
+    :param team1: экземпляр класса Team, содержит информацию по домашней команде
+    :param team2: экземпляр класса Team, содержит информацию по гостевой команде
+    """
+
+    def __init__(
+            self,
+            data: MatchModel,
+            formatter: Formatter,
+            models: ModelList,
+            team1: Team,
+            team2: Team,
+    ):
+        self.formatter = formatter
+        self.models = models
+        self.team1 = team1
+        self.team2 = team2
+        self.data = data
         self._set_exclude()
 
     def get_team1_score_by_period(self):
@@ -212,39 +190,14 @@ class Match:
     def get_team2_future_matches(self, num):
         return self.team2.get_json_future_matches(num, exclude=self._exclude)
 
-    def get_match_stats(self):
-        if self.data.status != 'finished':
-            return 'The match is not over yet'
-        return self.TableStats.match_stats_calculate(self.data)
-
     def get_table_stats(self):
-        season = self.season_class(self.data.season_id, config=self.config)
-        return season.get_table_stats(team_list=[self.team1.data, self.team2.data])
+        return self.data.table_data
 
     def get_bar_stats(self):
-        if self.data.status != 'finished':
-            return 'The match is not over yet'
-        return self.BarStats.calculate(self)
-
-    def get_live_bar_stats(self, match_data):
-        return self.LiveBarStats.calculate(match_data)
+        return self.data.bar_data
 
     def get_chart_stats(self):
-        team_list = (self.team1, self.team2)
-        return self.ChartStats.calculate(team_list)
-
-    def _get_m2m_table_name(self):
-        meta = self.models.match_model._meta
-        app_label = meta.app_label
-        match_model = meta.model_name
-        team_model = meta.many_to_many[0].column
-        return f'{app_label}_{match_model}_{team_model}'
-
-    def _set_teams(self):
-        m2m_table = self._get_m2m_table_name()
-        team1, team2 = self.data.teams.all().extra(select={'add_id': f'{m2m_table}.id'}).order_by('add_id')
-        self.team1 = self.team_class(team1.id, config=self.config)
-        self.team2 = self.team_class(team2.id, config=self.config)
+        return self.data.chart_data
 
     def _set_exclude(self):
         self._exclude = 0

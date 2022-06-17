@@ -1,6 +1,6 @@
 from sport_parser.core.config import Config
 
-from sport_parser.khl.models import ModelList
+from sport_parser.khl.models import KHLModelList
 from sport_parser.khl.parser import KHLParser
 
 
@@ -11,7 +11,7 @@ class KHLConfig(Config):
     league_logo = 'KHL.webp'
     background_image = 'tribuna.webp'
     theme = 'khlTheme.css'
-    models = ModelList
+    models = KHLModelList
     parser = KHLParser
     table_stats_names = {
         'sh': ('Sh', 'int'),
@@ -34,7 +34,7 @@ class KHLConfig(Config):
         'blocks__e': ('Blocks%', 'percent'),
         'penalty': ('Penalty', 'int'),
     }
-    table_stats = {
+    table_stats_types = {
         'sh': 'median',
         'sog': 'median',
         'g': 'median',
@@ -59,17 +59,6 @@ class KHLConfig(Config):
         'dev__e': '(1 - (sog__a / sh__a)) * 100',
         'time_a__e': 'time_a / (time_a + time_a__a) * 100',
         'pdo__e': 'sog__e + dev__e',
-    }
-    match_stats_names = {
-        'sh': ('Sh', 'int'),
-        'sog': ('SoG', 'int'),
-        'g': ('G', 'int'),
-        'faceoff': ('FaceOff', 'int'),
-        'faceoff_p': ('FaceOff%', 'percent'),
-        'hits': ('Hits', 'int'),
-        'blocks': ('Blocks', 'int'),
-        'penalty': ('Penalty', 'int'),
-        'time_a': ('TimeA', 'time'),
     }
     chart_stats_names = {
         'sh': ('Sh', 'Все броски', 'int'),
