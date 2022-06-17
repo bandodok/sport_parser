@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.10
 
 WORKDIR /home/bandodok/sport_parser
 COPY ./requirements.txt /home/bandodok/sport_parser/requirements.txt
