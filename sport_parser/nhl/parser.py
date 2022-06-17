@@ -1,11 +1,14 @@
-from sport_parser.core.data_taking.parser import Parser
+from sport_parser.core.data_taking.parser import Parser, TeamData, MatchData, MatchStatus, MatchProtocolsData, \
+    ProtocolRequiredStats, ProtocolData, MatchLiveData, MatchLiveProtocolsData
 from datetime import datetime
 import pytz
+
+from sport_parser.core.models import SeasonModel
 
 
 class NHLParser(Parser):
 
-    def parse_teams(self, season):
+    def parse_teams(self, season: SeasonModel) -> list[TeamData]:
         url = f'https://statsapi.web.nhl.com/api/v1/schedule?season={season.external_id}'
         dates_dict = self.get_api_request_content(url)
         dates_list = dates_dict.get('dates')
@@ -27,21 +30,18 @@ class NHLParser(Parser):
         for team in team_ids:
             team_url = f'{team_api_url}{team}'
             team_response = self.get_api_request_content(team_url).get('teams')[0]
-            teams.append({
-                'api_id': team,
-                'name': team_response.get('name'),
-                'short_name': team_response.get('teamName'),
-                'abbreviation': team_response.get('abbreviation'),
-                'season': season,
-                'arena': team_response.get('venue').get('name'),
-                'city': team_response.get('locationName'),
-                'division': team_response.get('division').get('name'),
-                'conference': team_response.get('conference').get('name'),
-                'img': self.get_picture(team_response.get('teamName')),
-            })
+            teams.append(TeamData(
+                name=team_response.get('name'),
+                img=self.get_picture(team_response.get('teamName')),
+                city=team_response.get('locationName'),
+                arena=team_response.get('venue').get('name'),
+                division=team_response.get('division').get('name'),
+                conference=team_response.get('conference').get('name'),
+                season_num=season.id
+            ))
         return teams
 
-    def parse_calendar(self, season, *, webdriver=None):
+    def parse_calendar(self, season: SeasonModel) -> list[MatchData]:
         url = f'https://statsapi.web.nhl.com/api/v1/schedule?season={season.external_id}'
         dates_dict = self.get_api_request_content(url)
         dates_list = dates_dict.get('dates')
@@ -56,79 +56,61 @@ class NHLParser(Parser):
             if game_type in ('PR', 'A', 'WA', 'O', 'WCOH_EXH', 'WCOH_PRELIM', 'WCOH_FINAL'):
                 continue
 
-            match_type = 'unknown'
-            if game_type == 'R':
-                match_type = 'Regular season'
-            if game_type == 'P':
-                match_type = 'Playoffs'
-
-            status = 'scheduled'
+            status = MatchStatus.SCHEDULED
             if game['status']['statusCode'] == '9':  # postponed code
-                status = 'postponed'
+                status = MatchStatus.POSTPONED
             elif game['status']['statusCode'] in ('6', '7'):  # finished codes
-                status = 'finished'
+                status = MatchStatus.FINISHED
 
             utc = pytz.utc
             naive_date = game.get('gameDate')
             date = datetime.strptime(naive_date, '%Y-%m-%dT%H:%M:%SZ')
             date_utc = utc.localize(date)
 
-            match_info = {
-                'match_id': game.get('gamePk'),
-                'match_type': match_type,
-                'date': date_utc,
-                'home_team': game['teams']['home']['team']['name'],
-                'guest_team': game['teams']['away']['team']['name'],
-                'season': season,
-                'status': status,
-                'arena': game['venue']['name'],
-            }
-            calendar.append(match_info)
+            match_data = MatchData(
+                id=game.get('gamePk'),
+                season_num=season.id,
+                date=date_utc,
+                home_team_name=game['teams']['home']['team']['name'],
+                guest_team_name=game['teams']['away']['team']['name'],
+                status=status,
+                arena=game['venue']['name']
+            )
+            calendar.append(match_data)
         return calendar
 
-    def parse_match(self, match):
+    def parse_match_additional_info(self, match: MatchData) -> None:
+        self.parse_finished_match(match)
+
+    def parse_finished_match(self, match: MatchData) -> MatchData:
         url = f'https://statsapi.web.nhl.com/api/v1/game/{match.id}/feed/live'  # 2021010003
         match_dict = self.get_api_request_content(url)
-
-        status_code = match_dict.get('gameData').get('status').get('statusCode')
-        linescore = match_dict.get('liveData').get('linescore')
-
-        match_data = self._parse_finished_match(match, linescore)
-        if status_code == '9':  # postponed code
-            match_data['status'] = 'postponed'
-        elif status_code == '7':  # finished code
-            match_data['status'] = 'finished'
-        else:
-            match_data['status'] = 'scheduled'
-
-        return match_data
-
-    def _parse_finished_match(self, match, linescore):
+        if match_dict.get('message') == "Game data couldn't be found":
+            return match
+        live_data = match_dict.get('liveData')
+        linescore = live_data.get('linescore')
         match_status = linescore.get('currentPeriodOrdinal')
-        overtime = False
-        penalties = False
         if match_status == 'OT':
-            overtime = True
+            match.overtime = True
         if match_status == 'SO':
-            penalties = True
+            match.penalties = True
+        return match
 
-        match_info = {
-            'match_id': match.id,
-            'season': match.season,
-            'overtime': overtime,
-            'penalties': penalties,
-        }
-        return match_info
+    def is_match_finished(self, match_id: int) -> bool:
+        url = f'https://statsapi.web.nhl.com/api/v1/game/{match_id}/feed/live'
+        match_dict = self.get_api_request_content(url)
+        if match_dict['gameData']['status']['statusCode'] in ('6', '7'):
+            return True
+        return False
 
-    def parse_protocol(self, match):
-        match_data = self._get_match_data(match.id)
+    def parse_protocol(self, match_id: int) -> MatchProtocolsData:
+        match_data = self._get_match_data(match_id)
 
         home_team = match_data['liveData']['boxscore']['teams']['home']['team']['name']
         guest_team = match_data['liveData']['boxscore']['teams']['away']['team']['name']
 
         # статистика из основного раздела
         stat_dict = {
-            'g': 'goals',
             'sog': 'shots',
             'penalty': 'pim',
             'blocks': 'blocked',
@@ -142,18 +124,72 @@ class NHLParser(Parser):
         main_data = self._get_main_data(match_data, stat_dict)
 
         # счет по периодам
-        periods_data = self._get_score_by_period(match_data)
+        required_data = self._get_score_by_period(match_data)
 
         # сбор статистики из всех ивентов матча
         event_data = self._get_events_data(match_data, home_team, guest_team)
 
-        home_protocol = main_data['row_home'] | periods_data['row_home'] | event_data['row_home']
-        guest_protocol = main_data['row_guest'] | periods_data['row_guest'] | event_data['row_guest']
+        home_protocol = ProtocolData(
+            team_name=home_team,
+            required_stats=required_data['row_home'],
+            additional_stats=main_data['row_home'] | event_data['row_home']
+        )
+        guest_protocol = ProtocolData(
+            team_name=guest_team,
+            required_stats=required_data['row_guest'],
+            additional_stats=main_data['row_guest'] | event_data['row_guest']
+        )
+        protocols = MatchProtocolsData(
+            match_id=match_id,
+            home_protocol=home_protocol,
+            guest_protocol=guest_protocol
+        )
+        return protocols
 
-        home_protocol['match_id'] = match.id
-        guest_protocol['match_id'] = match.id
+    def parse_live_match(self, match_id: int) -> MatchLiveData:
+        match_data = self._get_match_data(match_id)
+        match_status = self._get_match_status(match_data)
 
-        return home_protocol, guest_protocol
+        match_live_data = MatchLiveData(
+            match_id=match_id,
+            status=match_status,
+            team1_score=0,
+            team2_score=0,
+            protocols=MatchLiveProtocolsData(
+                home_protocol={},
+                guest_protocol={}
+            )
+        )
+        if match_status == 'матч скоро начнется':
+            return match_live_data
+
+        home_team = match_data['liveData']['boxscore']['teams']['home']['team']['name']
+        guest_team = match_data['liveData']['boxscore']['teams']['away']['team']['name']
+
+        # статистика из основного раздела
+        stat_dict = {
+            'g': 'goals',
+            'sog': 'shots',
+            'penalty': 'pim',
+            'blocks': 'blocked',
+            'hits': 'hits',
+            'takeaways': 'takeaways',
+            'giveaways': 'giveaways'
+        }
+        main_data = self._get_main_data(match_data, stat_dict)
+
+        # сбор статистики из всех ивентов матча
+        event_data = self._get_events_data(match_data, home_team, guest_team)
+
+        home_protocol = main_data['row_home'] | event_data['row_home']
+        guest_protocol = main_data['row_guest'] | event_data['row_guest']
+
+        match_live_data.team1_score = home_protocol.get('g', 0)
+        match_live_data.team2_score = guest_protocol.get('g', 0)
+        match_live_data.protocols.home_protocol = home_protocol
+        match_live_data.protocols.guest_protocol = guest_protocol
+
+        return match_live_data
 
     def parse_live_protocol(self, match_id):
         match_data = self._get_match_data(match_id)
@@ -300,7 +336,7 @@ class NHLParser(Parser):
         }
 
     @staticmethod
-    def _get_score_by_period(match_data):
+    def _get_score_by_period(match_data) -> dict[str, ProtocolRequiredStats]:
         live_data = match_data.get('liveData')
         linescore = live_data['linescore']
 
@@ -323,7 +359,24 @@ class NHLParser(Parser):
         if home_b < guest_b:
             row_guest['g_b'] += 1
 
+        home_req_stats = ProtocolRequiredStats(
+            g_1=row_home.get('g_1', 0),
+            g_2=row_home.get('g_2', 0),
+            g_3=row_home.get('g_3', 0),
+            g_ot=row_home.get('g_ot', 0),
+            g_b=row_home.get('g_b', 0),
+            g=sum(row_home.values()) - row_home.get('b', 0)
+        )
+        guest_req_stats = ProtocolRequiredStats(
+            g_1=row_guest.get('g_1', 0),
+            g_2=row_guest.get('g_2', 0),
+            g_3=row_guest.get('g_3', 0),
+            g_ot=row_guest.get('g_ot', 0),
+            g_b=row_guest.get('g_b', 0),
+            g=sum(row_guest.values()) - row_guest.get('b', 0)
+        )
+
         return {
-            'row_home': row_home,
-            'row_guest': row_guest
+            'row_home': home_req_stats,
+            'row_guest': guest_req_stats
         }

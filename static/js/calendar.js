@@ -1,9 +1,12 @@
-var SEASON = window.season
-var NEXT_PAGE_URL = 2
+let SEASON = window.season
+let NEXT_PAGE_URL = 2
 
 
-initCalendar = () => {
-    let url = `/api/calendar/?config=${CONFIG}&season=${SEASON}`;
+/**
+ * Получает список матчей сезона при загрузке страницы.
+ */
+function initCalendar() {
+    let url = `/api/calendar/?ordering=date&config=${CONFIG}&season=${SEASON}`;
     let f = new XMLHttpRequest();
     f.open('GET', url);
     f.responseType = 'json';
@@ -14,7 +17,13 @@ initCalendar = () => {
         const finished_matches = response['results']
         createMatchFrame('team1', finished_matches)
     }
-};
+
+    const form = document.getElementById( "calendar_filter" );
+    form.addEventListener( "submit", function ( event ) {
+        event.preventDefault();
+        sendData(form);
+    });
+}
 
 document.addEventListener('scroll', function(event) {
     if (NEXT_PAGE_URL !== null) {
@@ -37,60 +46,79 @@ document.addEventListener('scroll', function(event) {
 });
 
 
-window.addEventListener( "load", function () {
-  function sendData() {
+/**
+ * Отправляет данные формы, обрабатывает ответ.
+ * @param {HTMLElement} form
+ */
+function sendData(form) {
     const XHR = new XMLHttpRequest();
     const FD = new FormData( form );
 
     // Define what happens on successful data submission
     XHR.addEventListener( "load", function(event) {
-        clearBody('team1')
         const response = event.target.response;
-        NEXT_PAGE_URL = response['next']
-        const finished_matches = response['results']
-        createMatchFrame('team1', finished_matches)
+        successSubmission(response)
     } );
 
     // Define what happens in case of error
     XHR.addEventListener( "error", function( event ) {
-      alert( 'Oops! Something went wrong.' );
+        errorSubmission()
     } );
 
     // Set up our request
-    fd = FD.entries()
-    a = fd.next()
-    var params = "?"
-    while (a['done'] === false) {
-        if (a['value'][1] === "") {
-            a = fd.next()
-            continue
-        }
-        params += a['value'][0] + "=" + a['value'][1] + "&"
-        a = fd.next()
-    }
-    url = `/api/calendar/${params}config=${CONFIG}&season=${SEASON}`
+    let url = getUrl(FD);
     XHR.open( "GET", url );
     XHR.responseType = 'json';
 
     // The data sent is what the user provided in the form
     XHR.send( FD );
-  }
+}
 
-  // Access the form element...
-  const form = document.getElementById( "calendar_filter" );
 
-  // ...and take over its submit event.
-  form.addEventListener( "submit", function ( event ) {
-    event.preventDefault();
+/**
+ * Вызывается при успешном получении ответа после отправки формы.
+ * @param response данные ответа
+ */
+function successSubmission(response) {
+    clearBody('team1')
+    NEXT_PAGE_URL = response['next']
+    const matches = response['results']
+    createMatchFrame('team1', matches)
+}
 
-    sendData();
-  } );
-} );
+
+/**
+ * Вызывается при возникновении ошибки во время отправки формы.
+ */
+function errorSubmission() {
+    alert( 'Oops! Something went wrong.' );
+}
+
+
+/**
+ * Возвращает url, сформированный на основе данных формы.
+ * @param {FormData} formData данные формы
+ * @returns {string} url с параметрами
+ */
+function getUrl(formData) {
+    let fd = formData.entries()
+    let param = fd.next()
+    let params = "?"
+    while (param['done'] === false) {
+        if (param['value'][1] === "") {
+            param = fd.next()
+            continue
+        }
+        params += param['value'][0] + "=" + param['value'][1] + "&"
+        param = fd.next()
+    }
+    return `/api/calendar/${params}config=${CONFIG}&season=${SEASON}`
+}
 
 
 function toggleOrdering() {
-   var element = document.getElementById("ordering-checkbox");
-   var input = document.getElementById("id_ordering");
+   let element = document.getElementById("ordering-checkbox");
+   let input = document.getElementById("id_ordering");
    element.classList.toggle("on");
    switch (input.value) {
        case "-date": {
@@ -104,8 +132,8 @@ function toggleOrdering() {
 }
 
 function toggleOrderingAsc() {
-   var element = document.getElementById("ordering-checkbox");
-   var input = document.getElementById("id_ordering");
+   let element = document.getElementById("ordering-checkbox");
+   let input = document.getElementById("id_ordering");
    element.classList = "ordering-checkbox";
    input.value = 'date'
 }

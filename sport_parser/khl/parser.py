@@ -4,12 +4,22 @@ import pytz
 import requests
 from bs4 import BeautifulSoup
 
-from sport_parser.core.data_taking.parser import Parser
+from sport_parser.core.exceptions import UnableToGetProtocolException
+
+from sport_parser.core.data_taking.parser import Parser, TeamData, MatchData, MatchStatus, MatchProtocolsData, \
+    ProtocolRequiredStats, ProtocolData, MatchLiveData, MatchLiveProtocolsData
+from sport_parser.core.models import SeasonModel
 
 
 class KHLParser(Parser):
 
-    def parse_teams(self, season):
+    def parse_teams(self, season: SeasonModel) -> list[TeamData]:
+        """
+        Парсит информацию о командах сезона
+
+        :param season: строка сезона модели SeasonModel
+        :return: список информации по командам в формате TeamData
+        """
         url = f'https://www.khl.ru/standings/{season.external_id}/division/'
         soup = self.get_request_content(url)
         divisions = soup.find('div', id='tab-standings-division').find_all('div', class_='k-data_table')
@@ -21,20 +31,22 @@ class KHLParser(Parser):
             'Чернышева': 'Восток',
         }
         for division_soup, division, conference in zip(divisions, d_c.keys(), d_c.values()):
-            teams.extend(self._get_division_team_list(division_soup, division, conference, season))
+            teams.extend(self._get_division_team_list(division_soup, division, conference, season.id))
         return teams
 
-    def parse_calendar(self, season, *, webdriver=None):
-        """Загружает базовую информацию по матчам в базу данных"""
-        if not webdriver:
-            webdriver = self._calendar_request_content
+    def parse_calendar(self, season: SeasonModel) -> list[MatchData]:
+        """
+        Парсит основную информацию о матчах сезона
 
+        :param season: строка сезона модели SeasonModel
+        :return: список информации по матчам сезона в формате MatchData
+        """
         output = []
 
         regular_url = f'https://www.khl.ru/calendar/{season.external_id}/00/'
         playoff_url = f'https://www.khl.ru/calendar/{season.external_id + 1}/00/'
-        regular_soup = webdriver(regular_url)
-        playoff_soup = webdriver(playoff_url)
+        regular_soup = self._calendar_request_content(regular_url)
+        playoff_soup = self._calendar_request_content(playoff_url)
 
         dates, matches = self._get_dates_and_matches(regular_soup)
 
@@ -55,7 +67,8 @@ class KHLParser(Parser):
 
             match_list = matches.find_all('li', class_='b-wide_tile_item')
 
-            string_date = self.formatter.date_format(date)
+            # определение даты
+            string_date = self._date_format(date)
             msk = pytz.timezone('Europe/Moscow')
             date = datetime.datetime.strptime(string_date, '%Y-%m-%d')
             date_msk = msk.localize(date)
@@ -69,76 +82,62 @@ class KHLParser(Parser):
                     continue
                 home_team = home_team_a.text
                 guest_team = match.find('dl', class_='b-details m-club m-rightward').dd.h5.a.text
-                match_info = {
-                    'match_id': match_id,
-                    'date': date_msk,
-                    'home_team': home_team,
-                    'guest_team': guest_team,
-                    'season': season
-                }
 
-                match_extra_info = {
-                    'penalties': False,
-                    'overtime': False
-                }
+                # определение статуса
                 score = match.find('dl', class_='b-score')
                 if '+' in score.dt.h3.text:
-                    status = 'postponed'
+                    status = MatchStatus.POSTPONED
                 elif '—' in score.dt.h3.text:
-                    status = 'finished'
+                    status = MatchStatus.FINISHED
                 else:
-                    status = 'scheduled'
+                    status = MatchStatus.SCHEDULED
+
+                match_data = MatchData(
+                    id=match_id,
+                    season_num=season.id,
+                    date=date_msk,
+                    home_team_name=home_team,
+                    guest_team_name=guest_team,
+                    status=status
+                )
+
+                # в кхл если матч запланирован, то у него можно узнать точное время игры и город
+                if status == MatchStatus.SCHEDULED:
                     time = score.dt.h3.text.split(' ')[0]
                     hours, minutes = time.split(':')
                     timedelta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
-                    match_info['date'] = date_msk + timedelta
                     city = score.dd.p.text
-                    match_extra_info = {
-                        'city': city,
-                    }
 
-                match_info.update(match_extra_info)
-                match_info.update({
-                    'status': status,
-                })
-                output.append(match_info)
+                    match_data.date = date_msk + timedelta
+                    match_data.city = city
+
+                output.append(match_data)
         return output
 
-    def parse_match(self, match):
+    def parse_match_additional_info(self, match: MatchData) -> None:
+        self.parse_finished_match(match)
+
+    def parse_finished_match(self, match: MatchData) -> MatchData:
         url = f'https://text.khl.ru/text/{match.id}.html'
         soup = self.get_request_content(url)
 
         extra_info = soup.find_all('li', class_="b-match_add_info_item")
         if not extra_info:
-            return self.parse_unfinished_match(match)
+            return match
 
         match_status = soup.find('dd', class_="b-period_score").text
         if match_status != 'матч завершен':
-            return self.parse_unfinished_match(match)
+            return match
 
-        return self.parse_finished_match(match, soup)
-
-    def parse_unfinished_match(self, match):
-        return {
-            'match_id': match.id,
-            'season': match.season,
-        }
-
-    def parse_finished_match(self, match, match_data):
-        soup = match_data
-
-        penalties = False
-        overtime = False
+        # определение, были ли буллиты или овертайм
         score_status = soup.find('dt', class_="b-total_score").h3
         if 'Б' in score_status.text:
-            penalties = True
+            match.penalties = True
         if 'ОТ' in score_status.text:
-            overtime = True
+            match.overtime = True
 
-        extra_info = soup.find_all('li', class_="b-match_add_info_item")
+        # обновление времени игры
         date_info = extra_info[0]
-        arena_info = extra_info[1]
-
         info = date_info.find_all('span')[1]
         info = str(info).split('<br/>')
         time = info[1][:5]
@@ -153,8 +152,10 @@ class KHLParser(Parser):
             minute=int(minutes)
         )
         msk = pytz.timezone('Europe/Moscow')
-        date_msk = msk.localize(new_date)
+        match.date = msk.localize(new_date)
 
+        # обновление информации о месте проведения игры
+        arena_info = extra_info[1]
         info = arena_info.find_all('span')[1]
 
         info = str(info).split('<br/>')
@@ -163,39 +164,60 @@ class KHLParser(Parser):
         arena = arena[:-1]
         city = city[:-1]
         city = city.strip()
+        match.arena = arena
+        match.city = city
 
-        if info[1] == '</span>':
-            viewers = 0
-        else:
-            viewers = info[1][:-16]
+        if info[1] != '</span>':
+            match.viewers = info[1][:-16]
 
-        return {
-            'match_id': match.id,
-            'season': match.season,
-            'arena': arena,
-            'city': city,
-            'date': date_msk,
-            'viewers': viewers,
-            'penalties': penalties,
-            'overtime': overtime,
-            'status': 'finished'
-        }
+        return match
 
-    def parse_protocol(self, match):
+    def is_match_finished(self, match_id: int) -> bool:
+        url = f'https://text.khl.ru/text/{match_id}.html'
+        soup = self.get_request_content(url)
+
+        extra_info = soup.find_all('li', class_="b-match_add_info_item")
+        if not extra_info:
+            return False
+
+        match_status = soup.find('dd', class_="b-period_score").text
+        if match_status == 'матч завершен':
+            return True
+        return False
+
+    def parse_protocol(self, match_id: int) -> MatchProtocolsData:
         """Возвращает протокол по id матча в виде двух списков - для домашней и для гостевой команды"""
-        url = f"https://text.khl.ru/text/{match.id}.html"
+        url = f"https://text.khl.ru/text/{match_id}.html"
         soup = self.get_request_content(url)
         match_status = self._get_match_status(soup)
         if match_status != 'матч завершен':
-            return f'match not found {match.id}'
+            raise UnableToGetProtocolException
 
-        # Общего количества бросков нет в протоколе, берется отдельно из текстовой трансляции
+        # из текстовой трансляции берется количество бросков и голы по периодам
         text_broadcast_data = self._get_text_broadcast_stats(soup)
-        sh_home = text_broadcast_data['sh_home']
-        sh_guest = text_broadcast_data['sh_guest']
+
+        # сборка обязательных данных
         g_home = text_broadcast_data['g_home']
         g_guest = text_broadcast_data['g_guest']
 
+        home_req_stats = ProtocolRequiredStats(
+            g_1=g_home.get('p1', 0),
+            g_2=g_home.get('p2', 0),
+            g_3=g_home.get('p3', 0),
+            g_ot=g_home.get('ot', 0),
+            g_b=g_home.get('b', 0),
+            g=sum(g_home.values())
+        )
+        guest_req_stats = ProtocolRequiredStats(
+            g_1=g_guest.get('p1', 0),
+            g_2=g_guest.get('p2', 0),
+            g_3=g_guest.get('p3', 0),
+            g_ot=g_guest.get('ot', 0),
+            g_b=g_guest.get('b', 0),
+            g=sum(g_guest.values())
+        )
+
+        # сборка дополнительных данных
         stat_dict = {
             'Команда': 'team',
             'Ш': 'g',
@@ -211,29 +233,70 @@ class KHLParser(Parser):
             'НВШ': 'nshv',
             'ПД': 'pd'
         }
-        main_data = self._get_main_stats(soup, stat_dict)
-        row_home = main_data['row_home']
-        row_guest = main_data['row_guest']
+        additional_data = self._get_additional_stats(soup, stat_dict)
+        home_add_stats = additional_data['row_home']
+        guest_add_stats = additional_data['row_guest']
+        home_add_stats['sh'] = text_broadcast_data['sh_home']
+        guest_add_stats['sh'] = text_broadcast_data['sh_guest']
 
-        row_home.update({
-            'match_id': match.id,
-            'sh': sh_home,
-            'g_1': g_home.get('p1'),
-            'g_2': g_home.get('p2'),
-            'g_3': g_home.get('p3'),
-            'g_ot': g_home.get('ot'),
-            'g_b': g_home.get('b'),
-        })
-        row_guest.update({
-            'match_id': match.id,
-            'sh': sh_guest,
-            'g_1': g_guest.get('p1'),
-            'g_2': g_guest.get('p2'),
-            'g_3': g_guest.get('p3'),
-            'g_ot': g_guest.get('ot'),
-            'g_b': g_guest.get('b'),
-        })
-        return row_home, row_guest
+        home_team_name = home_add_stats.pop('team')
+        guest_team_name = guest_add_stats.pop('team')
+
+        return MatchProtocolsData(
+            match_id=match_id,
+            home_protocol=ProtocolData(
+                team_name=home_team_name,
+                required_stats=home_req_stats,
+                additional_stats=home_add_stats
+            ),
+            guest_protocol=ProtocolData(
+                team_name=guest_team_name,
+                required_stats=guest_req_stats,
+                additional_stats=guest_add_stats
+            )
+        )
+
+    def parse_live_match(self, match_id: int) -> MatchLiveData:
+        url = f'https://text.khl.ru/text/{match_id}.html'
+        soup = self.get_request_content(url)
+        match_status = self._get_match_status(soup)
+
+        match_data = MatchLiveData(
+            match_id=match_id,
+            status=match_status,
+            team1_score=0,
+            team2_score=0,
+            protocols=MatchLiveProtocolsData(
+                home_protocol={},
+                guest_protocol={}
+            )
+        )
+
+        if match_status in ('матч скоро начнется', 'status not found', 'подготовка'):
+            match_data.status = 'матч скоро начнется'
+            return match_data
+
+        if match_status != 'подготовка' and match_status != 'status not found':
+            stat_dict = {
+                'Команда': 'team',
+                'Ш': 'g',
+                'БВ': 'sog',
+                'Штр': 'penalty',
+                'ВВбр': 'faceoff',
+                '%ВВбр': 'faceoff_p',
+                'БлБ': 'blocks',
+                'СПр': 'hits',
+                'ФоП': 'fop',
+                'ВВА': 'time_a',
+            }
+            main_data = self._get_additional_stats(soup, stat_dict)
+
+            match_data.team1_score = main_data['row_home'].get('g', 0)
+            match_data.team2_score = main_data['row_guest'].get('g', 0)
+            match_data.protocols.home_protocol = main_data['row_home']
+            match_data.protocols.guest_protocol = main_data['row_home']
+
+        return match_data
 
     def parse_live_protocol(self, match_id):
         url = f"https://text.khl.ru/text/{match_id}.html"
@@ -267,7 +330,7 @@ class KHLParser(Parser):
                 'ФоП': 'fop',
                 'ВВА': 'time_a',
             }
-            main_data = self._get_main_stats(soup, stat_dict)
+            main_data = self._get_additional_stats(soup, stat_dict)
             row_home = main_data['row_home']
             row_guest = main_data['row_guest']
 
@@ -344,7 +407,7 @@ class KHLParser(Parser):
             'g_guest': g_guest,
         }
 
-    def _get_main_stats(self, soup, stat_dict):
+    def _get_additional_stats(self, soup, stat_dict: dict[str, str]):
         """Возвращает статистику из основной таблицы"""
         team_stats = soup.find_all('div', class_="table-responsive")
         head = [x.find_all('th') for x in team_stats][0]
@@ -380,8 +443,8 @@ class KHLParser(Parser):
                 row[stat] = 0
         return row
 
-    def _get_division_team_list(self, division_soup, division, conference, season):
-        """Возвращает """
+    def _get_division_team_list(self, division_soup, division, conference, season) -> list[TeamData]:
+        """Возвращает список информации о командах дивизиона"""
         teams = []
         for team in division_soup.find_all('a'):
             team_src = f"https://www.khl.ru{team['href']}arena/"
@@ -393,15 +456,15 @@ class KHLParser(Parser):
             city = city_table.find('p').text
             arena = soup.find_all('div', class_='b-short_block').pop().find('h4').text
 
-            teams.append({
-                'name': name,
-                'img': img,
-                'city': city,
-                'arena': arena,
-                'division': division,
-                'conference': conference,
-                'season': season
-            })
+            teams.append(TeamData(
+                name=name,
+                img=img,
+                city=city,
+                arena=arena,
+                division=division,
+                conference=conference,
+                season_num=season
+            ))
 
         return teams
 
@@ -419,7 +482,7 @@ class KHLParser(Parser):
             return soup
 
     @staticmethod
-    def _get_dates_and_matches(soup):
+    def _get_dates_and_matches(soup: BeautifulSoup) -> tuple[list, list[BeautifulSoup]]:
         match_soup = soup.find('div', id='tab-calendar-all')
         if not match_soup:
             match_soup = soup.find('div', id='tab-calendar-last')
@@ -431,3 +494,34 @@ class KHLParser(Parser):
 
         matches = match_soup.find_all('div', class_='m-future')
         return dates, matches
+
+    def _date_format(self, date):
+        if ', ' in date:
+            date = date.split(',')[0]
+        splitted_date = date.split(' ')
+        if not splitted_date[0]:
+            splitted_date.pop(0)
+        day, month, year = splitted_date
+        if len(day) == 1:
+            day = f'0{day}'
+        month = self._month_to_int_replace(month)
+        return f'{year}-{month}-{day}'
+
+    @staticmethod
+    def _month_to_int_replace(month: str):
+        """Возвращает номер месяца по слову"""
+        months = {
+            'января': '01',
+            'февраля': '02',
+            'марта': '03',
+            'апреля': '04',
+            'мая': '05',
+            'июня': '06',
+            'июля': '07',
+            'августа': '08',
+            'сентября': '09',
+            'октября': '10',
+            'ноября': '11',
+            'декабря': '12'
+        }
+        return months.get(month)

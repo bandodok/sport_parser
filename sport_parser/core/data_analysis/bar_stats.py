@@ -1,45 +1,63 @@
+from sport_parser.core.data_analysis.formatter import Formatter
+from sport_parser.core.data_taking.parser import MatchLiveProtocolsData
+from sport_parser.core.exceptions import UnableToCalculateBarStats
+from sport_parser.core.models import MatchModel
+
+
 class BarStats:
-    def __init__(self, config):
-        self.formatter = config.formatter
-        self.bar_stats_names = config.bar_stats_names
-        self.live_bar_stats_names = config.live_bar_stats_names
+    """
+    Класс для расчета статистики, отображаемой в виде полос.
 
-    def calculate(self, match):
-        """
-        output = {
-            stat: {
-                'short_title': '',
-                'long_title': '',
-                'left': {
-                    'value': 123,
-                    'perc': 50,
-                },
-                'right': {
-                    'value': 321,
-                    'perc': 50,
-                }
-            },
-            stat2: ...
-        }
-        """
-        team1 = match.team1.data
-        team2 = match.team2.data
-        match = match.data
+    :param stat_names: параметры расчета статистики, полученные из конфига.
+    :param formatter: экземпляр класса форматирования результатов.
+    """
 
-        comparison_stats = self.get_comparison_stats(
-            self.get_team_stats(team1, match),
-            self.get_team_stats(team2, match)
+    def __init__(
+            self,
+            stat_names: dict,
+            live_stat_names: dict,
+            formatter: Formatter
+    ):
+        self.formatter = formatter
+        self.bar_stats_names = stat_names
+        self.live_bar_stats_names = live_stat_names
+
+    def match_stats_calculate(self, match: MatchModel):
+        """
+        Рассчитывает статистику для команды.
+
+        :param match: строка матча модели MatchModel.
+        :return: рассчитанная статистика.
+        """
+        if match.status != 'finished':
+            raise UnableToCalculateBarStats
+        comparison_stats = self._get_comparison_stats(
+            self._get_team_stats(match.home_team, match),
+            self._get_team_stats(match.guest_team, match)
         )
         return self.formatter.bar_stat_format(comparison_stats, self.bar_stats_names)
 
-    def get_team_stats(self, team, match):
+    def live_match_stats_calculate(self, match_data: MatchLiveProtocolsData):
+        comparison_stats = self._get_comparison_stats(
+            self._get_team_live_stats(match_data.home_protocol),
+            self._get_team_live_stats(match_data.guest_protocol)
+        )
+        return self.formatter.bar_stat_format(comparison_stats, self.live_bar_stats_names)
+
+    def _get_team_stats(self, team, match):
         stats = {}
         t = match.protocols.get(team=team)
         for stat in self.bar_stats_names.keys():
             stats[stat] = self.formatter.chart_stat_format(t.__dict__.get(stat))
         return stats
 
-    def get_comparison_stats(self, team1_stats, team2_stats):
+    def _get_team_live_stats(self, data):
+        stats = {}
+        for stat in self.live_bar_stats_names.keys():
+            stats[stat] = self.formatter.live_bar_stat_format(data[stat])
+        return stats
+
+    def _get_comparison_stats(self, team1_stats, team2_stats):
         comparison_stats = {}
         for stat, team1_value, team2_value in zip(team1_stats.keys(), team1_stats.values(), team2_stats.values()):
             sum_value = team1_value + team2_value
@@ -58,18 +76,3 @@ class BarStats:
                 'right_perc': right_perc
             }
         return comparison_stats
-
-
-class LiveBarStats(BarStats):
-    def calculate(self, match_data):
-        comparison_stats = self.get_comparison_stats(
-            self.get_team_live_stats(match_data['row_home']),
-            self.get_team_live_stats(match_data['row_guest'])
-        )
-        return self.formatter.bar_stat_format(comparison_stats, self.live_bar_stats_names)
-
-    def get_team_live_stats(self, data):
-        stats = {}
-        for stat in self.live_bar_stats_names.keys():
-            stats[stat] = self.formatter.live_bar_stat_format(data[stat])
-        return stats
