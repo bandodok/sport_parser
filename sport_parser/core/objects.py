@@ -28,6 +28,9 @@ class Season:
     def get_match_list(self):
         return self.data.matches.all()
 
+    def get_team_list(self):
+        return self.data.teams.all().order_by('name')
+
     def get_last_matches(self, num):
         return self.data.matches.filter(status='finished').order_by('-date')[:num]
 
