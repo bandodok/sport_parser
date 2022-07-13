@@ -8,6 +8,7 @@ from django.views import View
 from sport_parser.core.configs import ConfigType
 from sport_parser.core.creator import Creator
 from sport_parser.core.exceptions import SeasonDoesNotExist, TeamDoesNotExist, MatchDoesNotExist
+from sport_parser.core.objects import Season, Team, Match
 from sport_parser.core.tasks import update, parse_season
 
 
@@ -72,14 +73,14 @@ class StatsView(HockeyView):
     config: ConfigType = ConfigType.khl
     template: str = 'khl_stats.html'
 
-    def get_object(self, season_id=0):
+    def get_object(self, season_id=0) -> Season:
         try:
             s = self.creator.get_season_class(season_id)
         except SeasonDoesNotExist:
             raise Http404("Season does not exist")
         return s
 
-    def get_context(self, s):
+    def get_context(self, s: Season):
         return {
             'update': s.last_updated(),
             'stats': s.get_table_stats(),
@@ -94,14 +95,14 @@ class TeamView(HockeyView):
     config: ConfigType = ConfigType.khl
     template: str = 'khl_team.html'
 
-    def get_object(self, team_id=0):
+    def get_object(self, team_id=0) -> Team:
         try:
             team = self.creator.get_team_class(team_id)
         except TeamDoesNotExist:
             raise Http404("Team does not exist")
         return team
 
-    def get_context(self, t):
+    def get_context(self, t: Team):
         return {
             'stats': t.get_chart_stats(),
             'team': t.data,
@@ -115,14 +116,14 @@ class MatchView(HockeyView):
     config: ConfigType = ConfigType.khl
     template: str = 'khl_match.html'
 
-    def get_object(self, match_id=0):
+    def get_object(self, match_id=0) -> Match:
         try:
             match = self.creator.get_match_class(match_id)
         except MatchDoesNotExist:
             raise Http404("Match does not exist")
         return match
 
-    def get_context(self, m):
+    def get_context(self, m: Match):
         return {
             'match': m.data,
             'match_stats': m.get_bar_stats(),
@@ -147,10 +148,10 @@ class CalendarView(HockeyView):
     config: ConfigType = ConfigType.khl
     template: str = 'khl_calendar.html'
 
-    def get_object(self, season_id=0):
+    def get_object(self, season_id=0) -> Season:
         return self.creator.get_season_class(season_id)
 
-    def get_context(self, s):
+    def get_context(self, s: Season):
         return {
             'season': s.data.id,
             'teams': s.get_team_list()
