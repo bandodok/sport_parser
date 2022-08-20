@@ -69,14 +69,18 @@ class TableStats:
         team_protocol_list = team.protocols.all().order_by('updated')
         opponent_protocol_list = protocol_list.filter(match__in=team_match_list).exclude(team=team)
         team_stats = {}
-        for stat, mode in self._team_stats.items():
-            team_stats[stat] = self._calculate_stat(stat, team_protocol_list, mode=mode)
 
-        for stat, mode in self._opponent_stats.items():
-            team_stats[stat] = self._calculate_stat(stat, opponent_protocol_list, mode=mode)
-
-        for stat, expr in self._extra_stats.items():
-            team_stats[stat] = eval(expr, {}, team_stats)
+        if not protocol_list:
+            team_stats = {stat: 0 for stat in self._team_stats.keys()}
+            team_stats.update({stat: 0 for stat in self._opponent_stats.keys()})
+            team_stats.update({stat: 0 for stat in self._extra_stats.keys()})
+        else:
+            for stat, mode in self._team_stats.items():
+                team_stats[stat] = self._calculate_stat(stat, team_protocol_list, mode=mode)
+            for stat, mode in self._opponent_stats.items():
+                team_stats[stat] = self._calculate_stat(stat, opponent_protocol_list, mode=mode)
+            for stat, expr in self._extra_stats.items():
+                team_stats[stat] = eval(expr, {}, team_stats)
 
         team_stats = self.formatter.table_stat_format(team_stats, stat_names=self.stat_names)
         ordered_stat_list = []
