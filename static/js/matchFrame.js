@@ -199,3 +199,64 @@ function setRightTeam(block, match_data) {
     block.appendChild(team_right_name);
     return block
 }
+
+
+/**
+ * Проверяет наличие будущих и прошедших матчей и убирает столбец, если матчей нет
+ */
+function checkMatches() {
+    let lastMatches = document.getElementById('team1')
+    let futureMatches = document.getElementById('team2')
+    if (lastMatches.children.length ===  0) hideLastMatches()
+    if (futureMatches.children.length ===  0) hideFutureMatches()
+}
+
+
+/**
+ * Скрывает столбец с будущими матчами. Расширяет столбец с прошедшими матчами.
+ */
+function hideFutureMatches() {
+    let futureMatchesTitle = document.getElementById('FutureMatchesTitle')
+    if (futureMatchesTitle) {
+        futureMatchesTitle.innerHTML = 'Сезон завершен'
+        futureMatchesTitle.style.color = 'grey'
+        let main = futureMatchesTitle.parentElement
+        main.removeChild(futureMatchesTitle)
+        main.appendChild(futureMatchesTitle)
+    }
+
+    let futureMatches = document.getElementById('team2')
+    if (futureMatches) futureMatches.remove()
+
+    let lastMatches = document.getElementById('team1')
+    if (lastMatches) {
+        lastMatches.style.display = 'grid'
+        lastMatches.style.gridTemplateColumns = '720px 720px'
+    }
+}
+
+
+/**
+ * Скрывает столбец с прошедшими матчами. Расширяет столбец с будущими матчами.
+ */
+function hideLastMatches() {
+    let lastMatchesTitle = document.getElementById('LastMatchesTitle')
+    if (lastMatchesTitle) {
+        lastMatchesTitle.innerHTML = 'Сезон еще не стартовал'
+        lastMatchesTitle.style.color = 'grey'
+        let main = lastMatchesTitle.parentElement
+        main.removeChild(lastMatchesTitle)
+        main.appendChild(lastMatchesTitle)
+    }
+
+    let lastMatches = document.getElementById('team1')
+    if (lastMatches) lastMatches.remove()
+
+    let futureMatches = document.getElementById('team2')
+    if (futureMatches) {
+        futureMatches.style.display = 'grid'
+        futureMatches.style.gridTemplateColumns = '720px 720px'
+    }
+
+
+}

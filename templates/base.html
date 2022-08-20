@@ -18,6 +18,7 @@
         if (typeof left_matches !== 'undefined') {
             createMatchFrame('team1', left_matches);
             createMatchFrame('team2', right_matches);
+            checkMatches();
         }
         if (typeof live_matches !== 'undefined') {
             createMatchFrame('LiveMatches', live_matches);
@@ -85,7 +86,7 @@
 {% block main_content %}
 {% endblock %}
 </div>
-    <div class="sidebarRight">
+    <div class="sidebarRight" id='rightSideBar'>
         {% block right_sidebar %}
         {% endblock %}
     </div>
