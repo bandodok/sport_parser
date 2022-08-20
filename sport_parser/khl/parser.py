@@ -22,7 +22,7 @@ class KHLParser(Parser):
         """
         url = f'https://www.khl.ru/standings/{season.external_id}/division/'
         soup = self.get_request_content(url)
-        divisions = soup.find('div', id='tab-standings-division').find_all('div', class_='k-data_table')
+        divisions = [soup.find('tbody', id=f'standings_content_{num}') for num in (3, 4, 5, 6)]
         teams = []
         d_c = {
             'Боброва': 'Запад',
@@ -45,52 +45,46 @@ class KHLParser(Parser):
 
         regular_url = f'https://www.khl.ru/calendar/{season.external_id}/00/'
         playoff_url = f'https://www.khl.ru/calendar/{season.external_id + 1}/00/'
-        regular_soup = self._calendar_request_content(regular_url)
-        playoff_soup = self._calendar_request_content(playoff_url)
+        regular_soup = self.get_request_content(regular_url)
+        playoff_soup = self.get_request_content(playoff_url)
 
-        dates, matches = self._get_dates_and_matches(regular_soup)
+        regular_matches_grouped_by_date = regular_soup.find_all('div', class_='calendary-body__item')
+        playoff_matches_grouped_by_date = playoff_soup.find_all('div', class_='calendary-body__item')
+        matches_grouped_by_date = [*regular_matches_grouped_by_date, *playoff_matches_grouped_by_date]
 
-        if playoff_soup != 'redirected':
-            playoff_dates, playoff_matches = self._get_dates_and_matches(playoff_soup)
-            dates = [*dates, *playoff_dates]
-            matches = [*matches, *playoff_matches]
+        for day_matches in matches_grouped_by_date:
 
-        match_dict = {}
-        for date, match_soup in zip(dates, matches):
-            if date in match_dict:
-                date = f'{date}_1'
-            match_dict[date] = match_soup
-
-        for date, matches in match_dict.items():
-            if date.endswith('_1'):
-                date = date[:-2]
-
-            match_list = matches.find_all('li', class_='b-wide_tile_item')
+            match_list = day_matches.find_all('div', class_='card-game card-game--calendar')
 
             # определение даты
+            date = day_matches.find('time').text.strip()
             string_date = self._date_format(date)
             msk = pytz.timezone('Europe/Moscow')
             date = datetime.datetime.strptime(string_date, '%Y-%m-%d')
             date_msk = msk.localize(date)
 
             for match in match_list:
-                href = match.find('dl', class_='b-title-option').div.div.ul.li.a['href']
-                match_id = href.split('/')[3]
+                href = match.div.a['href']
+                match_id = int(href.split('/')[3])
                 # у матчей дивизиона нет ссылок на страницу команды
-                home_team_a = match.find('dl', class_='b-details m-club').dd.h5.a
-                if not home_team_a:
+                home_team_a = match.find('a', class_='card-game__club card-game__club_left')
+                if not home_team_a['href']:
                     continue
-                home_team = home_team_a.text
-                guest_team = match.find('dl', class_='b-details m-club m-rightward').dd.h5.a.text
+
+                home_team = home_team_a.p.text.strip()
+                guest_team = match.find('a', class_='card-game__club card-game__club_right').p.text.strip()
 
                 # определение статуса
-                score = match.find('dl', class_='b-score')
-                if '+' in score.dt.h3.text:
-                    status = MatchStatus.POSTPONED
-                elif '—' in score.dt.h3.text:
-                    status = MatchStatus.FINISHED
-                else:
+                time = match.find('p', class_='card-game__center-time')
+                if time:
                     status = MatchStatus.SCHEDULED
+                else:
+                    score = match.find('p', class_='card-game__center-score')
+                    home_team_score = match.find('span', class_='card-game__center-score-left').text.strip()
+                    if home_team_score == '+':
+                        status = MatchStatus.POSTPONED
+                    else:
+                        status = MatchStatus.FINISHED
 
                 match_data = MatchData(
                     id=match_id,
@@ -103,10 +97,11 @@ class KHLParser(Parser):
 
                 # в кхл если матч запланирован, то у него можно узнать точное время игры и город
                 if status == MatchStatus.SCHEDULED:
-                    time = score.dt.h3.text.split(' ')[0]
+                    _small_text = time.small.text
+                    time = time.text.replace(_small_text, '').strip()
                     hours, minutes = time.split(':')
                     timedelta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
-                    city = score.dd.p.text
+                    city = match.find('p', class_='card-game__club-position').text.strip()
 
                     match_data.date = date_msk + timedelta
                     match_data.city = city
@@ -449,12 +444,17 @@ class KHLParser(Parser):
         for team in division_soup.find_all('a'):
             team_src = f"https://www.khl.ru{team['href']}arena/"
             soup = self.get_request_content(team_src)
-            city_table = soup.find('div', class_='b-blocks_cover')
 
-            name = team.text
-            img = f"https://www.khl.ru{city_table.find('img')['src']}"
-            city = city_table.find('p').text
-            arena = soup.find_all('div', class_='b-short_block').pop().find('h4').text
+            name_city = soup.find('div', class_='infoclub-club__info').find_all('p')
+            name = name_city[0].text.strip()
+            city = name_city[1].text.strip()
+            if name == 'Динамо':
+                if city == 'Москва':
+                    name = 'Динамо М'
+                if city == 'Минск':
+                    name = 'Динамо Мн'
+            img = f"https://www.khl.ru{soup.find('img', class_='infoclub-club__logo-img')['src']}"
+            arena = soup.find('div', class_='arena-info__header').find('h2').text.strip()
 
             teams.append(TeamData(
                 name=name,
@@ -467,33 +467,6 @@ class KHLParser(Parser):
             ))
 
         return teams
-
-    @staticmethod
-    def _calendar_request_content(url):
-        r = requests.get(url, allow_redirects=False)
-        if r.status_code == 301:
-            return 'redirected'
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            with open(f'{tmpdirname}/file1.txt', 'w', encoding='utf-8') as f:
-                a = r.text.replace('<!--div align="center" style="margin-top: 1em;">', ' ')
-                f.write(a)
-            with open(f'{tmpdirname}/file1.txt', 'rb') as f:
-                soup = BeautifulSoup(f, 'html.parser')
-            return soup
-
-    @staticmethod
-    def _get_dates_and_matches(soup: BeautifulSoup) -> tuple[list, list[BeautifulSoup]]:
-        match_soup = soup.find('div', id='tab-calendar-all')
-        if not match_soup:
-            match_soup = soup.find('div', id='tab-calendar-last')
-        if not match_soup:
-            match_soup = soup.find('div', id='tab-calendar-future')
-
-        dates = match_soup.find_all('div', class_='b-final_cup_date')
-        dates = [date.b.text for date in dates]
-
-        matches = match_soup.find_all('div', class_='m-future')
-        return dates, matches
 
     def _date_format(self, date):
         if ', ' in date:
