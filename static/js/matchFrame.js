@@ -218,7 +218,7 @@ function checkMatches() {
 function hideFutureMatches() {
     let futureMatchesTitle = document.getElementById('FutureMatchesTitle')
     if (futureMatchesTitle) {
-        futureMatchesTitle.innerHTML = 'Сезон завершен'
+        futureMatchesTitle.innerHTML = 'Нет запланированных матчей'
         futureMatchesTitle.style.color = 'grey'
         let main = futureMatchesTitle.parentElement
         main.removeChild(futureMatchesTitle)
@@ -242,7 +242,7 @@ function hideFutureMatches() {
 function hideLastMatches() {
     let lastMatchesTitle = document.getElementById('LastMatchesTitle')
     if (lastMatchesTitle) {
-        lastMatchesTitle.innerHTML = 'Сезон еще не стартовал'
+        lastMatchesTitle.innerHTML = 'Нет завершенных матчей'
         lastMatchesTitle.style.color = 'grey'
         let main = lastMatchesTitle.parentElement
         main.removeChild(lastMatchesTitle)
