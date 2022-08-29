@@ -133,6 +133,9 @@ class Creator:
     def get_glossary(self):
         return self.config.glossary
 
+    def get_season_list(self):
+        return list(self.config.models.season_model.objects.order_by('id').values_list('id', flat=True))
+
     # методы получения данных из моделей
     def _get_season_data(self, season_id: int) -> SeasonModel:
         model = self.config.models.season_model

@@ -42,6 +42,7 @@ class HockeyView(View):
             'config': self.config.name,
             'glossary': self.get_glossary(),
             'league': self.config.name,
+            'season_list': self.creator.get_season_list(),
 
             'url_stats': reverse_lazy(f'{self.config.name}:index_stats'),
             'url_team': reverse_lazy(f'{self.config.name}:index_team'),

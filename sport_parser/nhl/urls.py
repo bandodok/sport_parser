@@ -5,6 +5,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 app_name = 'nhl'
 urlpatterns = [
+    path('stats/', NHLStatsView.as_view(), name='last_stats'),
     path('stats/<int:season_id>', NHLStatsView.as_view(), name='stats'),
     path('team/<int:team_id>', NHLTeamView.as_view(), name='team'),
     path('match/<int:match_id>/', NHLMatchView.as_view(), name='match'),
