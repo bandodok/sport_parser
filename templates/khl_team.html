@@ -47,7 +47,6 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <p>Параметры:</p>
 
 <ul class="chartList" id="chartList">
 </ul>
@@ -68,8 +67,9 @@
     <div id="chartPenalty" class="charts"></div>
     <div id="chartTime_a" class="charts"></div>
 
-    <div style="display: flex; justify-content: space-between">
-        <h3>Последние матчи</h3><h3>Ближайшие матчи</h3>
+    <div id="matchTitles" style="display: flex; justify-content: space-between">
+        <h3 id="LastMatchesTitle">Последние матчи</h3>
+        <h3 id="FutureMatchesTitle">Ближайшие матчи</h3>
     </div>
 
     <div class="lastMatches">

@@ -31,11 +31,9 @@
 {% block left_sidebar %}
         <p>Cезоны:</p>
     <ul>
-        <a href="{{ url_calendar }}17"><li>17</li></a>
-        <a href="{{ url_calendar }}18"><li>18</li></a>
-        <a href="{{ url_calendar }}19"><li>19</li></a>
-        <a href="{{ url_calendar }}20"><li>20</li></a>
-        <a href="{{ url_calendar }}21"><li>21</li></a>
+        {% for season in season_list %}
+            <a href="{{ url_calendar }}{{ season }}"><li>{{ season }}</li></a>
+        {% endfor %}
     </ul>
 {% endblock %}
 
