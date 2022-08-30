@@ -167,18 +167,17 @@ class Updater:
                match.id in self.ignore:
                 continue
             else:
-                self._parse_additional_match_info(match)
                 output_calendar_data.append(match)
+        self._parse_matches_additional_info(output_calendar_data)
         self.ws_send_status(f'ret calendar len: {len(output_calendar_data)}')
         return output_calendar_data
 
-    def _parse_additional_match_info(self, match: MatchData) -> None:
+    def _parse_matches_additional_info(self, matches: list[MatchData]) -> None:
         """
-        Парсит дополнительную информацию по матчу и дополняет экземпляр MatchData
-        :param match: информация о матче в формате MatchData
+        Парсит дополнительную информацию по матчам и дополняет экземпляр MatchData
+        :param matches: список с информацией о матчах в формате MatchData
         """
-        self.ws_send_status(f"parsing info for match: {match.id}")
-        self.parser.parse_match_additional_info(match)
+        self.parser.parse_matches_additional_info(matches)
 
     def _parse_finished_match(self, match_id: int) -> MatchData:
         """

@@ -1,8 +1,5 @@
 import datetime
-import tempfile
 import pytz
-import requests
-from bs4 import BeautifulSoup
 
 from sport_parser.core.exceptions import UnableToGetProtocolException
 
@@ -109,12 +106,16 @@ class KHLParser(Parser):
                 output.append(match_data)
         return output
 
-    def parse_match_additional_info(self, match: MatchData) -> None:
-        self.parse_finished_match(match)
+    def parse_matches_additional_info(self, matches: list[MatchData]):
+        return self._parse(self.parse_match_additional_info, matches)
 
-    def parse_finished_match(self, match: MatchData) -> MatchData:
+    async def parse_match_additional_info(self, match: MatchData) -> None:
+        await self.parse_finished_match(match)
+
+    async def parse_finished_match(self, match: MatchData) -> MatchData:
+        print(f'parsing match {match.id}')
         url = f'https://text.khl.ru/text/{match.id}.html'
-        soup = self.get_request_content(url)
+        soup = await self.get_async_response(url)
 
         extra_info = soup.find_all('li', class_="b-match_add_info_item")
         if not extra_info:
