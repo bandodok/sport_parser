@@ -152,6 +152,7 @@
       ansible.builtin.shell:
         chdir: /home/sport_parser/app
         cmd: |
+          docker system prune -a -f
           docker-compose -f docker-compose.yml pull
           docker-compose -f docker-compose.yml up --build --remove-orphans -d
       become: yes
