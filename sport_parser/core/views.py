@@ -42,6 +42,7 @@ class HockeyView(View):
             'config': self.config.name,
             'glossary': self.get_glossary(),
             'league': self.config.name,
+            'season_list': self.creator.get_season_list(),
 
             'url_stats': reverse_lazy(f'{self.config.name}:index_stats'),
             'url_team': reverse_lazy(f'{self.config.name}:index_team'),
@@ -85,8 +86,8 @@ class StatsView(HockeyView):
             'update': s.last_updated(),
             'stats': s.get_table_stats(),
             'season': s.data.id,
-            'last_matches': s.get_json_last_matches(5),
-            'future_matches': s.get_json_future_matches(5),
+            'last_matches': s.get_json_last_matches(6),
+            'future_matches': s.get_json_future_matches(6),
             'live_matches': s.get_json_live_matches()
         }
 
@@ -107,8 +108,8 @@ class TeamView(HockeyView):
             'stats': t.get_chart_stats(),
             'team': t.data,
             'seasons': t.get_another_season_team_ids(),
-            'last_matches': t.get_json_last_matches(5),
-            'future_matches': t.get_json_future_matches(5)
+            'last_matches': t.get_json_last_matches(6),
+            'future_matches': t.get_json_future_matches(6)
         }
 
 
@@ -134,12 +135,12 @@ class MatchView(HockeyView):
             'team1': {
                 'data': m.team1.data,
                 'score': m.get_team1_score_by_period(),
-                'last_matches': m.get_team1_last_matches(5)
+                'last_matches': m.get_team1_last_matches(6)
             },
             'team2': {
                 'data': m.team2.data,
                 'score': m.get_team2_score_by_period(),
-                'last_matches': m.get_team2_last_matches(5)
+                'last_matches': m.get_team2_last_matches(6)
             },
         }
 

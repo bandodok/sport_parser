@@ -39,6 +39,7 @@ class Config:
     bar_stats: BarStats = BarStats
     formatter: Formatter = Formatter
     parser: Parser = Parser
+    parse_method: str
     db: DB = DB
     updater: Updater = Updater
     calendar_serializer = CalendarSerializer()

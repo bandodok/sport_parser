@@ -13,6 +13,7 @@ class KHLConfig(Config):
     theme = 'khlTheme.css'
     models = KHLModelList
     parser = KHLParser
+    parse_method = 'SYNC'
     table_stats_names = {
         'sh': ('Sh', 'int'),
         'sh__a': ('Sh(A)', 'int'),
@@ -89,6 +90,8 @@ class KHLConfig(Config):
         'time_a': ('TimeA', 'Время в атаке', 'time'),
     }
     updated_team_names = {
+        'Металлург': 'Металлург Мг',
+        'Куньлунь Ред Стар': 'Куньлунь РС',
         'Торпедо НН': 'Торпедо',
         'Динамо Мск': 'Динамо М',
         'ХК Динамо М': 'Динамо М',

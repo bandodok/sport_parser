@@ -4,15 +4,25 @@ import os
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import NamedTuple
+from typing import NamedTuple, Collection, Callable, Coroutine, TypeVar, Any
+import asyncio
 
+import aiohttp
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
 from sport_parser.core.models import SeasonModel
 
-from sport_parser.core.data_analysis.formatter import Formatter
+
+_T = TypeVar('_T')
+
+
+class ParseMethods(Enum):
+    SYNC = 'SYNC'
+    ASYNC = 'ASYNC'
 
 
 class MatchStatus(Enum):
@@ -89,6 +99,11 @@ class MatchLiveData:
 
 class Parser:
 
+    parser_type: ParseMethods
+
+    def __init__(self, parse_method):
+        self.parser_type = parse_method
+
     @abstractmethod
     def parse_teams(self, season: SeasonModel) -> list[TeamData]:
         """
@@ -102,7 +117,7 @@ class Parser:
     @abstractmethod
     def parse_calendar(self, season: SeasonModel) -> list[MatchData]:
         """
-        Парсит основную информацию о матчах сезона
+        Парсит основную информацию о матчах сезона.
 
         :param season: строка сезона модели SeasonModel
         :return: список информации по матчам сезона в формате MatchData
@@ -110,12 +125,12 @@ class Parser:
         pass
 
     @abstractmethod
-    def parse_match_additional_info(self, match: MatchData) -> None:
+    def parse_matches_additional_info(self, matches: list[MatchData]) -> None:
         """
-        Парсит дополнительную информацию по конкретному матчу и дополняет MatchData.
+        Парсит дополнительную информацию по матчам и дополняет MatchData.
         Вызывается после парсинга календаря для получения информации, которую не удалось получить.
 
-        :param match: информация о матче в формате MatchData
+        :param matches: список с информацией о матчах в формате MatchData
         """
         pass
 
@@ -172,6 +187,27 @@ class Parser:
         return json.loads(r)
 
     @staticmethod
+    async def get_async_api_response(url) -> dict:
+        async with aiohttp.request('GET', url) as response:
+            content = await response.read()
+            return json.loads(content)
+
+    async def get_async_response(self, url) -> BeautifulSoup:
+        if self.parser_type == ParseMethods.ASYNC:
+            connector = aiohttp.TCPConnector(limit=50)
+            async with aiohttp.ClientSession(connector=connector) as sess:
+                async with sess.request('GET', url) as response:
+                    content = await response.read()
+        else:
+            session = requests.Session()
+            retry = Retry(connect=3, backoff_factor=1)
+            adapter = HTTPAdapter(max_retries=retry)
+            session.mount('https://', adapter)
+            r = session.get(url)
+            content = r.content
+        return BeautifulSoup(content, 'html.parser')
+
+    @staticmethod
     def get_selenium_content(url) -> BeautifulSoup:
         loc = os.getenv('CHROMEDRIVER')
         op = webdriver.ChromeOptions()
@@ -184,3 +220,13 @@ class Parser:
         r = driver.page_source
         driver.close()
         return BeautifulSoup(r, 'html.parser')
+
+    def _parse(self, func: Callable[..., Coroutine[Any, Any, _T]], iterable: Collection, *args, **kwargs) -> list[_T]:
+        if self.parser_type == ParseMethods.ASYNC:
+            loop = asyncio.new_event_loop()
+            tasks = [asyncio.ensure_future(func(item, *args, **kwargs), loop=loop) for item in iterable]
+            awaited = asyncio.wait(tasks)
+            results = loop.run_until_complete(awaited)[0]
+            return [task.result() for task in results]
+        else:
+            return [asyncio.run(func(item, *args, **kwargs)) for item in iterable]

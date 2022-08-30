@@ -6,6 +6,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 app_name = 'khl'
 urlpatterns = [
+    path('stats/', KHLStatsView.as_view(), name='last_stats'),
     path('stats/<int:season_id>', KHLStatsView.as_view(), name='stats'),
     path('team/<int:team_id>', KHLTeamView.as_view(), name='team'),
     path('match/<int:match_id>/', KHLMatchView.as_view(), name='match'),

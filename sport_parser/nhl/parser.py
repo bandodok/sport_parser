@@ -22,24 +22,8 @@ class NHLParser(Parser):
         team_ids_list = []
         for team in teams_list:
             team_ids_list.append(team['home']['team']['id'])
-
-        team_ids = set(team_ids_list)
-        team_api_url = 'https://statsapi.web.nhl.com/api/v1/teams/'
-
-        teams = []
-        for team in team_ids:
-            team_url = f'{team_api_url}{team}'
-            team_response = self.get_api_request_content(team_url).get('teams')[0]
-            teams.append(TeamData(
-                name=team_response.get('name'),
-                img=self.get_picture(team_response.get('teamName')),
-                city=team_response.get('locationName'),
-                arena=team_response.get('venue').get('name'),
-                division=team_response.get('division').get('name'),
-                conference=team_response.get('conference').get('name'),
-                season_num=season.id
-            ))
-        return teams
+        team_ids = list(set(team_ids_list))
+        return self._parse(self._get_team_data, team_ids, season.id)
 
     def parse_calendar(self, season: SeasonModel) -> list[MatchData]:
         url = f'https://statsapi.web.nhl.com/api/v1/schedule?season={season.external_id}'
@@ -79,12 +63,15 @@ class NHLParser(Parser):
             calendar.append(match_data)
         return calendar
 
-    def parse_match_additional_info(self, match: MatchData) -> None:
-        self.parse_finished_match(match)
+    def parse_matches_additional_info(self, matches: list[MatchData]):
+        return self._parse(self.parse_match_additional_info, matches)
 
-    def parse_finished_match(self, match: MatchData) -> MatchData:
+    async def parse_match_additional_info(self, match: MatchData) -> None:
+        await self.parse_finished_match(match)
+
+    async def parse_finished_match(self, match: MatchData) -> MatchData:
         url = f'https://statsapi.web.nhl.com/api/v1/game/{match.id}/feed/live'  # 2021010003
-        match_dict = self.get_api_request_content(url)
+        match_dict = await self.get_async_api_response(url)
         if match_dict.get('message') == "Game data couldn't be found":
             return match
         live_data = match_dict.get('liveData')
@@ -209,8 +196,6 @@ class NHLParser(Parser):
         home_team = match_data['liveData']['boxscore']['teams']['home']['team']['name']
         guest_team = match_data['liveData']['boxscore']['teams']['away']['team']['name']
 
-
-
         # статистика из основного раздела
         stat_dict = {
             'g': 'goals',
@@ -253,6 +238,23 @@ class NHLParser(Parser):
         if not img.startswith('http'):
             img = f'https:{img}'
         return img
+
+    async def _get_team_data(self, team_id: str, season_id: int) -> TeamData:
+        team_api_url = 'https://statsapi.web.nhl.com/api/v1/teams/'
+        url = f'{team_api_url}/{team_id}'
+        team_response = await self.get_async_api_response(url)
+        team_data = team_response.get('teams')[0]
+        name = team_data.get('name')
+        print(name)
+        return TeamData(
+            name=name,
+            img=self.get_picture(team_data.get('teamName')),
+            city=team_data.get('locationName'),
+            arena=team_data.get('venue').get('name'),
+            division=team_data.get('division').get('name'),
+            conference=team_data.get('conference').get('name'),
+            season_num=season_id
+        )
 
     def _get_match_data(self, match_id):
         url = f'https://statsapi.web.nhl.com/api/v1/game/{match_id}/feed/live'  # 2021010003
