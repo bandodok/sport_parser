@@ -13,6 +13,7 @@ class NHLConfig(Config):
     theme = 'nhlTheme.css'
     models = NHLModelList
     parser = NHLParser
+    parse_method = 'ASYNC'
     table_stats_names = {
         'sh': ('Sh', 'int'),
         'sh__a': ('Sh(A)', 'int'),

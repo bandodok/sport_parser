@@ -7,7 +7,7 @@ from sport_parser.core.data_analysis.formatter import Formatter
 from sport_parser.core.data_analysis.stats_updater import StatsUpdater
 from sport_parser.core.data_analysis.table_stats import TableStats
 from sport_parser.core.data_taking.db import DB
-from sport_parser.core.data_taking.parser import Parser
+from sport_parser.core.data_taking.parser import Parser, ParseMethods
 from sport_parser.core.exceptions import SeasonDoesNotExist, TeamDoesNotExist, MatchDoesNotExist
 from sport_parser.core.models import ModelList, SeasonModel, TeamModel, MatchModel
 from sport_parser.core.objects import Season, Team, Match
@@ -70,7 +70,9 @@ class Creator:
         )
 
     def get_parser(self) -> Parser:
-        return self.config.parser()
+        return self.config.parser(
+            parse_method=ParseMethods[self.config.parse_method]
+        )
 
     def get_stats_updater(self) -> StatsUpdater:
         return self.config.stats_updater(

@@ -13,6 +13,7 @@ class KHLConfig(Config):
     theme = 'khlTheme.css'
     models = KHLModelList
     parser = KHLParser
+    parse_method = 'SYNC'
     table_stats_names = {
         'sh': ('Sh', 'int'),
         'sh__a': ('Sh(A)', 'int'),
