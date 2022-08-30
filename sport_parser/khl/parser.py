@@ -53,8 +53,7 @@ class KHLParser(Parser):
         matches_grouped_by_date = [*regular_matches_grouped_by_date, *playoff_matches_grouped_by_date]
 
         for day_matches in matches_grouped_by_date:
-
-            match_list = day_matches.find_all('div', class_='card-game card-game--calendar')
+            match_list = day_matches.find_all('div', class_='card-game')
 
             # определение даты
             date = day_matches.find('time').text.strip()
@@ -68,7 +67,9 @@ class KHLParser(Parser):
                 match_id = int(href.split('/')[3])
                 # у матчей дивизиона нет ссылок на страницу команды
                 home_team_a = match.find('a', class_='card-game__club card-game__club_left')
-                if not home_team_a['href']:
+                try:
+                    home_team_a['href']
+                except KeyError:
                     continue
 
                 home_team = home_team_a.p.text.strip()
@@ -79,7 +80,6 @@ class KHLParser(Parser):
                 if time:
                     status = MatchStatus.SCHEDULED
                 else:
-                    score = match.find('p', class_='card-game__center-score')
                     home_team_score = match.find('span', class_='card-game__center-score-left').text.strip()
                     if home_team_score == '+':
                         status = MatchStatus.POSTPONED
@@ -453,8 +453,13 @@ class KHLParser(Parser):
                     name = 'Динамо М'
                 if city == 'Минск':
                     name = 'Динамо Мн'
+                if city == 'Рига':
+                    name = 'Динамо Р'
             img = f"https://www.khl.ru{soup.find('img', class_='infoclub-club__logo-img')['src']}"
-            arena = soup.find('div', class_='arena-info__header').find('h2').text.strip()
+            arena = ''
+            arena_info = soup.find('div', class_='arena-info__header')
+            if arena_info:
+                arena = arena_info.find('h2').text.strip()
 
             teams.append(TeamData(
                 name=name,
