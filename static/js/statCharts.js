@@ -23,7 +23,7 @@ function drawNoStats() {
     let text = document.createElement('h3')
     let desc = document.createElement('p')
     text.innerHTML = 'Нет данных для отображения статистики'
-    desc.innerHTML = 'Статистика появится, когда будет сыгран хотя бы один матч'
+    desc.innerHTML = 'Статистика появится, когда будет сыграно несколько матчей'
     desc.className = 'update'
     div.appendChild(text)
     div.appendChild(desc)
