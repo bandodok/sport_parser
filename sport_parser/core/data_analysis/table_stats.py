@@ -70,7 +70,7 @@ class TableStats:
         opponent_protocol_list = protocol_list.filter(match__in=team_match_list).exclude(team=team)
         team_stats = {}
 
-        if not protocol_list:
+        if not team_protocol_list:
             team_stats = {stat: 0 for stat in self._team_stats.keys()}
             team_stats.update({stat: 0 for stat in self._opponent_stats.keys()})
             team_stats.update({stat: 0 for stat in self._extra_stats.keys()})

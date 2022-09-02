@@ -1,5 +1,6 @@
 import datetime
 import pytz
+import asyncio
 
 from sport_parser.core.exceptions import UnableToGetProtocolException
 
@@ -110,9 +111,12 @@ class KHLParser(Parser):
         return self._parse(self.parse_match_additional_info, matches)
 
     async def parse_match_additional_info(self, match: MatchData) -> None:
-        await self.parse_finished_match(match)
+        await self.async_parse_finished_match(match)
 
-    async def parse_finished_match(self, match: MatchData) -> MatchData:
+    def parse_finished_match(self, match: MatchData) -> MatchData:
+        return asyncio.run(self.async_parse_finished_match(match))
+
+    async def async_parse_finished_match(self, match: MatchData) -> MatchData:
         print(f'parsing match {match.id}')
         url = f'https://text.khl.ru/text/{match.id}.html'
         soup = await self.get_async_response(url)

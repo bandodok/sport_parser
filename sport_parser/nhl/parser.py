@@ -2,6 +2,7 @@ from sport_parser.core.data_taking.parser import Parser, TeamData, MatchData, Ma
     ProtocolRequiredStats, ProtocolData, MatchLiveData, MatchLiveProtocolsData
 from datetime import datetime
 import pytz
+import asyncio
 
 from sport_parser.core.models import SeasonModel
 
@@ -67,9 +68,12 @@ class NHLParser(Parser):
         return self._parse(self.parse_match_additional_info, matches)
 
     async def parse_match_additional_info(self, match: MatchData) -> None:
-        await self.parse_finished_match(match)
+        await self.async_parse_finished_match(match)
 
-    async def parse_finished_match(self, match: MatchData) -> MatchData:
+    def parse_finished_match(self, match: MatchData) -> MatchData:
+        return asyncio.run(self.async_parse_finished_match(match))
+
+    async def async_parse_finished_match(self, match: MatchData) -> MatchData:
         url = f'https://statsapi.web.nhl.com/api/v1/game/{match.id}/feed/live'  # 2021010003
         match_dict = await self.get_async_api_response(url)
         if match_dict.get('message') == "Game data couldn't be found":
