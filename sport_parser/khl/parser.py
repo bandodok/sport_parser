@@ -363,12 +363,20 @@ class KHLParser(Parser):
                     continue
                 match_stats['match'] = stats.text
             if 'Статистика 1-го периода:' in stats.text or 'Stats of 1st period:' in stats.text:
+                if match_stats.get('p1'):
+                    continue
                 match_stats['p1'] = stats.text
             if 'Статистика 2-го периода:' in stats.text or 'Stats of 2nd period:' in stats.text:
+                if match_stats.get('p2'):
+                    continue
                 match_stats['p2'] = stats.text
             if 'Статистика 3-го периода:' in stats.text or 'Stats of 3rd period:' in stats.text:
+                if match_stats.get('p3'):
+                    continue
                 match_stats['p3'] = stats.text
             if 'Статистика овертайма:' in stats.text or 'Stats of overtime:' in stats.text:
+                if match_stats.get('ot'):
+                    continue
                 match_stats['ot'] = stats.text
 
         sh_home = 0
