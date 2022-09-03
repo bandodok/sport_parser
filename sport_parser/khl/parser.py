@@ -294,7 +294,7 @@ class KHLParser(Parser):
             match_data.team1_score = main_data['row_home'].get('g', 0)
             match_data.team2_score = main_data['row_guest'].get('g', 0)
             match_data.protocols.home_protocol = main_data['row_home']
-            match_data.protocols.guest_protocol = main_data['row_home']
+            match_data.protocols.guest_protocol = main_data['row_guest']
 
         return match_data
 
