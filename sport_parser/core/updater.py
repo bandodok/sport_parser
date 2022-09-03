@@ -163,7 +163,7 @@ class Updater:
         output_calendar_data = []
         for match in calendar_data:
             if skip_finished and match.status == MatchStatus.FINISHED or \
-               skip_live and match.status == MatchStatus.LIVE or \
+               skip_live and self._is_match_live(match) or \
                match.id in self.ignore:
                 continue
             else:
@@ -259,6 +259,16 @@ class Updater:
         self.stats_updater.add_match(match.id)
         self.stats_updater.add_team(match.home_team.id)
         self.stats_updater.add_team(match.guest_team.id)
+
+    def _is_match_live(self, match: MatchData) -> bool:
+        """
+        Проверяет, отмечен ли матч в бд как текущий.
+
+        :param match: данные о матче из календаря.
+        :return: True, если у матча стоит статус live.
+        """
+        match_status = self.model_list.match_model.objects.get(id=match.id).status
+        return match_status == 'live'
 
     def _get_unfinished_matches_id(self) -> list[int]:
         """
