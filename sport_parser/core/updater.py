@@ -256,9 +256,14 @@ class Updater:
         Добавляет матч и команды матча в список к обновлению статистики.
         :param match: id матча
         """
-        self.stats_updater.add_match(match.id)
-        self.stats_updater.add_team(match.home_team.id)
-        self.stats_updater.add_team(match.guest_team.id)
+        home_team = match.home_team
+        guest_team = match.guest_team
+        self.stats_updater.add_team(home_team.id)
+        self.stats_updater.add_team(guest_team.id)
+        for _match in home_team.matches:
+            self.stats_updater.add_match(_match.id)
+        for _match in guest_team.matches:
+            self.stats_updater.add_match(_match.id)
 
     def _is_match_live(self, match: MatchData) -> bool:
         """
