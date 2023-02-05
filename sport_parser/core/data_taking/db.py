@@ -30,13 +30,13 @@ class DB:
         season = self.model_list.season_model.objects.get(id=team.season_num)
         t, _ = self.model_list.team_model.objects.get_or_create(
             name=self._team_name_update(team.name),
-            season=season,
-            img=team.img,
-            city=team.city,
-            arena=team.arena,
-            division=team.division,
-            conference=team.conference,
+            season=season
         )
+        t.img = team.img
+        t.city = team.city
+        t.arena = team.arena
+        t.division = team.division
+        t.conference = team.conference
         t.save()
         return t
 

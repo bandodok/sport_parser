@@ -200,10 +200,10 @@ class Parser:
                     content = await response.read()
         else:
             session = requests.Session()
-            retry = Retry(connect=3, backoff_factor=1)
+            retry = Retry(total=3, backoff_factor=1)
             adapter = HTTPAdapter(max_retries=retry)
             session.mount('https://', adapter)
-            r = session.get(url)
+            r = session.get(url, timeout=5)
             content = r.content
         return BeautifulSoup(content, 'html.parser')
 
