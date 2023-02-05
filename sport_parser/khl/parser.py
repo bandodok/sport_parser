@@ -1,6 +1,8 @@
 import datetime
 import pytz
+import re
 import asyncio
+from bs4 import BeautifulSoup
 
 from sport_parser.core.exceptions import UnableToGetProtocolException
 
@@ -117,58 +119,23 @@ class KHLParser(Parser):
         return asyncio.run(self.async_parse_finished_match(match))
 
     async def async_parse_finished_match(self, match: MatchData) -> MatchData:
-        print(f'parsing match {match.id}')
         url = f'https://text.khl.ru/text/{match.id}.html'
         soup = await self.get_async_response(url)
 
-        extra_info = soup.find_all('li', class_="b-match_add_info_item")
-        if not extra_info:
+        parser = _get_parser(soup)
+        if not parser:
             return match
 
-        match_status = soup.find('dd', class_="b-period_score").text
+        match_status = parser.get_status()
         if match_status != 'матч завершен':
             return match
 
-        # определение, были ли буллиты или овертайм
-        score_status = soup.find('dt', class_="b-total_score").h3
-        if 'Б' in score_status.text:
-            match.penalties = True
-        if 'ОТ' in score_status.text:
-            match.overtime = True
-
-        # обновление времени игры
-        date_info = extra_info[0]
-        info = date_info.find_all('span')[1]
-        info = str(info).split('<br/>')
-        time = info[1][:5]
-        hours, minutes = time.split(':')
-        msk_delta = datetime.timedelta(hours=3)
-        date = match.date + msk_delta
-        new_date = datetime.datetime(
-            year=date.year,
-            month=date.month,
-            day=date.day,
-            hour=int(hours),
-            minute=int(minutes)
-        )
-        msk = pytz.timezone('Europe/Moscow')
-        match.date = msk.localize(new_date)
-
-        # обновление информации о месте проведения игры
-        arena_info = extra_info[1]
-        info = arena_info.find_all('span')[1]
-
-        info = str(info).split('<br/>')
-        arena_city = info[0][6:]
-        arena, city = arena_city.split('(')
-        arena = arena[:-1]
-        city = city[:-1]
-        city = city.strip()
-        match.arena = arena
-        match.city = city
-
-        if info[1] != '</span>':
-            match.viewers = info[1][:-16]
+        match.penalties = parser.have_penalties()
+        match.overtime = parser.have_overtime()
+        match.date = parser.update_date(match.date)
+        match.city = parser.get_city()
+        match.arena = parser.get_arena()
+        match.viewers = parser.get_viewers()
 
         return match
 
@@ -176,29 +143,29 @@ class KHLParser(Parser):
         url = f'https://text.khl.ru/text/{match_id}.html'
         soup = self.get_request_content(url)
 
-        extra_info = soup.find_all('li', class_="b-match_add_info_item")
-        if not extra_info:
+        parser = _get_parser(soup)
+        if not parser:
             return False
 
-        match_status = soup.find('dd', class_="b-period_score").text
-        if match_status == 'матч завершен':
-            return True
-        return False
+        match_status = parser.get_status()
+        return match_status == 'матч завершен'
 
     def parse_protocol(self, match_id: int) -> MatchProtocolsData:
         """Возвращает протокол по id матча в виде двух списков - для домашней и для гостевой команды"""
         url = f"https://text.khl.ru/text/{match_id}.html"
         soup = self.get_request_content(url)
-        match_status = self._get_match_status(soup)
+        parser = _get_parser(soup)
+
+        match_status = parser.get_status()
         if match_status != 'матч завершен':
             raise UnableToGetProtocolException
 
         # из текстовой трансляции берется количество бросков и голы по периодам
-        text_broadcast_data = self._get_text_broadcast_stats(soup)
+        text_broadcast_data = parser.get_text_broadcast_stats()
 
         # сборка обязательных данных
-        g_home = text_broadcast_data['g_home']
-        g_guest = text_broadcast_data['g_guest']
+        g_home = self._row_update_type(text_broadcast_data['g_home'])
+        g_guest = self._row_update_type(text_broadcast_data['g_guest'])
 
         home_req_stats = ProtocolRequiredStats(
             g_1=g_home.get('p1', 0),
@@ -233,9 +200,9 @@ class KHLParser(Parser):
             'НВШ': 'nshv',
             'ПД': 'pd'
         }
-        additional_data = self._get_additional_stats(soup, stat_dict)
-        home_add_stats = additional_data['row_home']
-        guest_add_stats = additional_data['row_guest']
+        additional_data = parser.get_additional_stats(stat_dict)
+        home_add_stats = self._row_update_type(additional_data['row_home'])
+        guest_add_stats = self._row_update_type(additional_data['row_guest'])
         home_add_stats['sh'] = text_broadcast_data['sh_home']
         guest_add_stats['sh'] = text_broadcast_data['sh_guest']
 
@@ -259,7 +226,9 @@ class KHLParser(Parser):
     def parse_live_match(self, match_id: int) -> MatchLiveData:
         url = f'https://text.khl.ru/text/{match_id}.html'
         soup = self.get_request_content(url)
-        match_status = self._get_match_status(soup)
+        parser = _get_parser(soup)
+
+        match_status = parser.get_status()
 
         match_data = MatchLiveData(
             match_id=match_id,
@@ -289,153 +258,16 @@ class KHLParser(Parser):
                 'ФоП': 'fop',
                 'ВВА': 'time_a',
             }
-            main_data = self._get_additional_stats(soup, stat_dict)
+            main_data = parser.get_additional_stats(stat_dict)
+            home_stats = self._row_update_type(main_data['row_home'])
+            guest_stats = self._row_update_type(main_data['row_guest'])
 
-            match_data.team1_score = main_data['row_home'].get('g', 0)
-            match_data.team2_score = main_data['row_guest'].get('g', 0)
-            match_data.protocols.home_protocol = main_data['row_home']
-            match_data.protocols.guest_protocol = main_data['row_guest']
+            match_data.team1_score = home_stats.get('g', 0)
+            match_data.team2_score = guest_stats.get('g', 0)
+            match_data.protocols.home_protocol = home_stats
+            match_data.protocols.guest_protocol = guest_stats
 
         return match_data
-
-    def parse_live_protocol(self, match_id):
-        url = f"https://text.khl.ru/text/{match_id}.html"
-        soup = self.get_request_content(url)
-
-        match_status = self._get_match_status(soup)
-        if match_status in ('матч скоро начнется', 'status not found', 'подготовка'):
-            return {
-                'match_status': 'матч скоро начнется',
-                'team_1_score': '-',
-                'team_2_score': '-',
-                'data': {
-                    'row_home': '',
-                    'row_guest': ''
-                }
-            }
-
-        row_home = {}
-        row_guest = {}
-
-        if match_status != 'подготовка' and match_status != 'status not found':
-            stat_dict = {
-                'Команда': 'team',
-                'Ш': 'g',
-                'БВ': 'sog',
-                'Штр': 'penalty',
-                'ВВбр': 'faceoff',
-                '%ВВбр': 'faceoff_p',
-                'БлБ': 'blocks',
-                'СПр': 'hits',
-                'ФоП': 'fop',
-                'ВВА': 'time_a',
-            }
-            main_data = self._get_additional_stats(soup, stat_dict)
-            row_home = main_data['row_home']
-            row_guest = main_data['row_guest']
-
-        return {
-            'match_status': match_status,
-            'team_1_score': row_home.get('g', 0),
-            'team_2_score': row_guest.get('g', 0),
-            'data': {
-                'row_home': row_home,
-                'row_guest': row_guest
-            }
-        }
-
-    @staticmethod
-    def _get_match_status(soup):
-        match_status = soup.find('dd', class_="b-period_score")
-        if not match_status:
-            return 'status not found'
-        return match_status.text
-
-    @staticmethod
-    def _get_text_broadcast_stats(soup):
-        """Возвращает количество голов и всего бросков по периодам из текстовой трансляции"""
-        text_stats = soup.find_all('p', class_='e-action_txt')
-
-        match_stats = {}
-        for stats in text_stats:
-            if 'Статистика матча:' in stats.text or 'Game stats:' in stats.text:
-                if match_stats.get('match'):
-                    continue
-                match_stats['match'] = stats.text
-            if 'Статистика 1-го периода:' in stats.text or 'Stats of 1st period:' in stats.text:
-                if match_stats.get('p1'):
-                    continue
-                match_stats['p1'] = stats.text
-            if 'Статистика 2-го периода:' in stats.text or 'Stats of 2nd period:' in stats.text:
-                if match_stats.get('p2'):
-                    continue
-                match_stats['p2'] = stats.text
-            if 'Статистика 3-го периода:' in stats.text or 'Stats of 3rd period:' in stats.text:
-                if match_stats.get('p3'):
-                    continue
-                match_stats['p3'] = stats.text
-            if 'Статистика овертайма:' in stats.text or 'Stats of overtime:' in stats.text:
-                if match_stats.get('ot'):
-                    continue
-                match_stats['ot'] = stats.text
-
-        sh_home = 0
-        sh_guest = 0
-        g_home = {'b': 0}
-        g_guest = {'b': 0}
-
-        score_status = soup.find('dt', class_="b-total_score").h3
-        if 'Б' in score_status.text:
-            score = score_status.text.split('–')
-            score[0] = int(score[0])
-            score[1] = int(score[1][:-1])
-            if score[0] > score[1]:
-                g_home['b'] = 1
-                g_guest['b'] = 0
-            else:
-                g_home['b'] = 0
-                g_guest['b'] = 1
-
-        if not match_stats.get('p1') or not match_stats.get('p2') or not match_stats.get('p3'):
-            sh_home = match_stats['match'].split(':')[2].split('-')[0].strip()
-            sh_guest = match_stats['match'].split(':')[2].split('-')[1].split(' ')[0]
-        else:
-            for key, value in match_stats.items():
-                if key == 'match':
-                    continue
-                sh_home += int(value.split(';')[0].strip().split(' ').pop().split('-')[0])
-                sh_guest += int(value.split(';')[0].strip().split(' ').pop().split('-')[1])
-                g_home[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[0])
-                g_guest[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[1])
-
-        return {
-            'sh_home': sh_home,
-            'sh_guest': sh_guest,
-            'g_home': g_home,
-            'g_guest': g_guest,
-        }
-
-    def _get_additional_stats(self, soup, stat_dict: dict[str, str]):
-        """Возвращает статистику из основной таблицы"""
-        team_stats = soup.find_all('div', class_="table-responsive")
-        head = [x.find_all('th') for x in team_stats][0]
-        body = [x.find_all('td') for x in team_stats][0]
-        columns = [i.text.strip() for i in head]
-        rows = [i.text.strip() for i in body]
-
-        # находим индекс объединенной ячейки чтобы дублировать его во вторую строку
-        rowspan = {body.index(i): i.text.strip() for i in body if i.attrs == {'rowspan': '2'}}
-        for k, v in rowspan.items():
-            len_ = int((len(rows) + 1) / 2)
-            rows.insert((k + len_), v)
-
-        row_home = {stat_dict[stat]: value for stat, value in zip(columns, rows) if stat in stat_dict}
-        row_guest = {stat_dict[stat]: value for stat, value in zip(columns, rows[len(columns):]) if stat in stat_dict}
-
-        return {
-            'row_home': self._row_update_type(row_home),
-            'row_guest': self._row_update_type(row_guest)
-        }
 
     @staticmethod
     def _row_update_type(row):
@@ -516,3 +348,284 @@ class KHLParser(Parser):
             'декабря': '12'
         }
         return months.get(month)
+
+
+class _LocalParser:
+    _soup: BeautifulSoup
+
+    def __init__(self, soup):
+        self._soup = soup
+
+    def get_status(self) -> str:
+        pass
+
+    def get_arena(self) -> str:
+        pass
+
+    def get_city(self) -> str:
+        pass
+
+    def get_text_broadcast_stats(self) -> dict[str, int | dict[str, int]]:
+        pass
+
+    def get_additional_stats(self, stat_dict: dict[str, str]) -> dict[str, dict]:
+        pass
+
+    def update_date(self, date: datetime.datetime) -> datetime:
+        pass
+
+    def get_viewers(self) -> int:
+        pass
+
+    def have_penalties(self) -> bool:
+        pass
+
+    def have_overtime(self) -> bool:
+        pass
+
+    @staticmethod
+    def _get_stats_by_period(text_stats) -> dict:
+        match_stats = {}
+        for stats in text_stats:
+            if 'Статистика матча:' in stats.text or 'Game stats:' in stats.text:
+                if match_stats.get('match'):
+                    continue
+                match_stats['match'] = stats.text
+            if 'Статистика 1-го периода:' in stats.text or 'Stats of 1st period:' in stats.text:
+                if match_stats.get('p1'):
+                    continue
+                match_stats['p1'] = stats.text
+            if 'Статистика 2-го периода:' in stats.text or 'Stats of 2nd period:' in stats.text:
+                if match_stats.get('p2'):
+                    continue
+                match_stats['p2'] = stats.text
+            if 'Статистика 3-го периода:' in stats.text or 'Stats of 3rd period:' in stats.text:
+                if match_stats.get('p3'):
+                    continue
+                match_stats['p3'] = stats.text
+            if 'Статистика овертайма:' in stats.text or 'Stats of overtime:' in stats.text:
+                if match_stats.get('ot'):
+                    continue
+                match_stats['ot'] = stats.text
+        return match_stats
+
+    @staticmethod
+    def _parse_stats_by_period(match_stats) -> dict:
+        """Обрабатывает статистику из текстовой трансляции"""
+        sh_home = 0
+        sh_guest = 0
+        g_home = {'b': 0}
+        g_guest = {'b': 0}
+
+        if not match_stats.get('p1') or not match_stats.get('p2') or not match_stats.get('p3'):
+            sh_home = match_stats['match'].split(':')[2].split('-')[0].strip()
+            sh_guest = match_stats['match'].split(':')[2].split('-')[1].split(' ')[0]
+        else:
+            for key, value in match_stats.items():
+                if key == 'match':
+                    continue
+                sh_home += int(value.split(';')[0].strip().split(' ').pop().split('-')[0])
+                sh_guest += int(value.split(';')[0].strip().split(' ').pop().split('-')[1])
+                g_home[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[0])
+                g_guest[key] = int(value.split(';')[2].strip().split(' ').pop().split('-')[1])
+
+        return {
+            'sh_home': sh_home,
+            'sh_guest': sh_guest,
+            'g_home': g_home,
+            'g_guest': g_guest,
+        }
+
+    @staticmethod
+    def _parse_table_stats(head, body, stat_dict) -> dict:
+        """Обрабатывает статистику из основной таблицы"""
+        columns = [i.text.strip() for i in head]
+        rows = [i.text.strip() for i in body]
+
+        # находим индекс объединенной ячейки, чтобы дублировать значение во вторую строку
+        rowspan = {body.index(i): i.text.strip() for i in body if i.attrs == {'rowspan': '2'}}
+        for k, v in rowspan.items():
+            len_ = int((len(rows) + 1) / 2)
+            rows.insert((k + len_), v)
+
+        row_home = {stat_dict[stat]: value for stat, value in zip(columns, rows) if stat in stat_dict}
+        row_guest = {stat_dict[stat]: value for stat, value in zip(columns, rows[len(columns):]) if stat in stat_dict}
+
+        return {
+            'row_home': row_home,
+            'row_guest': row_guest
+        }
+
+
+class _NewDesignParser(_LocalParser):
+
+    def get_status(self) -> str:
+        return self._soup.find('p', class_='preview-frame__center-text').text.strip()
+
+    def get_arena(self) -> str:
+        card_infos = self._soup.find('div', class_='card-infos')
+        arena_city_viewers_infos = card_infos.find_all('div', class_='card-infos__item-info')[1]
+        arena = arena_city_viewers_infos.find_all()[0]
+        return arena.text.strip()
+
+    def get_city(self) -> str:
+        card_infos = self._soup.find('div', class_='card-infos')
+        arena_city_viewers_infos = card_infos.find_all('div', class_='card-infos__item-info')[1]
+        city = arena_city_viewers_infos.find_all()[1]
+        return city.text.strip()
+
+    def get_viewers(self) -> int:
+        card_infos = self._soup.find('div', class_='card-infos')
+        arena_city_viewers_infos = card_infos.find_all('div', class_='card-infos__item-info')[1]
+        try:
+            viewers = arena_city_viewers_infos.find_all()[2]
+            return int(viewers.text.split(' ')[0])
+        except Exception:
+            return 0
+
+    def get_text_broadcast_stats(self) -> dict[str, int | dict[str, int]]:
+        items = self._soup.findAll('p', class_='textBroadcast-item__right-text')
+        text_stats = [row for row in items if row.strong]
+
+        match_stats = self._get_stats_by_period(text_stats)
+        stats = self._parse_stats_by_period(match_stats)
+
+        if self.have_penalties():
+            score_status = self._soup.find('p', class_="preview-frame__center-score")
+            score_text = re.split('[<>]', str(score_status))
+            score = []
+            for item in score_text:
+                if item.isdigit():
+                    score.append(int(item))
+            if score[0] > score[1]:
+                stats['g_home']['b'] = 1
+                stats['g_guest']['b'] = 0
+            else:
+                stats['g_home']['b'] = 0
+                stats['g_guest']['b'] = 1
+
+        return stats
+
+    def get_additional_stats(self, stat_dict: dict[str, str]) -> dict[str, dict]:
+        team_stats = self._soup.find('table', class_="broadcast-table__group-item")
+        head = team_stats.find_all('th')
+        body = team_stats.find_all('td')
+        # заголовок команды отмечен тегом td, поэтому попадает в боди
+        head.insert(0, body.pop(0))
+        return self._parse_table_stats(head, body, stat_dict)
+
+    def update_date(self, date: datetime.datetime) -> datetime:
+        msk_delta = datetime.timedelta(hours=3)
+        _date = date + msk_delta
+        card_infos = self._soup.find('div', class_='card-infos')
+        date_text = card_infos.find('div', class_='card-infos__item-info').text
+        time = date_text.split(',')[1].strip()
+        hours, minutes = time.split(':')
+        new_date = datetime.datetime(
+            year=_date.year,
+            month=_date.month,
+            day=_date.day,
+            hour=int(hours),
+            minute=int(minutes)
+        )
+        msk = pytz.timezone('Europe/Moscow')
+        return msk.localize(new_date)
+
+    def have_penalties(self) -> bool:
+        ots = self._soup.find('span', class_='preview-frame__ots')
+        if not ots:
+            return False
+        return 'Б' in ots.text
+
+    def have_overtime(self) -> bool:
+        ots = self._soup.find('span', class_='preview-frame__ots')
+        if not ots:
+            return False
+        return 'ОТ' in ots.text
+
+
+class _OldDesignParser(_LocalParser):
+
+    def get_status(self) -> str:
+        return self._soup.find('dd', class_="b-period_score").text
+
+    def get_arena(self) -> str:
+        arena_info = self._soup.find_all('li', class_="b-match_add_info_item")[1]
+        info = arena_info.find_all('span')[1]
+        info = str(info).split('<br/>')
+        arena_city = info[0][6:]
+        return arena_city.split('(')[0][:-1]
+
+    def get_city(self) -> str:
+        arena_info = self._soup.find_all('li', class_="b-match_add_info_item")[1]
+        info = arena_info.find_all('span')[1]
+        info = str(info).split('<br/>')
+        arena_city = info[0][6:]
+        return arena_city.split('(')[1][:-1].strip()
+
+    def get_viewers(self) -> int:
+        arena_info = self._soup.find_all('li', class_="b-match_add_info_item")[1]
+        info = arena_info.find_all('span')[1]
+        info = str(info).split('<br/>')
+        if info[1] != '</span>':
+            return int(info[1][:-16])
+        return 0
+
+    def get_text_broadcast_stats(self) -> dict[str, int | dict[str, int]]:
+        text_stats = self._soup.find_all('p', class_='e-action_txt')
+
+        match_stats = self._get_stats_by_period(text_stats)
+        stats = self._parse_stats_by_period(match_stats)
+
+        if self.have_penalties():
+            score = self._soup.find('dt', class_="b-total_score").h3.text.split('–')
+            score[0] = int(score[0])
+            score[1] = int(score[1][:-1])
+            if score[0] > score[1]:
+                stats['g_home']['b'] = 1
+                stats['g_guest']['b'] = 0
+            else:
+                stats['g_home']['b'] = 0
+                stats['g_guest']['b'] = 1
+
+        return stats
+
+    def get_additional_stats(self, stat_dict: dict[str, str]) -> dict[str, dict]:
+        team_stats = self._soup.find_all('div', class_="table-responsive")
+        head = [x.find_all('th') for x in team_stats][0]
+        body = [x.find_all('td') for x in team_stats][0]
+        return self._parse_table_stats(head, body, stat_dict)
+
+    def update_date(self, date: datetime.datetime) -> datetime:
+        date_info = self._soup.find('li', class_="b-match_add_info_item")
+        info = date_info.find_all('span')[1]
+        info = str(info).split('<br/>')
+        time = info[1][:5]
+        hours, minutes = time.split(':')
+        msk_delta = datetime.timedelta(hours=3)
+        _date = date + msk_delta
+        new_date = datetime.datetime(
+            year=_date.year,
+            month=_date.month,
+            day=_date.day,
+            hour=int(hours),
+            minute=int(minutes)
+        )
+        msk = pytz.timezone('Europe/Moscow')
+        return msk.localize(new_date)
+
+    def have_penalties(self) -> bool:
+        return 'Б' in self._soup.find('dt', class_="b-total_score").h3.text
+
+    def have_overtime(self) -> bool:
+        return 'ОТ' in self._soup.find('dt', class_="b-total_score").h3.text
+
+
+def _get_parser(soup) -> _LocalParser | None:
+    extra_info = soup.find_all('li', class_="b-match_add_info_item")
+    if extra_info:
+        return _OldDesignParser(soup)
+    extra_info = soup.find_all('div', class_="card-infos__item-info")
+    if extra_info:
+        return _NewDesignParser(soup)
+    return
