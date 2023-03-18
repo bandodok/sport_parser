@@ -162,12 +162,12 @@ class Updater:
         self.ws_send_status(f'calendar len: {len(calendar_data)}')
         output_calendar_data = []
         for match in calendar_data:
-            if skip_finished and match.status == MatchStatus.FINISHED or \
-               skip_live and self._is_match_live(match) or \
-               match.id in self.ignore:
-                continue
-            else:
-                output_calendar_data.append(match)
+            if self._is_match_exists(match):
+                if skip_finished and match.status == MatchStatus.FINISHED or \
+                   skip_live and self._is_match_live(match) or \
+                   match.id in self.ignore:
+                    continue
+            output_calendar_data.append(match)
         self._parse_matches_additional_info(output_calendar_data)
         self.ws_send_status(f'ret calendar len: {len(output_calendar_data)}')
         return output_calendar_data
@@ -264,6 +264,19 @@ class Updater:
             self.stats_updater.add_match(_match.id)
         for _match in guest_team.matches:
             self.stats_updater.add_match(_match.id)
+
+    def _is_match_exists(self, match: MatchData) -> bool:
+        """
+        Проверяет, есть ли такой матч в базе данных.
+
+        :param match: данные о матче из календаря.
+        :return: True, если матч есть в базе данных.
+        """
+        try:
+            self.model_list.match_model.objects.get(id=match.id)
+        except self.model_list.match_model.DoesNotExist:
+            return False
+        return True
 
     def _is_match_live(self, match: MatchData) -> bool:
         """
