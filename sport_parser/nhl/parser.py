@@ -237,7 +237,8 @@ class NHLParser(Parser):
         soup = self.get_request_content(url)
         img_class1 = 'logo site-footer__team-logo'
         img_class2 = 'site-footer__team-logo'
-        img_tag = soup.find('img', class_=img_class1) or soup.find('img', class_=img_class2)
+        img_class3 = 'nhl-c-footer__logo-img'
+        img_tag = soup.find('img', class_=img_class1) or soup.find('img', class_=img_class2) or soup.find('img', class_=img_class3)
         img = img_tag['src']
         if not img.startswith('http'):
             img = f'https:{img}'
